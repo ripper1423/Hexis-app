@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { PROFILES, WORKOUTS, MEALS } from './data/profiles';
+import {
+  saveProfile, loadProfile, savePlan, loadPlan, saveUserData, loadUserData,
+  saveHabits, loadHabits, saveExercises, loadExercises,
+  saveWater, loadWater, saveWeight, loadWeightLog,
+  updateStreak, loadStreak, clearAll
+} from './storage';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
 import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
 
@@ -1153,25 +1159,37 @@ function Onboarding({onDone}){
 
 // ── MAIN APP ─────────────────────────────────────────────────────
 export default function App(){
-  const [profile,setProfile]=useState(null);
-  const [plan,setPlan]=useState(null);
+  const [profile,setProfile]=useState(()=>loadProfile());
+  const [plan,setPlan]=useState(()=>loadPlan());
   const [tab,setTab]=useState("inicio");
   const [screen,setScreen]=useState(null); // "exdb" | "nutdb"
   const [habits,setHabits]=useState([false,false,false,false]);
   const [exercises,setExercises]=useState(Array(5).fill(false));
-  const [water,setWater]=useState(3);
+  const [water,setWater]=useState(()=>loadWater());
   const [expandMeal,setExpandMeal]=useState(null);
   const [expandSupp,setExpandSupp]=useState(null);
   const [expandTip,setExpandTip]=useState(null);
   const [expandPrinciple,setExpandPrinciple]=useState(null);
-  const [weekWeight]=useState([72.4,72.1,72.6,72.0,71.8,71.5,null]);
+  const [weightLog, setWeightLog]=useState(()=>loadWeightLog());
+  const [weightInput, setWeightInput]=useState('');
   const [showProgress,setShowProgress]=useState(false);
   const streakDay=12;
 
+  // Load saved habits/exercises when profile is already set
+  useState(()=>{
+    if(profile && PROFILES[profile]) {
+      setHabits(loadHabits(PROFILES[profile].habits.length));
+      setExercises(loadExercises(WORKOUTS[profile]?.length||4));
+    }
+  });
+
   const handleDone=(prof,ud,pd)=>{
     setProfile(prof);setPlan(pd);
-    setExercises(Array(WORKOUTS[prof].length).fill(false));
-    setHabits(Array(PROFILES[prof].habits.length).fill(false));
+    saveProfile(prof);
+    savePlan(pd);
+    saveUserData(ud);
+    setExercises(loadExercises(WORKOUTS[prof].length));
+    setHabits(loadHabits(PROFILES[prof].habits.length));
   };
 
   if(!profile) return <Onboarding onDone={handleDone}/>;
@@ -1190,8 +1208,9 @@ export default function App(){
   const habitsDone=habits.filter(Boolean).length;
   const today=p.weekPlan.find(d=>d.today);
   const quoteIdx=streakDay%DAILY_QUOTES.length;
-  const validW=weekWeight.filter(x=>x!==null);
+  const validW=weightLog.map(e=>e.value);
   const wTrend=validW.length>1?(validW[validW.length-1]-validW[0]).toFixed(1):0;
+  const weekWeight=weightLog.slice(-7).map(e=>e.value);
   const scr={paddingBottom:90,overflowY:"auto",minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
   const root={maxWidth:430,minHeight:"100vh",background:BG,margin:"0 auto",fontFamily:"Poppins,sans-serif",color:"#fff",position:"relative",overflow:"hidden"};
 
@@ -1213,7 +1232,7 @@ export default function App(){
               <div style={{fontSize:11,color:"#666"}}>Racha activa · El sistema sigue contigo</div>
             </div>
             <div style={{textAlign:"right"}}>
-              <div style={{fontSize:9,color:"#444",letterSpacing:2,textTransform:"uppercase"}}>Semana 1</div>
+              <div style={{fontSize:9,color:"#444",letterSpacing:2,textTransform:"uppercase"}}>Récord: {streakBest}d</div>
               <div style={{fontSize:11,color:"#555"}}>{habitsDone}/{habits.length} hábitos</div>
             </div>
           </div>
@@ -1247,7 +1266,11 @@ export default function App(){
           <div style={{height:8}}/>
           <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:16}}>
             {w.slice(0,3).map(({name,sets,reps,muscle},i)=>(
-              <div key={i} onClick={()=>setExercises(e=>e.map((v,j)=>j===i?!v:v))} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:i<2?"1px solid #0e0e0e":"none",cursor:"pointer"}}>
+              <div key={i} onClick={()=>{
+              const newE = exercises.map((v,j)=>j===i?!v:v);
+              setExercises(newE);
+              saveExercises(newE);
+            }} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:i<2?"1px solid #0e0e0e":"none",cursor:"pointer"}}>
                 <div style={{fontSize:9,fontWeight:700,color:exercises[i]?"#2a2a2a":p.color,minWidth:18}}>{`0${i+1}`}</div>
                 <div style={{flex:1}}>
                   <div style={{fontSize:13,color:exercises[i]?"#3a3a3a":"#bbb",textDecoration:exercises[i]?"line-through":"none"}}>{name}</div>
@@ -1259,7 +1282,13 @@ export default function App(){
           </div>
           <SLabel text="Hábitos de hoy" right={`${habitsDone}/${habits.length}`}/>
           {p.habits.map((h,i)=>(
-            <div key={i} onClick={()=>setHabits(hb=>hb.map((v,j)=>j===i?!v:v))} style={{display:"flex",alignItems:"center",gap:12,background:"#0c0c0c",border:`1px solid ${habits[i]?"rgba(200,170,80,0.1)":"#111"}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
+            <div key={i} onClick={()=>{
+              const newH = habits.map((v,j)=>j===i?!v:v);
+              setHabits(newH);
+              saveHabits(newH);
+              const s=updateStreak(newH.filter(Boolean).length);
+              setStreakData(s);
+            }} style={{display:"flex",alignItems:"center",gap:12,background:"#0c0c0c",border:`1px solid ${habits[i]?"rgba(200,170,80,0.1)":"#111"}`,borderRadius:10,padding:"12px 14px",marginBottom:8,cursor:"pointer"}}>
               <div style={{fontSize:16,flexShrink:0}}>{p.habitIcons[i]}</div>
               <div style={{flex:1,fontSize:13,color:habits[i]?"#444":"#aaa",textDecoration:habits[i]?"line-through":"none"}}>{h}</div>
               <div style={{width:20,height:20,borderRadius:"50%",border:`1px solid ${habits[i]?p.color:"#2a2a2a"}`,background:habits[i]?p.color:"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#050505",flexShrink:0}}>{habits[i]?"✓":""}</div>
@@ -1290,8 +1319,12 @@ export default function App(){
             </div>
             {showProgress&&(
               <div style={{display:"flex",alignItems:"flex-end",gap:4,height:56,marginBottom:8}}>
-                {["L","M","X","J","V","S","D"].map((d,i)=>{
-                  const val=weekWeight[i];
+                {(()=>{
+                const days=["L","M","X","J","V","S","D"];
+                const last7=weightLog.slice(-7);
+                return days.map((d,i)=>{
+                  const entry=last7[i];
+                  const val=entry?entry.value:null;
                   const min=Math.min(...validW)-0.5;
                   const max=Math.max(...validW)+0.5;
                   const bh=val?Math.round(((val-min)/(max-min))*44)+10:4;
@@ -1302,10 +1335,29 @@ export default function App(){
                       <div style={{fontSize:7,color:"#333"}}>{d}</div>
                     </div>
                   );
-                })}
+                });
+              })()}
               </div>
             )}
-            <div style={{fontSize:11,color:"#444",lineHeight:1.6}}>La tendencia semanal importa, no el número de hoy. El peso fluctúa ±1-2kg por agua y digestión.</div>
+            <div style={{display:"flex",gap:8,marginBottom:10}}>
+              <input
+                type="number"
+                placeholder="Ej: 74.5"
+                value={weightInput}
+                onChange={e=>setWeightInput(e.target.value)}
+                style={{flex:1,background:"#111",border:"1px solid #1a1a1a",borderRadius:6,padding:"8px 12px",color:"#fff",fontFamily:"Poppins,sans-serif",fontSize:13,outline:"none"}}
+              />
+              <button onClick={()=>{
+                const v=parseFloat(weightInput);
+                if(!v||v<20||v>300)return;
+                const log=saveWeight(v);
+                setWeightLog(log);
+                setWeightInput('');
+              }} style={{padding:"8px 14px",background:p.color,border:"none",borderRadius:6,color:"#050505",fontFamily:"Poppins,sans-serif",fontSize:11,fontWeight:700,cursor:"pointer"}}>
+                Guardar
+              </button>
+            </div>
+            <div style={{fontSize:11,color:"#444",lineHeight:1.6}}>{validW.length===0?"Introduce tu peso cada mañana para ver la tendencia real.":"La tendencia semanal importa, no el número de hoy. El peso fluctúa ±1-2kg por agua y digestión."}</div>
           </div>
           <Quote text={`"${DAILY_QUOTES[quoteIdx]}"`} attr="Filosofía HEXIS"/>
         </div>
@@ -1327,7 +1379,11 @@ export default function App(){
           </div>
           <SLabel text="Ejercicios de hoy"/>
           {w.map(({name,sets,reps,weight,unit,muscle,rpe,lastWeek},i)=>(
-            <div key={i} onClick={()=>setExercises(e=>e.map((v,j)=>j===i?!v:v))} style={{background:"#0c0c0c",border:`1px solid ${exercises[i]?"rgba(200,170,80,0.1)":"#1a1a1a"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer",opacity:exercises[i]?0.5:1,transition:"all 0.2s"}}>
+            <div key={i} onClick={()=>{
+              const newE = exercises.map((v,j)=>j===i?!v:v);
+              setExercises(newE);
+              saveExercises(newE);
+            }} style={{background:"#0c0c0c",border:`1px solid ${exercises[i]?"rgba(200,170,80,0.1)":"#1a1a1a"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer",opacity:exercises[i]?0.5:1,transition:"all 0.2s"}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontSize:11,fontWeight:700,color:exercises[i]?"#2a2a2a":p.color,minWidth:22}}>{`0${i+1}`}</div>
                 <div style={{flex:1}}>
@@ -1395,7 +1451,7 @@ export default function App(){
             </div>
             <div style={{display:"flex",gap:8}}>
               {Array.from({length:8}).map((_,i)=>(
-                <div key={i} onClick={()=>setWater(w=>w===i+1?i:i+1)} style={{flex:1,aspectRatio:1,borderRadius:"50%",border:`1px solid ${water>i?"#8BA4A0":"#1a1a1a"}`,background:water>i?"rgba(139,164,160,0.18)":"#0c0c0c",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,cursor:"pointer"}}>💧</div>
+                <div key={i} onClick={()=>{const nw=water===i+1?i:i+1;setWater(nw);saveWater(nw);}} style={{flex:1,aspectRatio:1,borderRadius:"50%",border:`1px solid ${water>i?"#8BA4A0":"#1a1a1a"}`,background:water>i?"rgba(139,164,160,0.18)":"#0c0c0c",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,cursor:"pointer"}}>💧</div>
               ))}
             </div>
           </div>
@@ -1465,17 +1521,6 @@ export default function App(){
             <div style={{fontSize:9,letterSpacing:3,color:p.color,textTransform:"uppercase",marginBottom:6}}>{profile} · Tu manifiesto</div>
             <div style={{fontFamily:PF,fontSize:13,fontStyle:"italic",color:"#777",lineHeight:1.7}}>"{p.manifesto}"</div>
           </div>
-          {/* Test access */}
-          <div style={{background:"rgba(200,170,80,0.04)",border:"1px solid rgba(200,170,80,0.15)",borderRadius:12,padding:"16px",marginBottom:16,cursor:"pointer"}} onClick={()=>setScreen("test")}>
-            <div style={{display:"flex",alignItems:"center",gap:14}}>
-              <div style={{fontSize:28}}>🎯</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:G,marginBottom:3}}>Test de perfil HEXIS</div>
-                <div style={{fontSize:11,color:"#555"}}>10 preguntas · Descubre tu arquetipo · Sistema de puntuación real</div>
-              </div>
-              <div style={{fontSize:18,color:"#444"}}>→</div>
-            </div>
-          </div>
           <SLabel text="Los 6 principios HEXIS"/>
           {PRINCIPLES.map((pr,i)=>(
             <div key={pr.n} onClick={()=>setExpandPrinciple(expandPrinciple===i?null:i)} style={{background:"#0c0c0c",border:`1px solid ${expandPrinciple===i?"rgba(200,170,80,0.2)":"#111"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer"}}>
@@ -1505,6 +1550,9 @@ export default function App(){
             </div>
           ))}
           <Quote text='"Lo bueno, si es simple, es doblemente bueno."' attr="Baltasar Gracián"/>
+          <div onClick={()=>{if(window.confirm('¿Resetear tu perfil y empezar de nuevo?')){clearAll();setProfile(null);setPlan(null);setWeightLog([]);setStreakData({current:0,best:0});}}} style={{textAlign:"center",padding:"12px",cursor:"pointer",marginTop:8}}>
+            <div style={{fontSize:10,color:"#2a2a2a",letterSpacing:2,textTransform:"uppercase"}}>Resetear perfil</div>
+          </div>
           <Quote text='"Complejo por dentro. Simple por fuera. Eso es HEXIS."' attr="Manifiesto HEXIS"/>
           <div style={{height:8}}/>
         </div>
