@@ -1449,7 +1449,6 @@ export default function App(){
   const quoteIdx=streakDay%DAILY_QUOTES.length;
   const validW=weightLog.map(e=>e.value);
   const wTrend=validW.length>1?(validW[validW.length-1]-validW[0]).toFixed(1):0;
-  const weekWeight=weightLog.slice(-7).map(e=>e.value);
   const scr={paddingBottom:90,overflowY:"auto",minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
   const root={maxWidth:430,minHeight:"100vh",background:BG,margin:"0 auto",fontFamily:"Poppins,sans-serif",color:"#fff",position:"relative",overflow:"hidden"};
 
