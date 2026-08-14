@@ -200,7 +200,7 @@ function RankBadge({color,habitsDone,habitsTotal,exDone,exTotal,water,streakDay}
 
 // ── HEXIS PRO — funciones futuras visibles con candado ──────────
 // Sustituye esta URL por el checkout real del upgrade en Hotmart cuando exista.
-const PRO_UPGRADE_URL="https://pay.hotmart.com/TU-LINK-PRO-AQUI";
+const PRO_UPGRADE_URL="https://pay.hotmart.com/B107168387J";
 const PRO_FEATURES=[
   {icon:"🧬",title:"Arquitectura de Dominio",desc:"Ciclos reales (Hipertrofia, Definición, Fuerza, Salud, Rendimiento, Mantenimiento) en vez de un plan fijo."},
   {icon:"📈",title:"Motor adaptativo",desc:"Tu entreno evoluciona con tu progreso real, no con un split fijo por arquetipo."},
