@@ -5,8 +5,8 @@ export const PROFILES = {
     cal:2650, prot:180, carbs:290, fat:75,
     days:5, goal:"Superávit +250 kcal", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["strong","confident"], obstacle:["noconstancy","motivation"],
-    habits:["Duerme mínimo 8h","Proteína en cada comida","Registra cada serie","Creatina 5g diaria"],
-    habitIcons:["🌙","🥩","📝","💊"],
+    habits:["Duerme mínimo 8h","Proteína en cada comida","8000 pasos diarios (NEAT)","Sube el peso si completas las reps","Creatina 5g diaria"],
+    habitIcons:["🌙","🥩","👣","🏋️","💊"],
     manifesto:"Construyes tu cuerpo con la misma constancia con que los griegos esculpían el mármol. Sin prisa, sin pausa.",
     supps:[["Creatina","5g","Post-entreno con agua"],["Proteína Whey","30g","Inmediatamente post-entreno"],["Vitamina D3","2000 UI","Con desayuno y grasa"],["Omega 3","2g","Con la comida principal"]],
     weekPlan:[
@@ -25,8 +25,8 @@ export const PROFILES = {
     cal:1820, prot:140, carbs:180, fat:60,
     days:4, goal:"Déficit suave -200 kcal", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["confident","light"], obstacle:["eating","motivation"],
-    habits:["Hidratación 2.5L","Cardio suave 20 min","Pesa tus comidas","Sin ultraprocesados"],
-    habitIcons:["💧","🏃‍♀️","⚖️","🚫"],
+    habits:["Hidratación 2.5L","9000 pasos diarios (NEAT)","Pesa tus comidas","Sube el peso si completas las reps"],
+    habitIcons:["💧","👣","⚖️","🏋️"],
     manifesto:"La definición no es ausencia. Es presencia. Tu cuerpo expresando quién eres con claridad y elegancia.",
     supps:[["Proteína Whey","25g","Post-entreno"],["Magnesio","300mg","Antes de dormir"],["Vitamina D3","2000 UI","Con desayuno"],["Colágeno","10g","Con vitamina C"]],
     weekPlan:[
@@ -45,8 +45,8 @@ export const PROFILES = {
     cal:2100, prot:150, carbs:240, fat:70,
     days:3, goal:"Mantenimiento · Energía estable", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["balanced","focused"], obstacle:["stress","notime"],
-    habits:["Meditación 5 min al despertar","7000 pasos diarios","Sin pantallas 1h antes de dormir","Journaling nocturno"],
-    habitIcons:["🧘","👣","📵","📓"],
+    habits:["Meditación 5 min al despertar","7000 pasos diarios (NEAT)","Sin pantallas 1h antes de dormir","Siente el músculo, no compitas con el peso"],
+    habitIcons:["🧘","👣","📵","🏋️"],
     manifesto:"El equilibrio no es inactividad. Es la fuerza que surge cuando cuerpo y mente dejan de luchar entre sí.",
     supps:[["Ashwagandha","600mg","Con la cena"],["Magnesio","300mg","Antes de dormir"],["Vitamina B12","1000mcg","Con el desayuno"],["L-Teanina","200mg","En momentos de estrés agudo"]],
     weekPlan:[
@@ -65,8 +65,8 @@ export const PROFILES = {
     cal:1980, prot:185, carbs:200, fat:65,
     days:4, goal:"Recomposición · Déficit moderado", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["light","energetic"], obstacle:["eating","confused"],
-    habits:["Pesa en ayunas cada mañana","Entrena postdesayuno","Mide cintura semanal","Sin alcohol esta semana"],
-    habitIcons:["⚖️","💪","📏","🚫"],
+    habits:["Pesa en ayunas cada mañana","Prioriza compuestos pesados antes que accesorios","Mide cintura semanal","9000 pasos diarios (NEAT)"],
+    habitIcons:["⚖️","🏋️","📏","👣"],
     manifesto:"La recomposición no es magia. Es paciencia inteligente. El cuerpo cambia cuando el sistema es constante.",
     supps:[["Creatina","5g","Post-entreno"],["Proteína Whey","30g","Post-entreno"],["Cafeína","200mg","30 min pre-entreno"],["Vitamina D3","2000 UI","Con desayuno"]],
     weekPlan:[
@@ -85,8 +85,8 @@ export const PROFILES = {
     cal:2000, prot:150, carbs:210, fat:65,
     days:3, goal:"Mantenimiento eficiente · Fuerza útil", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["focused","energetic"], obstacle:["notime","confused"],
-    habits:["Entrena en bloques de 30 min","Prepara comidas en batch el domingo","Revisa tu semana antes de que empiece","Prioriza fuerza compuesta, no relleno"],
-    habitIcons:["⏱","🍱","🗓","🏋️"],
+    habits:["Entrena en bloques de 30 min","8000 pasos diarios (NEAT)","Revisa tu semana antes de que empiece","Prioriza fuerza compuesta, no relleno"],
+    habitIcons:["⏱","👣","🗓","🏋️"],
     manifesto:"La estructura no te quita libertad. Te la da. Un sistema eficiente rinde más en menos tiempo que el caos con más horas.",
     supps:[["Creatina","5g","Cualquier momento del día"],["Proteína Whey","30g","Post-entreno o como comida rápida"],["Cafeína","150mg","30 min antes de entrenar"],["Vitamina D3","2000 UI","Con el desayuno"]],
     weekPlan:[
@@ -105,21 +105,62 @@ export const PROFILES = {
     cal:1950, prot:130, carbs:220, fat:68,
     days:3, goal:"Mantenimiento suave · Recuperación activa", phase:"Fase 1 · Fundamentals", week:12,
     feeling:["balanced","light"], obstacle:["stress","motivation"],
-    habits:["Camina 20 min sin pantalla","Estírate antes de dormir","Come sin prisa, sin distracciones","Un día de descanso real a la semana"],
-    habitIcons:["🚶","🧘","🍽","🌿"],
+    habits:["7000 pasos diarios, sin prisa (NEAT)","Estírate antes de dormir","Siente el movimiento, no compitas con nadie","Un día de descanso real a la semana"],
+    habitIcons:["👣","🧘","🏋️","🌿"],
     manifesto:"La tierra no compite con nada. Solo sostiene. Tu cuerpo tampoco necesita compararse — necesita que lo escuches.",
     supps:[["Magnesio","300mg","Antes de dormir"],["Omega 3","2g","Con la comida principal"],["Vitamina D3","2000 UI","Con desayuno"],["Probiótico","1 cápsula","En ayunas"]],
     weekPlan:[
-      {day:"L",focus:"Full Body suave",type:"train",done:true,split:"fullbody_suave"},
+      {day:"L",focus:"Full Body suave A",type:"train",done:true,split:"fullbody_suave"},
       {day:"M",focus:"Caminar 30 min",type:"cardio",done:true},
       {day:"X",focus:"Yoga o movilidad",type:"mobility",done:false,today:true},
-      {day:"J",focus:"Full Body suave",type:"train",done:false,split:"fullbody_suave"},
+      {day:"J",focus:"Full Body suave B",type:"train",done:false,split:"fullbody_suave_b"},
       {day:"V",focus:"Caminar 30 min",type:"cardio",done:false},
       {day:"S",focus:"Movilidad libre",type:"mobility",done:false},
       {day:"D",focus:"Descanso total",type:"rest",done:false},
     ],
   },
 };
+
+// ── PROTOCOLOS DE CARDIO ────────────────────────────────────────────
+// Sistemas concretos, no "cardio 20 min" vago. Cada uno con su
+// estructura real (rondas, tiempos, intensidad) y por qué funciona.
+export const CARDIO_PROTOCOLS = {
+  hiit: {
+    label: "HIIT — Alta intensidad por intervalos",
+    protocol: "5 min de calentamiento suave. Después, 8 rondas de: 30s a máxima intensidad (sprint, bici, burpees o cuerda) + 90s de recuperación activa caminando. Cierra con 5 min de vuelta a la calma.",
+    why: "Quema más grasa por minuto que el cardio continuo y genera EPOC (exceso de consumo de oxígeno post-ejercicio): sigues gastando calorías hasta 24h después de terminar. El sistema más eficiente por tiempo invertido.",
+    fc: "85-95% FC máx en los picos, 60-65% en la recuperación",
+  },
+  liss: {
+    label: "LISS — Baja intensidad sostenida",
+    protocol: "30 min continuos a intensidad conversacional: caminar rápido, bici suave o elíptica. Ritmo constante, sin intervalos ni picos.",
+    why: "No compite con la recuperación del entreno de fuerza ni eleva el cortisol como el HIIT. Ideal combinado con fuerza el mismo día o en días de descanso activo.",
+    fc: "60-70% FC máx, deberías poder mantener una conversación",
+  },
+  moderado: {
+    label: "Cardio moderado",
+    protocol: "20-30 min a intensidad media, ritmo constante con cambios suaves de intensidad cada 5 min si quieres variarlo.",
+    why: "Punto intermedio entre LISS y HIIT: sube el gasto calórico sin acumular tanta fatiga como el HIIT ni ocupar tanto tiempo como el LISS.",
+    fc: "70-80% FC máx",
+  },
+  caminar: {
+    label: "Caminar / actividad libre",
+    protocol: "30-45 min de paseo a paso vivo, o cualquier actividad que disfrutes (bici, baile, senderismo) al menos a intensidad ligera.",
+    why: "Es NEAT estructurado: gasto calórico real sin coste de recuperación. Se suma sin interferir con el entreno de fuerza de esa semana.",
+    fc: "50-65% FC máx",
+  },
+};
+// Detecta qué protocolo corresponde al texto del día del plan semanal
+// (ej. "Cardio HIIT 20 min" → hiit), sin tener que etiquetar cada día a mano.
+export function getCardioProtocol(focus) {
+  if (!focus) return null;
+  const f = focus.toLowerCase();
+  if (f.includes("hiit")) return CARDIO_PROTOCOLS.hiit;
+  if (f.includes("liss")) return CARDIO_PROTOCOLS.liss;
+  if (f.includes("moderado")) return CARDIO_PROTOCOLS.moderado;
+  if (f.includes("caminar") || f.includes("libre")) return CARDIO_PROTOCOLS.caminar;
+  return null;
+}
 
 export const WORKOUTS = {
   ALPHA: {
@@ -244,6 +285,12 @@ export const WORKOUTS = {
       {name:"Remo suave con banda",sets:"3",reps:"12",weight:0,unit:"pc",muscle:"Espalda",rpe:"5/10",lastWeek:0,rest:"60 seg",how:"Tira la banda hacia el abdomen apretando los omóplatos, vuelve despacio y controlado."},
       {name:"Puente de glúteo",sets:"3",reps:"15",weight:0,unit:"pc",muscle:"Glúteo",rpe:"5/10",lastWeek:0,rest:"45-60 seg",how:"Tumbada, empuja con los talones y aprieta el glúteo arriba 1-2 segundos antes de bajar."},
       {name:"Plancha isométrica",sets:"3",reps:"30s",weight:0,unit:"—",muscle:"Core",rpe:"5/10",lastWeek:0,rest:"45-60 seg",how:"Cuerpo en línea recta, sin hundir la cadera. Respira con calma, sal antes de que la técnica se rompa."},
+    ],
+    fullbody_suave_b: [
+      {name:"Zancada estática suave",sets:"3",reps:"10 por pierna",weight:0,unit:"pc",muscle:"Pierna",rpe:"5/10",lastWeek:0,rest:"60 seg",how:"Un pie adelante, baja recto sin prisa hasta donde te sea cómodo. Vuelve arriba con control, sin buscar profundidad."},
+      {name:"Press de pecho con banda",sets:"3",reps:"12",weight:0,unit:"pc",muscle:"Pecho",rpe:"5/10",lastWeek:0,rest:"60 seg",how:"Banda anclada a la espalda, empuja al frente sin bloquear los codos de golpe. Vuelve despacio y con calma."},
+      {name:"Elevaciones laterales suaves",sets:"3",reps:"12",weight:1,unit:"kg",muscle:"Hombros",rpe:"5/10",lastWeek:0,rest:"45-60 seg",how:"Sube los brazos hasta la altura del hombro sin impulso, baja con calma. Peso mínimo, prioriza la técnica limpia."},
+      {name:"Rotación de core tumbada",sets:"3",reps:"10 por lado",weight:0,unit:"pc",muscle:"Core",rpe:"5/10",lastWeek:0,rest:"45-60 seg",how:"Tumbada con las rodillas flexionadas, deja caer las rodillas suavemente a un lado sin forzar, vuelve al centro."},
     ],
   },
 };

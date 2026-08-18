@@ -13,6 +13,12 @@ const STORAGE_KEYS = {
   WEIGHT_LOG: 'hexis_weight_log',  // [ { date, value } ]
   STREAK:     'hexis_streak',      // { current, best, lastDate }
   HABIT_LOG:  'hexis_habit_log',   // { 'YYYY-MM-DD': bool } — did any habit that day?
+  SET_LOGS:   'hexis_set_logs',    // [ { date, exercise, profile, weight, reps, sets, rir } ] — historial real
+  VO2_LOG:    'hexis_vo2_log',     // [ { date, distance, vo2max } ] — test de Cooper
+  STEPS_LOG:  'hexis_steps_log',   // [ { date, steps } ] — NEAT diario
+  SLEEP_LOG:  'hexis_sleep_log',   // [ { date, hours } ] — sueño diario
+  CYCLE:      'hexis_cycle',       // { id, startDate } — ciclo activo (Arquitectura de Dominio)
+  MIRROR_LOG: 'hexis_mirror_log',  // [ { date, note, score, label } ] — Espejo de Coherencia
 };
 
 function today() {
@@ -92,6 +98,138 @@ export function saveWeight(value) {
 export function loadWeightLog() {
   const w = localStorage.getItem(STORAGE_KEYS.WEIGHT_LOG);
   return w ? JSON.parse(w) : [];
+}
+
+// Peso objetivo — se guarda dentro de los datos del usuario, no necesita
+// su propia clave. null = sin meta definida.
+export function saveGoalWeight(value) {
+  const ud = loadUserData() || {};
+  ud.goalWeight = value;
+  saveUserData(ud);
+  return value;
+}
+export function loadGoalWeight() {
+  const ud = loadUserData();
+  return ud && ud.goalWeight ? ud.goalWeight : null;
+}
+
+// ── PASOS DIARIOS (NEAT) ───────────────────────────────────────────
+export function saveSteps(steps) {
+  const log = loadStepsLog();
+  const t = today();
+  const existing = log.findIndex(e => e.date === t);
+  if (existing >= 0) log[existing].steps = steps;
+  else log.push({ date: t, steps });
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-30);
+  localStorage.setItem(STORAGE_KEYS.STEPS_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadStepsLog() {
+  const s = localStorage.getItem(STORAGE_KEYS.STEPS_LOG);
+  return s ? JSON.parse(s) : [];
+}
+
+// ── SUEÑO ──────────────────────────────────────────────────────────
+export function saveSleep(hours) {
+  const log = loadSleepLog();
+  const t = today();
+  const existing = log.findIndex(e => e.date === t);
+  if (existing >= 0) log[existing].hours = hours;
+  else log.push({ date: t, hours });
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-30);
+  localStorage.setItem(STORAGE_KEYS.SLEEP_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadSleepLog() {
+  const s = localStorage.getItem(STORAGE_KEYS.SLEEP_LOG);
+  return s ? JSON.parse(s) : [];
+}
+// ── CICLO ACTIVO (Arquitectura de Dominio) ──────────────────────────
+export function saveCycle(cycleId) {
+  const data = { id: cycleId, startDate: today() };
+  localStorage.setItem(STORAGE_KEYS.CYCLE, JSON.stringify(data));
+  return data;
+}
+export function loadCycle() {
+  const c = localStorage.getItem(STORAGE_KEYS.CYCLE);
+  return c ? JSON.parse(c) : null;
+}
+export function clearCycle() {
+  localStorage.removeItem(STORAGE_KEYS.CYCLE);
+}
+
+// ── ESPEJO DE COHERENCIA — cierre diario opcional ───────────────────
+// Nunca obligatorio: el usuario abre la pantalla si quiere, y puede
+// guardar sin escribir nada (solo queda el score del día).
+export function saveMirrorEntry(entry) {
+  const log = loadMirrorLog();
+  const idx = log.findIndex(e => e.date === entry.date);
+  if (idx >= 0) log[idx] = entry; else log.push(entry);
+  const sorted = log.sort((a, b) => a.date.localeCompare(b.date)).slice(-60);
+  localStorage.setItem(STORAGE_KEYS.MIRROR_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadMirrorLog() {
+  const m = localStorage.getItem(STORAGE_KEYS.MIRROR_LOG);
+  return m ? JSON.parse(m) : [];
+}
+export function hasClosedToday() {
+  return loadMirrorLog().some(e => e.date === today());
+}
+
+export async function logWellnessToCloud(userId, { steps, sleepHours }) {
+  if (!userId) return;
+  try {
+    const row = { user_id: userId, log_date: today() };
+    if (steps !== undefined && steps !== null) row.steps = Math.round(steps);
+    if (sleepHours !== undefined && sleepHours !== null) row.sleep_hours = sleepHours;
+    await supabase.from('wellness_logs').insert(row);
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo registrar el bienestar', e.message);
+  }
+}
+
+// ── SET LOGS (rendimiento real por ejercicio) ─────────────────────
+// Un registro por ejercicio y día. Es la base del motor adaptativo
+// y de las gráficas de tensión mecánica y esfuerzo.
+export function saveSetLog(entry) {
+  const log = loadSetLogs();
+  const idx = log.findIndex(e => e.date === entry.date && e.exercise === entry.exercise);
+  if (idx >= 0) log[idx] = entry; else log.push(entry);
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-500);
+  localStorage.setItem(STORAGE_KEYS.SET_LOGS, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadSetLogs() {
+  const l = localStorage.getItem(STORAGE_KEYS.SET_LOGS);
+  return l ? JSON.parse(l) : [];
+}
+export function removeSetLog(exerciseName, date = today()) {
+  const log = loadSetLogs().filter(e => !(e.date === date && e.exercise === exerciseName));
+  localStorage.setItem(STORAGE_KEYS.SET_LOGS, JSON.stringify(log));
+  return log;
+}
+
+// ── VO2 MÁX (test de Cooper) ──────────────────────────────────────
+export function saveVo2Test(distanceMeters) {
+  const vo2max = Math.round(((distanceMeters - 504.9) / 44.73) * 10) / 10;
+  const log = loadVo2Log();
+  log.push({ date: today(), distance: distanceMeters, vo2max });
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-20);
+  localStorage.setItem(STORAGE_KEYS.VO2_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadVo2Log() {
+  const v = localStorage.getItem(STORAGE_KEYS.VO2_LOG);
+  return v ? JSON.parse(v) : [];
+}
+export async function logVo2ToCloud(userId, vo2max) {
+  if (!userId) return;
+  try {
+    await supabase.from('body_metrics').insert({ user_id: userId, log_date: today(), vo2max });
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo registrar el VO2max', e.message);
+  }
 }
 
 // ── STREAK ─────────────────────────────────────────────────────
@@ -176,7 +314,7 @@ export async function syncProfileToCloud(userId, { name, archetype, gender, age,
   }
 }
 
-export async function logExerciseToCloud(userId, { name, weight, reps, sets }) {
+export async function logExerciseToCloud(userId, { name, weight, reps, sets, rir }) {
   if (!userId) return;
   try {
     await supabase.from('exercise_logs').insert({
@@ -185,6 +323,7 @@ export async function logExerciseToCloud(userId, { name, weight, reps, sets }) {
       weight_kg: weight || 0,
       reps: parseInt(reps) || 0,
       sets: parseInt(sets) || 0,
+      rir: rir !== undefined && rir !== null && rir !== '' ? parseInt(rir) : null,
     });
   } catch (e) {
     console.warn('HEXIS cloud: no se pudo registrar el ejercicio', e.message);
