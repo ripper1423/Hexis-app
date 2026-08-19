@@ -162,6 +162,44 @@ export function getCardioProtocol(focus) {
   return null;
 }
 
+// ── PROTOCOLOS DE MOVILIDAD Y YOGA ──────────────────────────────────
+// Los días marcados como "mobility" en el weekPlan (ZEN y GAIA) solo
+// tenían una etiqueta ("Movilidad y stretching", "Yoga o movilidad",
+// "Movilidad libre") sin contenido real detrás — mismo hueco que tenían
+// los días de cardio antes de existir CARDIO_PROTOCOLS. Se corrige igual:
+// protocolo concreto, con postura/tiempo/respiración y el porqué.
+export const MOBILITY_PROTOCOLS = {
+  stretching: {
+    label: "Movilidad y stretching — rango articular",
+    protocol: "10 min de movilidad dinámica: círculos de cuello, hombros, cadera y tobillos, 10 repeticiones cada uno, sin forzar. Después, estiramiento estático de isquios, cuádriceps, flexores de cadera, pecho, espalda alta y gemelos: 30 segundos por zona, 2 rondas, respiración lenta y nasal, sin rebotar.",
+    why: "La movilidad dinámica activa la articulación sin perder rango antes de estirar en frío. 30s por zona y 2 rondas es la dosis mínima que las guías de ACSM asocian con ganancias reales y sostenidas de rango de movimiento.",
+    tip: "Estira hasta notar tensión, nunca hasta el dolor. Si tiembla la zona, has ido demasiado lejos.",
+  },
+  yoga: {
+    label: "Yoga suave — cuerpo y sistema nervioso",
+    protocol: "Secuencia de ~20 min: gato-vaca (10 respiraciones) → postura del niño (1 min) → perro boca abajo (5 respiraciones) → estocada baja, cada lado (5 respiraciones) → pliegue hacia delante sentado (1 min) → torsión tumbada, cada lado (5 respiraciones) → savasana final (3-5 min). Respiración nasal, la exhalación más larga que la inhalación.",
+    why: "En comparativas entre modalidades de ejercicio, el yoga es la que muestra mayor efecto reduciendo cortisol — no es solo sensación subjetiva de calma, hay respuesta hormonal medible detrás.",
+    tip: "No es sobre flexibilidad, es sobre soltar. Si un día tu cuerpo no llega a la postura completa, no fuerces — quédate donde estés cómoda.",
+  },
+  libre: {
+    label: "Movilidad libre — tu ritmo, tu elección",
+    protocol: "Elige una opción: (1) 15 min de estiramiento siguiendo lo que pida tu cuerpo, sin rutina fija, más 5 min de respiración consciente; (2) paseo de 20-25 min sin objetivo de ritmo ni distancia; (3) baile, natación suave o cualquier movimiento que disfrutes, a intensidad ligera.",
+    why: "Hoy el objetivo no es el estímulo, es sostener el hábito sin que se convierta en otra obligación más. La adherencia constante importa más que la sesión perfecta.",
+    tip: "El único fallo posible hoy es no moverte nada. Todo lo demás, cuenta.",
+  },
+};
+// "Yoga o movilidad" contiene ambas palabras → se comprueba yoga primero.
+// "Movilidad libre" contiene "movilidad" y "libre" → se comprueba libre antes
+// que el genérico de stretching para no perder la variante "libre".
+export function getMobilityProtocol(focus) {
+  if (!focus) return null;
+  const f = focus.toLowerCase();
+  if (f.includes("yoga")) return MOBILITY_PROTOCOLS.yoga;
+  if (f.includes("libre")) return MOBILITY_PROTOCOLS.libre;
+  if (f.includes("movilidad") || f.includes("stretching")) return MOBILITY_PROTOCOLS.stretching;
+  return null;
+}
+
 export const WORKOUTS = {
   ALPHA: {
     empuje: [
@@ -208,16 +246,17 @@ export const WORKOUTS = {
       {name:"Zancadas caminando",sets:"3",reps:"20",weight:10,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:9,rest:"60-90 seg",how:"Paso largo, rodilla trasera casi toca el suelo, rodilla delantera no sobrepasa la punta del pie."},
     ],
     superior_pecho_espalda: [
-      {name:"Press banca mancuernas",sets:"3",reps:"12",weight:16,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Baja controlado a los lados del pecho, empuja sin bloquear de golpe."},
+      {name:"Press banca mancuernas",sets:"4",reps:"12",weight:16,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Baja controlado a los lados del pecho, empuja sin bloquear de golpe."},
       {name:"Aperturas con mancuernas",sets:"3",reps:"12",weight:8,unit:"kg",muscle:"Pecho",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Brazos semi-flexionados, baja en arco amplio sintiendo el estiramiento del pecho."},
-      {name:"Jalón al pecho",sets:"3",reps:"12",weight:45,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:42.5,rest:"90 seg",how:"Codos hacia abajo y atrás, pecho arriba, controla la vuelta."},
+      {name:"Jalón al pecho",sets:"4",reps:"12",weight:45,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:42.5,rest:"90 seg",how:"Codos hacia abajo y atrás, pecho arriba, controla la vuelta."},
       {name:"Remo en polea baja",sets:"3",reps:"12",weight:35,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:32.5,rest:"60-90 seg",how:"Espalda recta, tira hasta el abdomen apretando los omóplatos."},
+      {name:"Face pull",sets:"3",reps:"15",weight:15,unit:"kg",muscle:"Espalda",rpe:"6/10",lastWeek:12.5,rest:"60 seg",how:"Cuerda a la altura de la cara, tira separando las manos y apretando omóplatos. Protege el hombro y suma volumen de espalda alta."},
     ],
     superior_hombros_brazos: [
-      {name:"Press militar mancuernas",sets:"3",reps:"12",weight:12,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:11,rest:"90 seg",how:"Sentada, empuja hasta bloqueo sin arquear la espalda baja."},
-      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:6,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:5,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
-      {name:"Curl de bíceps mancuernas",sets:"3",reps:"12",weight:8,unit:"kg",muscle:"Bíceps",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Codos pegados al cuerpo, sube controlado sin balancear."},
-      {name:"Patada de tríceps",sets:"3",reps:"15",weight:6,unit:"kg",muscle:"Tríceps",rpe:"6/10",lastWeek:5,rest:"60 seg",how:"Torso inclinado, extiende el brazo hacia atrás manteniendo el codo fijo."},
+      {name:"Press militar mancuernas",sets:"4",reps:"12",weight:12,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:11,rest:"90 seg",how:"Sentada, empuja hasta bloqueo sin arquear la espalda baja."},
+      {name:"Elevaciones laterales",sets:"4",reps:"15",weight:6,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:5,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Curl de bíceps mancuernas",sets:"4",reps:"12",weight:8,unit:"kg",muscle:"Bíceps",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Codos pegados al cuerpo, sube controlado sin balancear."},
+      {name:"Patada de tríceps",sets:"4",reps:"15",weight:6,unit:"kg",muscle:"Tríceps",rpe:"6/10",lastWeek:5,rest:"60 seg",how:"Torso inclinado, extiende el brazo hacia atrás manteniendo el codo fijo."},
     ],
   },
   ZEN: {
@@ -240,6 +279,7 @@ export const WORKOUTS = {
       {name:"Press banca",sets:"3",reps:"10",weight:65,unit:"kg",muscle:"Pecho",rpe:"8/10",lastWeek:62.5,rest:"90 seg-2 min",how:"Baja controlado hasta rozar el pecho, codos a ~45°. Empuja explosivo sin despegar los glúteos del banco."},
       {name:"Jalón al pecho",sets:"4",reps:"12",weight:55,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:52.5,rest:"60-90 seg",how:"Tira con los codos hacia abajo y atrás, pecho arriba. No uses el impulso del cuerpo."},
       {name:"Sentadilla búlgara",sets:"3",reps:"10",weight:20,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:18,rest:"90 seg",how:"Pie trasero elevado en banco, baja recto hasta 90° en la rodilla delantera. Torso ligeramente inclinado adelante."},
+      {name:"Press militar mancuernas",sets:"3",reps:"10",weight:14,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:12,rest:"90 seg",how:"De pie o sentada, empuja hasta bloqueo sin arquear la espalda baja. Hombro era el grupo con menos volumen del plan, este ejercicio lo corrige."},
       {name:"Plancha lateral",sets:"3",reps:"30s",weight:0,unit:"—",muscle:"Core",rpe:"6/10",lastWeek:0,rest:"45-60 seg",how:"Cuerpo en línea recta apoyado en antebrazo, cadera arriba sin hundirse. Cambia de lado entre series."},
     ],
     b_volumen: [
@@ -247,7 +287,7 @@ export const WORKOUTS = {
       {name:"Press inclinado mancuernas",sets:"4",reps:"15",weight:18,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:16,rest:"60-90 seg",how:"Banco a 30-45°, controla la bajada, foco en sentir el músculo."},
       {name:"Jalón al pecho agarre abierto",sets:"4",reps:"15",weight:50,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:47.5,rest:"60-90 seg",how:"Codos hacia abajo, contracción completa arriba del movimiento."},
       {name:"Hip thrust",sets:"4",reps:"15",weight:50,unit:"kg",muscle:"Glúteo",rpe:"7/10",lastWeek:47.5,rest:"90 seg",how:"Empuja con los talones, aprieta el glúteo 1 segundo arriba."},
-      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:8,unit:"kg",muscle:"Hombros",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Sube hasta la altura del hombro sin impulso, controla la bajada."},
+      {name:"Elevaciones laterales",sets:"4",reps:"15",weight:8,unit:"kg",muscle:"Hombros",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Sube hasta la altura del hombro sin impulso, controla la bajada."},
     ],
     c_potencia: [
       {name:"Sentadilla con barra",sets:"4",reps:"5",weight:75,unit:"kg",muscle:"Cuádriceps",rpe:"8/10",lastWeek:72.5,rest:"2-3 min",how:"Peso alto, pocas repeticiones, técnica estricta, explota al subir."},

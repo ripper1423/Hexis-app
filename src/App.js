@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getCardioProtocol } from './data/profiles';
+import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getCardioProtocol, getMobilityProtocol } from './data/profiles';
+import { BREATHING_PROTOCOLS, SLEEP_PREP } from './data/wellness';
 import {
   saveProfile, loadProfile, savePlan, loadPlan, saveUserData, loadUserData,
   saveHabits, loadHabits, saveExercises, loadExercises,
@@ -36,7 +37,7 @@ const PRINCIPLES = [
 const TIPS = [
   {tag:"Ciencia",icon:"🔬",color:"#C8AA50",title:"Tensión mecánica real",body:"La hipertrofia ocurre cuando el músculo se contrae bajo carga suficiente con rango completo. No es el peso, es la tensión. Siente el músculo, no solo mueves el peso."},
   {tag:"Nutrición",icon:"🍽",color:"#A09060",title:"El anabolic window ya no existe",body:"Tienes 4-6 horas post-entreno para la proteína, no 30 minutos. Lo que sí importa es el total diario: 1.6-2.4g/kg de proteína en 3-4 comidas."},
-  {tag:"Descanso",icon:"🌙",color:"#8BA4A0",title:"El músculo crece dormido",body:"El 80% de la GH se libera en sueño profundo. Sin 7-8h, el mejor entreno da la mitad de resultados. Optimiza el sueño antes que el entreno."},
+  {tag:"Descanso",icon:"🌙",color:"#8BA4A0",title:"El músculo crece dormido",body:"La mayoría de los pulsos de hormona de crecimiento nocturnos ocurren en sueño profundo, sobre todo en las primeras horas de la noche. Sin 7-8h, el mejor entreno rinde muy por debajo de su potencial. Optimiza el sueño antes que el entreno."},
   {tag:"Hábitos",icon:"🔄",color:"#D4C5A9",title:"La regla de los 2 minutos",body:"Si un hábito tarda menos de 2 minutos en iniciarse, hazlo ahora. La acción mínima mantiene la identidad activa cada día."},
   {tag:"Mental",icon:"🧠",color:"#C8AA50",title:"El efecto identidad",body:"Cuando seas 'alguien que entrena', no necesitarás motivación. La identidad lo hace automático. No esperes motivación — actúa hasta crearla."},
   {tag:"Eficiencia",icon:"⚡",color:"#A09060",title:"El mínimo efectivo",body:"3-4 series por grupo muscular con buena ejecución producen el 80% de la adaptación. El volumen extra tiene rendimientos decrecientes."},
@@ -44,6 +45,7 @@ const TIPS = [
   {tag:"Filosofía",icon:"🏛",color:"#C8AA50",title:"Kalokagathia aplicada",body:"Los griegos no separaban físico y carácter. Cuidar tu cuerpo con inteligencia no es vanidad, es coherencia. El físico es la expresión visible de cómo te tratas a ti mismo."},
   {tag:"Ciencia",icon:"🚶",color:"#8BA4A0",title:"NEAT: el gasto que no ves",body:"El 15-30% de tu gasto calórico diario no viene del entreno, sino del movimiento espontáneo: subir escaleras, caminar, moverte sin pensarlo. Sube tus pasos diarios y el déficit se sostiene sin necesitar más cardio estructurado."},
   {tag:"Ciencia",icon:"🔥",color:"#A09060",title:"HIIT vs. LISS: no compiten, se complementan",body:"El HIIT quema más por minuto y genera EPOC (sigues gastando horas después), pero fatiga más y puede interferir con la recuperación de fuerza. El LISS es más suave y no compite con tus ganancias. El sistema real usa ambos según la semana, no uno solo para siempre."},
+  {tag:"Respiración",icon:"🫁",color:"#8BA4A0",title:"La técnica que más rápido te calma",body:"Un estudio de Stanford comparó 4 técnicas de respiración y meditación: la que más bajó la frecuencia respiratoria y más subió el ánimo en una sola sesión fue el 'suspiro fisiológico' — 2 inhalaciones seguidas por la nariz y una exhalación larga por la boca. 3-5 rondas bastan."},
 ];
 
 const DAILY_QUOTES = [
@@ -99,7 +101,12 @@ function calcPlan(d,id){
   const bmr=d.gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
   const tdee=Math.round(bmr*act);
   const m={ALPHA:1.095,HERA:0.9,ZEN:1,SHAPE:0.85,ATENEA:1.0,GAIA:0.95};
-  const pg={ALPHA:2.2,HERA:2.0,ZEN:1.8,SHAPE:2.4,ATENEA:2.0,GAIA:1.8};
+  // g de proteína por kg de peso/día. Rango general 1.4-2.0 g/kg (ISSN
+  // Position Stand, Jäger et al. 2017) para quien entrena fuerza; sube a
+  // 2.3-3.1 g/kg en fase de déficit para proteger la masa magra (mismo
+  // documento). HERA y SHAPE están en déficit -> banda alta. ALPHA en
+  // superávit se queda cerca del techo general para maximizar síntesis.
+  const pg={ALPHA:2.2,HERA:2.3,ZEN:1.8,SHAPE:2.4,ATENEA:2.0,GAIA:1.9};
   const cal=Math.round(tdee*(m[id]||1));
   const prot=Math.round(w*(pg[id]||1.8));
   const fat=Math.round(cal*0.27/9);
@@ -290,6 +297,12 @@ function RecoveryCard({archetype,fatigue,avgSleep}){
         </div>
       </div>
       <div style={{fontSize:12,color:"#aaa",lineHeight:1.7}}>{r.message}</div>
+      {r.level==='high'&&(()=>{const br=BREATHING_PROTOCOLS.sigh;return(
+        <div style={{marginTop:10,paddingTop:10,borderTop:"1px solid #1a1a1a"}}>
+          <div style={{fontSize:10,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🫁 {br.label}</div>
+          <div style={{fontSize:11,color:"#888",lineHeight:1.6}}>{br.protocol}</div>
+        </div>
+      );})()}
     </div>
   );
 }
@@ -2396,21 +2409,30 @@ export default function App(){
             <div style={{fontSize:11,color:pct===100?G:"#444",fontWeight:pct===100?700:400}}>{pct}%{pct===100?" ✦":""}</div>
           </div>
           {isPro&&<RecoveryCard archetype={profile} fatigue={recoveryFatigue} avgSleep={coherenceAvgSleep}/>}
-          <SLabel text="Ciencia del entreno"/>
+          <SLabel text="Ciencia del entreno" right="Con fuente"/>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
             <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
               <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🔬 Tensión mecánica</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>La hipertrofia ocurre cuando el músculo se contrae bajo carga suficiente con rango completo. No es el peso, es la tensión. Siente el músculo, no solo mueves el peso.</div>
+              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>La hipertrofia ocurre cuando el músculo se contrae bajo carga suficiente con rango completo. No es solo el peso, es la tensión sostenida. Siente el músculo, no solo muevas la carga.</div>
+              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— ACSM Position Stand sobre entreno de fuerza (2026): carga, volumen, frecuencia y rango de movimiento son los factores que más pesan.</div>
+            </div>
+            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
+              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>📊 Volumen semanal de {profile}</div>
+              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>Este plan reparte entre 10 y 20 series semanales por grupo muscular grande. Por debajo de 5 series/semana el crecimiento es escaso; por encima de 20 los resultados se aplanan y sube el riesgo de fatiga acumulada.</div>
+              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— Schoenfeld, Ogborn &amp; Krieger (2017), meta-análisis dosis-respuesta de volumen de entreno.</div>
             </div>
             <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
               <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🌙 Por qué crece en el descanso</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>El 80% de la hormona de crecimiento se libera en sueño profundo. El entreno rompe fibra, el descanso la reconstruye más fuerte. Sin 7-8h, el mejor entreno rinde la mitad.</div>
+              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>La mayoría de los pulsos de hormona de crecimiento nocturnos ocurren durante el sueño profundo (ondas lentas), sobre todo en las primeras horas de sueño. El entreno rompe fibra; el descanso la reconstruye. Dormir menos de 7h recorta esa ventana.</div>
+              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— Van Cauter et al., fisiología de la secreción de GH ligada al sueño de ondas lentas.</div>
             </div>
             <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
               <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>💊 Suplementación de {profile}</div>
               <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>{p.supps.slice(0,2).map(s=>s[0]).join(" + ")} son la base para este arquetipo. Ver dosis y timing exactos en Nutrición.</div>
+              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— ISSN Position Stands sobre creatina y proteína (los dos suplementos con más evidencia acumulada en fuerza).</div>
             </div>
           </div>
+          <div style={{fontSize:10,color:"#3a3a3a",lineHeight:1.5,marginBottom:16,padding:"0 2px"}}>Los números de tu plan (series, %1RM, proteína g/kg, ritmo de déficit/superávit) están calibrados dentro de los rangos que recomiendan estas fuentes — no sustituyen la revisión de un entrenador o médico si tienes una lesión o condición previa.</div>
 
           <SLabel text="Ejercicios de hoy" right="Toca para ver técnica y registrar"/>
           {w.map(({name,sets,reps,weight,unit,muscle,rpe,lastWeek,rest,how},i)=>{
@@ -2507,24 +2529,27 @@ export default function App(){
           <SLabel text="Plan semanal" right="Toca un día de cardio para ver el protocolo"/>
           {p.weekPlan.map((d,i)=>{
             const cardioProto=d.type==="cardio"?getCardioProtocol(d.focus):null;
+            const mobilityProto=d.type==="mobility"?getMobilityProtocol(d.focus):null;
+            const dayProto=cardioProto||mobilityProto;
             return(
-            <div key={i} onClick={()=>cardioProto&&setExpandDay(expandDay===i?null:i)} style={{background:d.today?"rgba(200,170,80,0.04)":"#0a0a0a",border:`1px solid ${expandDay===i?"rgba(200,170,80,0.3)":d.today?G:"#111"}`,borderRadius:10,padding:"11px 14px",marginBottom:6,cursor:cardioProto?"pointer":"default"}}>
+            <div key={i} onClick={()=>dayProto&&setExpandDay(expandDay===i?null:i)} style={{background:d.today?"rgba(200,170,80,0.04)":"#0a0a0a",border:`1px solid ${expandDay===i?"rgba(200,170,80,0.3)":d.today?G:"#111"}`,borderRadius:10,padding:"11px 14px",marginBottom:6,cursor:dayProto?"pointer":"default"}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <div style={{width:28,height:28,borderRadius:"50%",background:d.done?(d.type==="rest"?"#0a0808":"rgba(200,170,80,0.1)"):"#0c0c0c",border:`1px solid ${d.done?(d.type==="rest"?"#1a1008":G):"#111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>
                   {d.done?(d.type==="rest"?"🌙":"✓"):(d.today?"→":typeIcon[d.type]||"·")}
                 </div>
                 <div style={{flex:1}}>
                   <div style={{fontSize:12,fontWeight:600,color:d.today?G:d.done?"#555":"#888"}}>{d.day}</div>
-                  <div style={{fontSize:11,color:d.today?"#777":"#3a3a3a"}}>{d.focus}{cardioProto&&" 🔬"}</div>
+                  <div style={{fontSize:11,color:d.today?"#777":"#3a3a3a"}}>{d.focus}{dayProto&&" 🔬"}</div>
                 </div>
                 {d.today&&<div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",border:`1px solid ${G}`,padding:"2px 8px",borderRadius:100,opacity:0.7}}>HOY</div>}
               </div>
-              {expandDay===i&&cardioProto&&(
+              {expandDay===i&&dayProto&&(
                 <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>
-                  <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:5}}>{cardioProto.label}</div>
-                  <div style={{fontSize:12,color:"#aaa",lineHeight:1.7,marginBottom:8}}>{cardioProto.protocol}</div>
-                  <div style={{fontSize:11,color:"#666",lineHeight:1.6,marginBottom:8}}>{cardioProto.why}</div>
-                  <div style={{fontSize:11,color:"#8a8a8a"}}>💓 Zona objetivo: {cardioProto.fc}</div>
+                  <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:5}}>{dayProto.label}</div>
+                  <div style={{fontSize:12,color:"#aaa",lineHeight:1.7,marginBottom:8}}>{dayProto.protocol}</div>
+                  <div style={{fontSize:11,color:"#666",lineHeight:1.6,marginBottom:8}}>{dayProto.why}</div>
+                  {cardioProto&&<div style={{fontSize:11,color:"#8a8a8a"}}>💓 Zona objetivo: {cardioProto.fc}</div>}
+                  {mobilityProto&&<div style={{fontSize:11,color:"#8a8a8a"}}>💡 {mobilityProto.tip}</div>}
                 </div>
               )}
             </div>
@@ -2691,6 +2716,23 @@ export default function App(){
               {expandTip===i&&<div style={{fontSize:13,color:"#666",lineHeight:1.75,paddingTop:10,borderTop:"1px solid #1a1a1a"}}>{t.body}</div>}
             </div>
           ))}
+          <SLabel text="Preparación al sueño"/>
+          {(()=>{const sp=SLEEP_PREP[profile]||SLEEP_PREP.ALPHA;const br=BREATHING_PROTOCOLS[sp.breathing];return(
+          <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"16px",marginBottom:14}}>
+            <div style={{fontSize:11,letterSpacing:2,color:p.color,textTransform:"uppercase",marginBottom:8}}>🌙 {profile}, antes de dormir</div>
+            <div style={{fontSize:12,color:"#999",lineHeight:1.7,marginBottom:12,fontStyle:"italic"}}>{sp.intro}</div>
+            {sp.checklist.map((item,i)=>(
+              <div key={i} style={{display:"flex",gap:8,marginBottom:8,fontSize:12,color:"#777",lineHeight:1.6}}>
+                <span style={{color:p.color,flexShrink:0}}>✓</span><span>{item}</span>
+              </div>
+            ))}
+            {br&&<div style={{marginTop:10,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>
+              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🫁 {br.label}</div>
+              <div style={{fontSize:12,color:"#777",lineHeight:1.6,marginBottom:6}}>{br.protocol}</div>
+              <div style={{fontSize:10,color:"#4a4a4a"}}>— {br.source}</div>
+            </div>}
+          </div>
+          );})()}
           <Quote text='"Lo bueno, si es simple, es doblemente bueno."' attr="Baltasar Gracián"/>
           <Quote text='"Complejo por dentro. Simple por fuera. Eso es HEXIS."' attr="Manifiesto HEXIS"/>
           <div style={{height:8}}/>
