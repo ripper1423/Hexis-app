@@ -1618,15 +1618,16 @@ function Onboarding({onDone}){
   const scr={minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
 
   if(step===0) return(
-    <div style={{...scr,position:"relative",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
-      <FigW/>
-      <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(5,5,5,0) 18%,rgba(5,5,5,0.96) 70%)"}}/>
-      <div style={{position:"relative",zIndex:2,padding:"0 28px 56px",textAlign:"center"}}>
-        <div style={{fontSize:52,opacity:0.05,fontFamily:"serif",lineHeight:1}}>Χ</div>
+    <div style={{...scr,position:"relative",display:"flex",flexDirection:"column",overflow:"auto"}}>
+      <div style={{position:"relative",padding:"36px 20px 0",display:"flex",justifyContent:"center"}}>
+        <img src="/estatuas/estatua_reclinada_kalokagathia.jpg" alt="" style={{width:"100%",maxWidth:400,height:"auto",display:"block"}}/>
+        <div style={{position:"absolute",left:0,right:0,bottom:0,height:70,background:"linear-gradient(to bottom,rgba(5,5,5,0),rgba(5,5,5,1))"}}/>
+      </div>
+      <div style={{position:"relative",zIndex:2,padding:"0 28px 40px",textAlign:"center",marginTop:-6}}>
         <div style={{fontSize:11,fontWeight:900,letterSpacing:8,color:G,marginBottom:6}}>HEXIS</div>
-        <div style={{fontSize:11,letterSpacing:3,color:"#6b6b6b",textTransform:"uppercase",marginBottom:32}}>Fortaleza del cuerpo · Claridad de la mente</div>
-        <div style={{fontFamily:PF,fontSize:36,fontWeight:700,lineHeight:1.1,marginBottom:14}}>El cuerpo que eres<br/><em style={{fontStyle:"italic",color:G}}>empieza aquí.</em></div>
-        <div style={{fontSize:13,color:"#555",lineHeight:1.75,marginBottom:32}}>No es una dieta. No es un reto.<br/>Es el sistema que trabaja con tu naturaleza.</div>
+        <div style={{fontSize:11,letterSpacing:3,color:"#6b6b6b",textTransform:"uppercase",marginBottom:26}}>Fortaleza del cuerpo · Claridad de la mente</div>
+        <div style={{fontFamily:PF,fontSize:32,fontWeight:700,lineHeight:1.1,marginBottom:14}}>El cuerpo que eres<br/><em style={{fontStyle:"italic",color:G}}>empieza aquí.</em></div>
+        <div style={{fontSize:13,color:"#555",lineHeight:1.75,marginBottom:26}}>No es una dieta. No es un reto.<br/>Es el sistema que trabaja con tu naturaleza.</div>
         <Btn label="Comenzar mi camino" onClick={next}/>
         <div style={{fontSize:11,color:"#222",marginTop:12,letterSpacing:1}}>3 minutos · Gratis · Sin tarjeta</div>
       </div>
