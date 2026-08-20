@@ -286,14 +286,142 @@ export function clearAll() {
 export async function ensureCloudSession() {
   try {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) return session.user.id;
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error) { console.warn('HEXIS cloud: no se pudo crear sesión', error.message); return null; }
-    return data.user.id;
+    let uid = null;
+    let email = null;
+    if (session) {
+      uid = session.user.id;
+      email = session.user.email || null;
+    } else {
+      const { data, error } = await supabase.auth.signInAnonymously();
+      if (error) { console.warn('HEXIS cloud: no se pudo crear sesión', error.message); return null; }
+      uid = data.user.id;
+    }
+    // Auto-relleno best-effort: si la sesión ya tiene un email verificado
+    // (cuenta vinculada) pero el perfil en la nube todavía no lo tiene
+    // guardado, lo escribe aquí. No bloquea nada si falla o la fila aún
+    // no existe (se creará con el email la próxima vez que haya sesión).
+    if (uid && email) {
+      supabase.from('user_profiles').update({ email }).eq('id', uid).then(() => {}, () => {});
+    }
+    return uid;
   } catch (e) {
     console.warn('HEXIS cloud: sin conexión', e.message);
     return null;
   }
+}
+
+// ── IDENTIDAD PERSISTENTE POR EMAIL ────────────────────────────────
+// signInAnonymously() crea una identidad nueva por dispositivo: si el
+// usuario cambia de móvil, borra datos del navegador o reinstala, pierde
+// el acceso a su user_id de siempre y todo lo que había en la nube queda
+// huérfano. Esto lo resuelve vinculando esa sesión anónima a un email
+// real (sin contraseña, sin fricción) para poder recuperarla desde
+// cualquier dispositivo más adelante.
+
+export async function getAccountStatus() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { linked: false, email: null };
+    return { linked: !user.is_anonymous && !!user.email, email: user.email || null };
+  } catch (e) {
+    return { linked: false, email: null };
+  }
+}
+
+// Vincula la sesión anónima actual (con todo su historial) a un email real.
+// Supabase manda un enlace de confirmación; al pulsarlo desde cualquier
+// navegador, esa misma sesión pasa a ser permanente — mismo user_id, no se
+// pierde nada de lo ya guardado.
+export async function linkEmailToAccount(email) {
+  try {
+    const { error } = await supabase.auth.updateUser(
+      { email },
+      { emailRedirectTo: window.location.origin }
+    );
+    if (error) throw error;
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'unknown' };
+  }
+}
+
+// Para un móvil nuevo: manda un enlace de acceso a un email ya vinculado
+// antes. Al pulsarlo entra en la MISMA cuenta permanente (mismo user_id
+// que en el dispositivo original), no crea una anónima nueva.
+export async function restoreAccountByEmail(email) {
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
+    });
+    if (error) throw error;
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e.message || 'unknown' };
+  }
+}
+
+// Lee el perfil real guardado en Supabase para reconstruir localmente el
+// arquetipo/plan de un usuario que acaba de restaurar sesión en un móvil
+// nuevo (sin pasar otra vez por el test de onboarding).
+export async function fetchCloudProfile(userId) {
+  if (!userId) return null;
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('full_name,archetype,gender,age,weight_kg,height_cm,activity_level')
+      .eq('id', userId)
+      .single();
+    if (error) throw error;
+    if (!data || !data.archetype) return null;
+    return {
+      archetype: data.archetype,
+      userData: {
+        name: data.full_name || '',
+        age: data.age != null ? String(data.age) : '',
+        weight: data.weight_kg != null ? String(data.weight_kg) : '',
+        height: data.height_cm != null ? String(data.height_cm) : '',
+        gender: data.gender || '',
+        activity: data.activity_level != null ? String(data.activity_level) : '',
+      },
+    };
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo leer el perfil', e.message);
+    return null;
+  }
+}
+
+// Trae el historial real (peso, VO2max, pasos, sueño) para que las
+// gráficas de Métricas no aparezcan vacías tras restaurar en un móvil
+// nuevo. Best-effort: si algo falla, devuelve arrays vacíos y la app
+// sigue funcionando con lo que haya localmente.
+export async function fetchCloudHistory(userId) {
+  const empty = { weightLog: [], vo2Log: [], stepsLog: [], sleepLog: [] };
+  if (!userId) return empty;
+  try {
+    const [bodyRes, wellnessRes] = await Promise.all([
+      supabase.from('body_metrics').select('log_date,weight_kg,vo2max').eq('user_id', userId).order('log_date', { ascending: true }),
+      supabase.from('wellness_logs').select('log_date,steps,sleep_hours').eq('user_id', userId).order('log_date', { ascending: true }),
+    ]);
+    const weightLog = (bodyRes.data || []).filter(r => r.weight_kg != null).map(r => ({ date: r.log_date, value: r.weight_kg }));
+    const vo2Log = (bodyRes.data || []).filter(r => r.vo2max != null).map(r => ({ date: r.log_date, distance: null, vo2max: r.vo2max }));
+    const stepsLog = (wellnessRes.data || []).filter(r => r.steps != null).map(r => ({ date: r.log_date, steps: r.steps }));
+    const sleepLog = (wellnessRes.data || []).filter(r => r.sleep_hours != null).map(r => ({ date: r.log_date, hours: r.sleep_hours }));
+    return { weightLog, vo2Log, stepsLog, sleepLog };
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo leer el historial', e.message);
+    return empty;
+  }
+}
+
+// Escribe directamente en localStorage el historial recuperado de la nube
+// (bypassa los setters normales de "un registro por día" porque aquí llega
+// el array completo de golpe, no una entrada nueva).
+export function restoreLocalLogs({ weightLog, vo2Log, stepsLog, sleepLog }) {
+  if (weightLog && weightLog.length) localStorage.setItem(STORAGE_KEYS.WEIGHT_LOG, JSON.stringify(weightLog.slice(-30)));
+  if (vo2Log && vo2Log.length) localStorage.setItem(STORAGE_KEYS.VO2_LOG, JSON.stringify(vo2Log.slice(-20)));
+  if (stepsLog && stepsLog.length) localStorage.setItem(STORAGE_KEYS.STEPS_LOG, JSON.stringify(stepsLog.slice(-30)));
+  if (sleepLog && sleepLog.length) localStorage.setItem(STORAGE_KEYS.SLEEP_LOG, JSON.stringify(sleepLog.slice(-30)));
 }
 
 export async function syncProfileToCloud(userId, { name, archetype, gender, age, weight, height, activity }) {
@@ -367,6 +495,83 @@ export async function redeemProCode(code) {
     if (error) throw error;
     return data || { ok: false, error: 'unknown' };
   } catch (e) {
+    return { ok: false, error: e.message || 'unknown' };
+  }
+}
+
+// ── FOTOS DE PROGRESO (Antes/Después) — HEXIS START ────────────────
+// Bucket privado 'progress-photos' en Supabase Storage, ruta
+// {user_id}/{timestamp}_{tipo}.{ext}. Nadie más puede leer las fotos
+// de otro usuario (RLS a nivel de storage.objects, ver migración
+// create_progress_photos_bucket). Metadatos (tipo, feedback, peso,
+// fecha) van en la tabla progress_photos.
+
+// type: 'antes' | 'despues'. Devuelve { ok, photo } o { ok:false, error }
+export async function uploadProgressPhoto(userId, file, { type, feedback, weightKg } = {}) {
+  if (!userId || !file) return { ok: false, error: 'missing_data' };
+  try {
+    const ext = (file.name && file.name.split('.').pop()) || 'jpg';
+    const path = `${userId}/${Date.now()}_${type}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('progress-photos')
+      .upload(path, file, { contentType: file.type || 'image/jpeg', upsert: false });
+    if (uploadError) throw uploadError;
+
+    const row = {
+      user_id: userId,
+      photo_type: type === 'despues' ? 'despues' : 'antes',
+      storage_path: path,
+      feedback: feedback || null,
+      weight_kg: weightKg || null,
+    };
+    const { data, error: insertError } = await supabase
+      .from('progress_photos')
+      .insert(row)
+      .select()
+      .single();
+    if (insertError) throw insertError;
+
+    return { ok: true, photo: data };
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo subir la foto de progreso', e.message);
+    return { ok: false, error: e.message || 'unknown' };
+  }
+}
+
+// Devuelve la lista de fotos del usuario, con una URL firmada (1h) por foto lista para <img>
+export async function fetchProgressPhotos(userId) {
+  if (!userId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('progress_photos')
+      .select('*')
+      .eq('user_id', userId)
+      .order('log_date', { ascending: true });
+    if (error) throw error;
+    if (!data || !data.length) return [];
+
+    const withUrls = await Promise.all(data.map(async (row) => {
+      const { data: signed } = await supabase.storage
+        .from('progress-photos')
+        .createSignedUrl(row.storage_path, 3600);
+      return { ...row, url: signed ? signed.signedUrl : null };
+    }));
+    return withUrls;
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudieron cargar las fotos de progreso', e.message);
+    return [];
+  }
+}
+
+export async function deleteProgressPhoto(photoId, storagePath) {
+  try {
+    await supabase.storage.from('progress-photos').remove([storagePath]);
+    const { error } = await supabase.from('progress_photos').delete().eq('id', photoId);
+    if (error) throw error;
+    return { ok: true };
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo borrar la foto de progreso', e.message);
     return { ok: false, error: e.message || 'unknown' };
   }
 }

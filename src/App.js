@@ -10,7 +10,10 @@ import {
   fetchSubscriptionTier, redeemProCode,
   saveSetLog, loadSetLogs, removeSetLog, saveVo2Test, loadVo2Log, logVo2ToCloud,
   saveGoalWeight, loadGoalWeight, saveSteps, loadStepsLog, saveSleep, loadSleepLog, logWellnessToCloud,
-  saveCycle, loadCycle, saveMirrorEntry, loadMirrorLog
+  saveCycle, loadCycle, saveMirrorEntry, loadMirrorLog,
+  getAccountStatus, linkEmailToAccount, restoreAccountByEmail,
+  fetchCloudProfile, fetchCloudHistory, restoreLocalLogs,
+  uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto
 } from './storage';
 import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Category, weeklyCaloriesBurned, weeklySleep, volumeByMuscleGroup, weightTrend, computeHexisAge } from './adaptive';
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
@@ -504,16 +507,133 @@ function AnalyzeScreen({onBack,isPro,onUnlocked,color}){
   );
 }
 
+// ── FOTOS DE PROGRESO (Antes/Después) — HEXIS START ──────────────
+// Disponible desde el plan base, igual que el registro de peso o
+// hábitos. Fotos privadas (Supabase Storage, RLS por usuario) +
+// feedback de texto opcional. No usa IA, es solo registro visual.
+function ProgressPhotosScreen({onBack,userId,color}){
+  const [photos,setPhotos]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [uploading,setUploading]=useState(false);
+  const [pendingType,setPendingType]=useState(null); // 'antes' | 'despues' mientras se sube
+  const [feedback,setFeedback]=useState('');
+  const [weightInput,setWeightInput]=useState('');
+
+  const reload=async()=>{
+    if(!userId){setLoading(false);return;}
+    setLoading(true);
+    const list=await fetchProgressPhotos(userId);
+    setPhotos(list);
+    setLoading(false);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(()=>{reload();},[]);
+
+  const onFileChange=async(e,type)=>{
+    const file=e.target.files&&e.target.files[0];
+    e.target.value='';
+    if(!file||!userId)return;
+    setUploading(true);
+    setPendingType(type);
+    const w=parseFloat(weightInput);
+    await uploadProgressPhoto(userId,file,{type,feedback:feedback.trim()||null,weightKg:(w&&w>20&&w<300)?w:null});
+    setFeedback('');
+    setWeightInput('');
+    setUploading(false);
+    setPendingType(null);
+    reload();
+  };
+
+  const onDelete=async(photo)=>{
+    setPhotos(prev=>prev.filter(p=>p.id!==photo.id));
+    await deleteProgressPhoto(photo.id,photo.storage_path);
+  };
+
+  const antes=photos.filter(p=>p.photo_type==='antes');
+  const despues=photos.filter(p=>p.photo_type==='despues');
+
+  const UploadCard=({type,label,icon,list})=>(
+    <div style={{flex:1,minWidth:0}}>
+      <div style={{fontSize:11,letterSpacing:2,color:"#8a8a8a",textTransform:"uppercase",marginBottom:8}}>{icon} {label}</div>
+      <label style={{display:"block",border:"1px dashed #333",borderRadius:12,padding:list.length?0:20,textAlign:"center",cursor:uploading?"default":"pointer",marginBottom:10,overflow:"hidden",minHeight:list.length?0:90}}>
+        <input type="file" accept="image/*" capture="environment" disabled={uploading} onChange={e=>onFileChange(e,type)} style={{display:"none"}}/>
+        {uploading&&pendingType===type?(
+          <div style={{fontSize:11,color:"#666",padding:"30px 0"}}>Subiendo...</div>
+        ):(
+          <div style={{fontSize:11,color:"#666",padding:list.length?"12px 0":"28px 0"}}>📷 Añadir foto {label.toLowerCase()}</div>
+        )}
+      </label>
+      {list.slice().reverse().map(ph=>(
+        <div key={ph.id} style={{position:"relative",marginBottom:8}}>
+          {ph.url?(
+            <img src={ph.url} alt="" style={{width:"100%",borderRadius:10,display:"block"}}/>
+          ):(
+            <div style={{width:"100%",height:120,background:"#0c0c0c",borderRadius:10}}/>
+          )}
+          <div onClick={()=>onDelete(ph)} style={{position:"absolute",top:6,right:6,width:22,height:22,borderRadius:11,background:"rgba(0,0,0,0.6)",color:"#e0a0a0",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>✕</div>
+          <div style={{fontSize:10,color:"#666",marginTop:4}}>{ph.log_date}{ph.weight_kg?` · ${ph.weight_kg}kg`:""}</div>
+          {ph.feedback&&<div style={{fontSize:11,color:"#999",marginTop:2,lineHeight:1.5,fontStyle:"italic"}}>"{ph.feedback}"</div>}
+        </div>
+      ))}
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:80}}>
+      <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
+        <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
+        <div>
+          <div style={{fontSize:11,letterSpacing:4,color:color||G,textTransform:"uppercase"}}>Progreso visual</div>
+          <div style={{fontSize:16,fontWeight:700}}>Antes / Después</div>
+        </div>
+      </div>
+      <div style={{padding:20}}>
+        <div style={{fontSize:12,color:"#888",lineHeight:1.7,marginBottom:16}}>Sube fotos para comparar tu progreso a lo largo del tiempo. Son privadas — solo tú puedes verlas.</div>
+
+        <div style={{marginBottom:16}}>
+          <div style={{fontSize:11,color:"#666",marginBottom:6}}>Peso el día de la foto (opcional)</div>
+          <input
+            type="number"
+            placeholder="Ej: 74.5"
+            value={weightInput}
+            onChange={e=>setWeightInput(e.target.value)}
+            style={{width:"100%",background:"#111",border:"1px solid #1a1a1a",borderRadius:6,padding:"8px 12px",color:"#fff",fontFamily:"Poppins,sans-serif",fontSize:13,outline:"none",marginBottom:10}}
+          />
+          <div style={{fontSize:11,color:"#666",marginBottom:6}}>Feedback / cómo te sientes (opcional)</div>
+          <textarea
+            placeholder="Ej: Más definido, con más energía por las mañanas..."
+            value={feedback}
+            onChange={e=>setFeedback(e.target.value)}
+            rows={2}
+            style={{width:"100%",background:"#111",border:"1px solid #1a1a1a",borderRadius:6,padding:"8px 12px",color:"#fff",fontFamily:"Poppins,sans-serif",fontSize:13,outline:"none",resize:"vertical"}}
+          />
+        </div>
+
+        {loading?(
+          <div style={{fontSize:12,color:"#555",textAlign:"center",padding:"30px 0"}}>Cargando...</div>
+        ):(
+          <div style={{display:"flex",gap:14}}>
+            <UploadCard type="antes" label="Antes" icon="◐" list={antes}/>
+            <UploadCard type="despues" label="Después" icon="◑" list={despues}/>
+          </div>
+        )}
+
+        <div style={{fontSize:10,color:"#555",marginTop:20,lineHeight:1.6}}>El feedback es opcional y solo lo ves tú — no se comparte ni se analiza automáticamente.</div>
+      </div>
+    </div>
+  );
+}
+
 // ── HEXIS PRO — funciones futuras visibles con candado ──────────
 // Sustituye esta URL por el checkout real del upgrade en Hotmart cuando exista.
-const PRO_UPGRADE_URL="https://pay.hotmart.com/B107168387J";
+const PRO_UPGRADE_URL="https://pay.hotmart.com/K107168260M";
 const PRO_FEATURES=[
   {icon:"🧬",title:"Arquitectura de Dominio",desc:"Ciclos reales (Hipertrofia, Definición, Fuerza, Salud, Rendimiento, Mantenimiento) en vez de un plan fijo."},
   {icon:"📈",title:"Motor adaptativo",desc:"Tu entreno evoluciona con tu progreso real, no con un split fijo por arquetipo."},
   {icon:"🎯",title:"Score de Coherencia",desc:"Mide si tus acciones diarias encajan con tu identidad y tu arquetipo."},
   {icon:"🔋",title:"Recovery integrado",desc:"Reglas de descanso y recuperación personalizadas por arquetipo."},
   {icon:"📸",title:"Análisis con IA",desc:"Sube una foto de tu plato o tu físico y recibe un desglose visual."},
-  {icon:"🏛",title:"Comunidad HEXIS",desc:"Acceso a la comunidad privada en Skool."},
 ];
 function ProFeatureRow({icon,title,desc,unlocked}){
   return(
@@ -591,6 +711,56 @@ function ProTeaser({isPro,onUnlocked}){
         </div>
         {PRO_FEATURES.map((f,i)=>(<ProFeatureRow key={i} {...f} unlocked={isPro}/>))}
         {!isPro&&<ProCodeInput onUnlocked={onUnlocked}/>}
+      </div>
+    </>
+  );
+}
+
+// Vincular email — para no perder los datos si el usuario cambia de móvil,
+// borra el navegador o reinstala. Solo lo pide una vez, sin contraseña.
+function AccountLinkCard(){
+  const[status,setStatus]=useState(null); // null (cargando) | { linked, email }
+  const[showInput,setShowInput]=useState(false);
+  const[email,setEmail]=useState('');
+  const[sendState,setSendState]=useState('idle'); // idle | sending | sent | error
+  const[errMsg,setErrMsg]=useState('');
+
+  useEffect(()=>{ getAccountStatus().then(setStatus); },[]);
+
+  const submit=async()=>{
+    if(!email.trim())return;
+    setSendState('sending');setErrMsg('');
+    const res=await linkEmailToAccount(email.trim());
+    if(res.ok){ setSendState('sent'); }
+    else{ setSendState('error'); setErrMsg(res.error||''); }
+  };
+
+  if(!status)return null;
+
+  return(
+    <>
+      <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Tu email</div>
+      <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
+        {status.linked?(
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6}}>
+            Cuenta vinculada a <strong style={{color:"#ccc"}}>{status.email}</strong>. Si cambias de móvil, entra en "¿Ya tienes cuenta?" al abrir la app por primera vez y recuperarás todo tu historial.
+          </div>
+        ):sendState==='sent'?(
+          <div style={{fontSize:12,color:"#888",lineHeight:1.6}}>
+            Te hemos enviado un enlace a <strong style={{color:"#ccc"}}>{email}</strong>. Ábrelo para confirmar y no perder tus datos si cambias de móvil.
+          </div>
+        ):showInput?(
+          <>
+            <input style={inp} type="email" placeholder="tu@email.com" value={email} onChange={e=>setEmail(e.target.value)}/>
+            {sendState==='error'&&<div style={{fontSize:11,color:"#c86a6a",marginBottom:8}}>No se pudo vincular{errMsg?`: ${errMsg}`:''}.</div>}
+            <Btn label={sendState==='sending'?"Enviando...":"Vincular este email"} onClick={submit} disabled={sendState==='sending'||!email.trim()}/>
+          </>
+        ):(
+          <>
+            <div style={{fontSize:12,color:"#888",lineHeight:1.6,marginBottom:12}}>Tus datos solo están en este dispositivo salvo que vincules un email. Sin contraseña, sin fricción — solo para poder recuperarlos si cambias de móvil.</div>
+            <div onClick={()=>setShowInput(true)} style={{textAlign:"center",padding:"12px",borderRadius:8,border:`1px solid ${G}`,color:G,fontSize:12,fontWeight:600,letterSpacing:1,cursor:"pointer"}}>Vincular mi email</div>
+          </>
+        )}
       </div>
     </>
   );
@@ -1036,6 +1206,8 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
           {!isPro&&<ProCodeInput onUnlocked={onUnlocked} compact/>}
         </div>
 
+        <AccountLinkCard/>
+
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Ciclo de entrenamiento</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
           {!isPro?(
@@ -1068,7 +1240,7 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Datos y almacenamiento</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24,fontSize:12,color:"#777",lineHeight:1.7}}>
-          Tu progreso (peso, ejercicios, hábitos, racha) se guarda automáticamente en este dispositivo cada vez que lo actualizas.
+          Tu progreso (peso, ejercicios, hábitos, racha) se guarda al instante en este dispositivo, y también se respalda en la nube en segundo plano. Para poder recuperarlo si cambias de móvil, vincula tu email arriba.
         </div>
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Reiniciar</div>
@@ -1376,489 +1548,56 @@ function NutritionDB({onBack}){
 }
 
 // ── ONBOARDING ───────────────────────────────────────────────────
-// ⚠️ CÓDIGO NO USADO: el bloque QUESTIONS/RESULTS/calcProfile/HexisTest de aquí abajo
-// es un prototipo de test alternativo que nunca se conecta a la app real (no hay ningún
-// setScreen("test") que lo alcance). El flujo real de onboarding es el componente
-// `Onboarding` (más abajo), que usa `detect()` sobre PROFILES — ese ya tiene los 6
-// arquetipos correctos. Este bloque todavía usa el perfil "CORE" antiguo (obsoleto,
-// nunca actualizado a ATENEA/GAIA) — pendiente de arreglar o borrar en otra sesión.
-// ── TEST DE PERFIL (SIN USAR) ────────────────────────────────────────────────
-const QUESTIONS = [
-  {
-    n:"01", cat:"OBJETIVO",
-    q:"¿Qué resultado quieres conseguir?",
-    opts:[
-      {l:"A",t:"Ganar masa muscular y fuerza real — notarlo en el espejo y en el gimnasio",s:{ALPHA:3,SHAPE:1}},
-      {l:"B",t:"Definirme, tonificarme y sentirme bien sin perder feminidad",s:{HERA:3,SHAPE:1}},
-      {l:"C",t:"Recuperar el equilibrio, bajar el estrés y sentirme bien por dentro y por fuera",s:{ZEN:3}},
-      {l:"D",t:"Perder grasa y ganar músculo al mismo tiempo — recomposición total",s:{SHAPE:3,HERA:1}},
-      {l:"E",t:"Crear un hábito sólido desde cero y dejar de empezar y abandonar",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"02", cat:"PUNTO DE PARTIDA",
-    q:"¿Cómo describirías tu físico ahora mismo?",
-    opts:[
-      {l:"A",t:"Tengo base muscular pero quiero más volumen y más fuerza",s:{ALPHA:3}},
-      {l:"B",t:"Estoy en un peso razonable pero quiero más tono y definición",s:{HERA:3,SHAPE:1}},
-      {l:"C",t:"El estrés y el ritmo de vida han pasado factura — me siento fuera de forma",s:{ZEN:3,CORE:1}},
-      {l:"D",t:"Tengo más grasa de la que quiero y menos músculo del que debería",s:{SHAPE:3,CORE:1}},
-      {l:"E",t:"Nunca he tenido una rutina real — soy principiante o llevo mucho tiempo sin hacer nada",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"03", cat:"NUTRICIÓN",
-    q:"¿Cómo es tu relación con la alimentación?",
-    opts:[
-      {l:"A",t:"Como bastante y sin problema — el reto es estructurarlo para crecer",s:{ALPHA:3}},
-      {l:"B",t:"Intento comer bien pero me cuesta controlar cantidades y caprichos",s:{HERA:2,SHAPE:2}},
-      {l:"C",t:"Como según el estrés — cuando estoy bien como bien, cuando no, mal",s:{ZEN:3}},
-      {l:"D",t:"He probado dietas pero siempre acabo abandonando o compensando",s:{SHAPE:2,CORE:2}},
-      {l:"E",t:"No tengo ningún control ni estructura — como lo que hay sin pensar",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"04", cat:"ESTRÉS",
-    q:"¿Cómo describirías tu nivel de estrés y energía diaria?",
-    opts:[
-      {l:"A",t:"Alto rendimiento — mucha energía, mucha carga, pero lo llevo bien",s:{ALPHA:2,SHAPE:1}},
-      {l:"B",t:"Equilibrado — algún día de estrés pero en general bien",s:{HERA:2,CORE:1}},
-      {l:"C",t:"Estrés crónico — siempre con la mente acelerada, cansado pero sin poder descansar",s:{ZEN:3}},
-      {l:"D",t:"Variable — hay semanas muy duras que me desregulan completamente",s:{ZEN:1,SHAPE:1,CORE:1}},
-      {l:"E",t:"Poca energía en general — me cuesta arrancar y mantener el ritmo",s:{CORE:2,ZEN:1}},
-    ]
-  },
-  {
-    n:"05", cat:"DISPONIBILIDAD",
-    q:"¿Cuántos días reales puedes dedicar al entrenamiento cada semana?",
-    opts:[
-      {l:"A",t:"5 o más días — el gimnasio es una prioridad en mi vida",s:{ALPHA:3}},
-      {l:"B",t:"4 días — tengo vida, pero el entrenamiento tiene su espacio fijo",s:{HERA:2,SHAPE:2}},
-      {l:"C",t:"3 días — necesito un sistema eficiente que respete mi tiempo",s:{ZEN:2,CORE:2}},
-      {l:"D",t:"2 días o menos — tengo muy poco tiempo y necesito maximizar cada sesión",s:{ZEN:1,CORE:2}},
-      {l:"E",t:"No lo sé — depende de la semana, no tengo rutina fija",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"06", cat:"EXPERIENCIA",
-    q:"¿Cuánta experiencia tienes entrenando con método real?",
-    opts:[
-      {l:"A",t:"Años de gimnasio — sé lo que hago pero quiero llevarlo al siguiente nivel",s:{ALPHA:3,SHAPE:1}},
-      {l:"B",t:"Entreno con regularidad pero sin un plan real estructurado",s:{HERA:2,SHAPE:2}},
-      {l:"C",t:"He entrenado en épocas pero siempre lo acabo dejando por estrés o falta de tiempo",s:{ZEN:2,CORE:1}},
-      {l:"D",t:"Poca experiencia — he probado cosas sueltas pero nunca con un sistema",s:{CORE:2,SHAPE:1}},
-      {l:"E",t:"Nula o casi nula — soy principiante de verdad",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"07", cat:"MOTIVACIÓN",
-    q:"¿Qué te mueve de verdad cuando piensas en cambiar tu cuerpo?",
-    opts:[
-      {l:"A",t:"El rendimiento — quiero ser más fuerte, más potente, más capaz",s:{ALPHA:3}},
-      {l:"B",t:"La imagen — quiero verme bien, sentirme segura y que se note",s:{HERA:3,SHAPE:1}},
-      {l:"C",t:"El bienestar — quiero tener energía, dormir bien y desconectar",s:{ZEN:3}},
-      {l:"D",t:"La transformación total — quiero ser una versión completamente distinta de quien soy",s:{SHAPE:3}},
-      {l:"E",t:"El hábito — quiero convertirme en alguien que cuida su cuerpo de forma consistente",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"08", cat:"OBSTÁCULO",
-    q:"¿Qué te ha frenado hasta ahora?",
-    opts:[
-      {l:"A",t:"No tenía el plan correcto — entrenaba pero sin estructura ni progresión real",s:{ALPHA:2,SHAPE:1}},
-      {l:"B",t:"La alimentación — sé moverme pero no sé comer para mi objetivo",s:{HERA:2,SHAPE:2}},
-      {l:"C",t:"El estrés y el cansancio — cuando más lo necesito, menos puedo",s:{ZEN:3}},
-      {l:"D",t:"La confusión — demasiada información, no sé qué es lo correcto",s:{SHAPE:2,CORE:2}},
-      {l:"E",t:"La constancia — empiezo con fuerza y a las 2-3 semanas lo abandono",s:{CORE:2,HERA:1}},
-    ]
-  },
-  {
-    n:"09", cat:"RELACIÓN CON EL CUERPO",
-    q:"¿Cómo te sientes con tu cuerpo ahora mismo?",
-    opts:[
-      {l:"A",t:"Bien en general — pero sé que puedo ir a más y quiero ir a más",s:{ALPHA:3}},
-      {l:"B",t:"Insatisfecha con algunas zonas — quiero definición sin obsesionarme",s:{HERA:3}},
-      {l:"C",t:"Desconectado — el estrés me ha alejado de mi cuerpo y necesito reconectar",s:{ZEN:3}},
-      {l:"D",t:"Frustrado — veo grasa donde no quiero y falta músculo donde debería haberlo",s:{SHAPE:3}},
-      {l:"E",t:"Sin referencias — nunca he tenido un cuerpo del que sentirme orgulloso/a",s:{CORE:3}},
-    ]
-  },
-  {
-    n:"10", cat:"IDENTIDAD DESEADA",
-    q:"¿Cómo quieres verte y sentirte dentro de 12 semanas?",
-    note:"Esta pregunta tiene el doble de peso — define quién decides ser.",
-    opts:[
-      {l:"A",t:"Más grande, más fuerte, con una presencia física que no pase desapercibida",s:{ALPHA:6}},
-      {l:"B",t:"Definida, estilizada, con confianza real en mi cuerpo y en cómo me veo",s:{HERA:6}},
-      {l:"C",t:"Equilibrado, con energía estable, sin ansiedad y con una rutina que me sostenga",s:{ZEN:6}},
-      {l:"D",t:"Transformado — diferente a quien soy hoy, con otro cuerpo y otra mentalidad",s:{SHAPE:6}},
-      {l:"E",t:"Con un hábito sólido — siendo alguien que entrena y cuida su alimentación de verdad",s:{CORE:6}},
-    ]
-  },
-];
 
-const RESULTS = {
-  ALPHA:{
-    color:"#C8AA50",sub:"El constructor",
-    tagline:"Vives para crecer. La fuerza es tu lenguaje.",
-    identity:"Eres alguien que ya sabe lo que quiere. No estás aquí para ponerte en forma — estás aquí para ir al siguiente nivel. El músculo no es estética para ti. Es rendimiento. Es presencia. Es quién eres.",
-    insight:"Tu mayor riesgo es entrenar sin progresión real. Volumen sin estructura. Esfuerzo sin estrategia. HEXIS ALPHA convierte cada semana en un paso medible hacia más fuerza y más masa.",
-    needs:["Superávit calórico calculado con tu TDEE real","Programa de fuerza con progresión semanal medible","Proteína optimizada para síntesis muscular máxima","Suplementación que potencia el rendimiento sin relleno"],
-    days:5,goal:"Superávit +250 kcal · Masa y fuerza",
-    phases:["Fundamentos","Desarrollo","Potencia"],
-  },
-  HERA:{
-    color:"#D4C5A9",sub:"La definición",
-    tagline:"Forma, tono y presencia. Tu cuerpo refleja tu fuerza interior.",
-    identity:"No buscas más volumen. Buscas elegancia. Quieres un cuerpo que refleje quién eres — con forma, con tono, con presencia. No la restricción de siempre. La inteligencia de saber cómo lograrlo.",
-    insight:"El error más común: comer poco y hacer demasiado cardio. Resultado: pérdida de músculo y metabolismo lento. HEXIS HERA invierte esa ecuación con déficit inteligente e hipertrofia femenina.",
-    needs:["Déficit suave que preserva músculo mientras elimina grasa","Entrenamiento de hipertrofia adaptado a objetivo femenino","Nutrición que no se siente como dieta","Suplementación para recuperación y colágeno articular"],
-    days:4,goal:"Déficit suave -200 kcal · Definición y tono",
-    phases:["Activación","Definición","Mantenimiento activo"],
-  },
-  ZEN:{
-    color:"#8BA4A0",sub:"El reset",
-    tagline:"El estrés no te define. Reconecta cuerpo y mente.",
-    identity:"Tu cuerpo sabe que algo no está bien. El estrés crónico eleva el cortisol, retiene grasa, destruye músculo y bloquea el sueño. No es falta de voluntad. Es fisiología. Y tiene solución.",
-    insight:"La mayoría de los programas te exigirían más de lo que tienes ahora. HEXIS ZEN hace lo contrario: te devuelve energía antes de exigirte rendimiento. Primero el equilibrio. Después el cuerpo.",
-    needs:["Entrenamiento de 3 días que no añade estrés al sistema","Nutrición antiinflamatoria que regula el cortisol","Protocolo de sueño y recuperación activa","Suplementación adaptógena basada en evidencia"],
-    days:3,goal:"Mantenimiento · Energía estable · Cortisol bajo",
-    phases:["Reset","Equilibrio","Construcción"],
-  },
-  SHAPE:{
-    color:"#A09060",sub:"La transformación",
-    tagline:"Recomposición total. Pierdes lo que sobra, construyes lo que falta.",
-    identity:"Quieres los dos objetivos a la vez — y eso es posible si se hace con el sistema correcto. La recomposición corporal no es magia. Es precisión. Macros exactos, progresión inteligente y paciencia estratégica.",
-    insight:"El error más común: obsesionarse con la báscula. Puedes perder grasa, ganar músculo y ver el peso estancado — y estar progresando perfectamente. HEXIS SHAPE te enseña a leer los números correctos.",
-    needs:["Déficit moderado que permite síntesis muscular simultánea","Ciclos de carbohidratos adaptados a días de entreno","Alta proteína para preservar y construir músculo","Métricas correctas: perímetros, fotos, fuerza — no solo peso"],
-    days:4,goal:"Recomposición · Déficit moderado · Carb cycling",
-    phases:["Recomposición","Definición","Optimización"],
-  },
-  CORE:{
-    color:"#909090",sub:"El inicio",
-    tagline:"Empiezas desde cero con claridad. Sin presión, solo progreso.",
-    identity:"Empezar es el acto más valiente. No porque sea difícil — sino porque la mayoría nunca lo hace de verdad. La diferencia entre quien llega y quien no llega no es el talento. Es el sistema.",
-    insight:"El error que ha saboteado todos tus intentos anteriores no eres tú. Es la ausencia de un sistema diseñado para principiantes reales. Uno que no exija perfección desde el día uno. Uno que sobreviva a los días malos.",
-    needs:["Programa de 3 días con progresión gradual sin abrumar","Nutrición simple con hábitos de bajo impacto y alto efecto","Sistema antifallo — el proceso no se rompe si fallas un día","Base sólida para escalar a cualquier otro perfil"],
-    days:3,goal:"Base sólida · Hábito primero · Sin presión",
-    phases:["Fundamentos","Progresión","Consolidación"],
-  },
-};
+// Puerta de entrada antes del test: por defecto es el Onboarding de
+// siempre, pero deja un hueco discreto para quien ya tiene cuenta HEXIS y
+// solo necesita recuperarla en este móvil (no repetir el test ni perder
+// su historial).
+function RestoreForm({onBack}){
+  const[email,setEmail]=useState('');
+  const[status,setStatus]=useState('idle'); // idle | sending | sent | error
+  const[errMsg,setErrMsg]=useState('');
 
-function calcProfile(answers) {
-  const scores = {ALPHA:0,HERA:0,ZEN:0,SHAPE:0,CORE:0};
-  answers.forEach((letter, qi) => {
-    if (!letter) return;
-    const opt = QUESTIONS[qi].opts.find(o => o.l === letter);
-    if (opt) Object.entries(opt.s).forEach(([p,v]) => { scores[p] += v; });
-  });
-  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
-  return { primary: sorted[0][0], secondary: sorted[1][0], scores };
-}
-
-function HexisTest() {
-  const [step, setStep] = useState("intro"); // intro | test | result
-  const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState(Array(10).fill(null));
-  const [selected, setSelected] = useState(null);
-  const [result, setResult] = useState(null);
-  const [animIn, setAnimIn] = useState(true);
-
-  const q = QUESTIONS[current];
-  const progress = ((current) / QUESTIONS.length) * 100;
-
-  function handleSelect(letter) { setSelected(letter); }
-
-  function handleNext() {
-    const newAns = [...answers];
-    newAns[current] = selected;
-    setAnswers(newAns);
-    setAnimIn(false);
-    setTimeout(() => {
-      if (current < QUESTIONS.length - 1) {
-        setCurrent(c => c + 1);
-        setSelected(null);
-        setAnimIn(true);
-      } else {
-        const r = calcProfile(newAns);
-        setResult(r);
-        setStep("result");
-        setAnimIn(true);
-      }
-    }, 220);
-  }
-
-  function handleBack() {
-    if (current === 0) { setStep("intro"); return; }
-    setAnimIn(false);
-    setTimeout(() => {
-      setCurrent(c => c - 1);
-      setSelected(answers[current - 1]);
-      setAnimIn(true);
-    }, 180);
-  }
-
-  const root = {
-    maxWidth: 480, minHeight: "100vh", margin: "0 auto",
-    background: BG, fontFamily: "Poppins, sans-serif", color: "#fff",
-    position: "relative", overflow: "hidden",
+  const submit=async()=>{
+    if(!email.trim())return;
+    setStatus('sending');setErrMsg('');
+    const res=await restoreAccountByEmail(email.trim());
+    if(res.ok){ setStatus('sent'); }
+    else{ setStatus('error'); setErrMsg(res.error||''); }
   };
 
-  // ── INTRO ──────────────────────────────────────────────────
-  if (step === "intro") return (
-    <div style={root}>
-      {/* Background Greek numeral watermark */}
-      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:280,fontFamily:PF,color:G,opacity:0.03,pointerEvents:"none",userSelect:"none",lineHeight:1}}>Χ</div>
-
-      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"48px 32px 40px"}}>
-        <div>
-          <div style={{fontSize:11,letterSpacing:6,color:G,marginBottom:8}}>HEXIS</div>
-          <div style={{width:28,height:1,background:G,marginBottom:48}}/>
+  return(
+    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",display:"flex",flexDirection:"column",justifyContent:"center",padding:24}}>
+      <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:8,textAlign:"center"}}>Restaurar mi cuenta</div>
+      <div style={{fontFamily:PF,fontSize:22,fontWeight:700,textAlign:"center",marginBottom:16,lineHeight:1.3}}>Recupera tus datos<br/><em style={{color:G,fontStyle:"italic"}}>en este móvil</em></div>
+      {status==='sent'?(
+        <div style={{fontSize:13,color:"#aaa",textAlign:"center",lineHeight:1.7}}>
+          Te hemos enviado un enlace a <strong style={{color:"#fff"}}>{email}</strong>. Ábrelo desde este móvil para entrar en tu cuenta con todo tu historial.
         </div>
-
-        <div>
-          <div style={{fontSize:11,letterSpacing:4,color:"#8a8a8a",textTransform:"uppercase",marginBottom:16}}>Test de perfil · 10 preguntas</div>
-          <div style={{fontFamily:PF,fontSize:42,fontWeight:700,lineHeight:1.05,marginBottom:8}}>
-            Descubre
+      ):(
+        <>
+          <div style={{fontSize:12,color:"#8a8a8a",textAlign:"center",marginBottom:16,lineHeight:1.7}}>
+            Solo funciona si antes vinculaste un email desde Perfil → Tu cuenta en tu otro dispositivo. Si es tu primera vez en HEXIS, no hace falta esto — vuelve al test.
           </div>
-          <div style={{fontFamily:PF,fontSize:42,fontStyle:"italic",color:G,lineHeight:1.05,marginBottom:32}}>
-            quién eres.
-          </div>
-          <div style={{width:40,height:1,background:"#222",marginBottom:28}}/>
-          <p style={{fontSize:14,color:"#888",lineHeight:1.8,marginBottom:12}}>
-            No hay respuestas correctas ni incorrectas. Solo las tuyas.
-          </p>
-          <p style={{fontSize:14,color:"#666",lineHeight:1.8,marginBottom:40}}>
-            En 3 minutos descubrirás cuál de los 5 arquetipos HEXIS eres — y qué significa eso para tu entrenamiento, tu nutrición y tu mentalidad.
-          </p>
-
-          {/* Profile chips preview */}
-          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:44}}>
-            {Object.entries(RESULTS).map(([k,v])=>(
-              <div key={k} style={{padding:"4px 14px",borderRadius:100,border:`1px solid ${v.color}44`,fontSize:11,color:v.color,letterSpacing:2,fontWeight:600}}>{k}</div>
-            ))}
-          </div>
-        </div>
-
-        <button onClick={()=>{setStep("test");setAnimIn(true);}} style={{width:"100%",padding:"18px 0",background:`linear-gradient(135deg,${G},#d4b85a)`,border:"none",borderRadius:3,color:BG,fontFamily:"Poppins,sans-serif",fontSize:13,fontWeight:700,letterSpacing:3,textTransform:"uppercase",cursor:"pointer"}}>
-          Comenzar el test →
-        </button>
+          <input style={inp} type="email" placeholder="tu@email.com" value={email} onChange={e=>setEmail(e.target.value)}/>
+          {status==='error'&&<div style={{fontSize:12,color:"#c86a6a",marginBottom:8}}>No se pudo enviar el enlace{errMsg?`: ${errMsg}`:''}.</div>}
+          <Btn label={status==='sending'?"Enviando...":"Enviar enlace de acceso"} onClick={submit} disabled={status==='sending'||!email.trim()}/>
+        </>
+      )}
+      <div style={{textAlign:"center",marginTop:20}}>
+        <span style={{fontSize:12,color:"#8a8a8a",textDecoration:"underline",cursor:"pointer"}} onClick={onBack}>← Volver al test</span>
       </div>
     </div>
   );
+}
 
-  // ── RESULT ─────────────────────────────────────────────────
-  if (step === "result" && result) {
-    const p = RESULTS[result.primary];
-    const s = RESULTS[result.secondary];
-    const col = p.color;
-    const maxScore = Math.max(...Object.values(result.scores));
-
-    return (
-      <div style={root}>
-        <div style={{
-          opacity: animIn ? 1 : 0,
-          transform: animIn ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.5s ease",
-          minHeight:"100vh",overflowY:"auto",paddingBottom:40
-        }}>
-          {/* Hero */}
-          <div style={{padding:"48px 32px 32px",position:"relative",overflow:"hidden"}}>
-            <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,transparent,${col},transparent)`}}/>
-            <div style={{position:"absolute",top:"50%",right:-20,transform:"translateY(-50%)",fontFamily:PF,fontSize:160,color:col,opacity:0.04,fontWeight:700,pointerEvents:"none"}}>{result.primary}</div>
-
-            <div style={{fontSize:11,letterSpacing:4,color:col,marginBottom:6}}>TU ARQUETIPO HEXIS</div>
-            <div style={{width:24,height:1,background:col,marginBottom:28}}/>
-            <div style={{fontFamily:PF,fontSize:52,fontWeight:700,lineHeight:1,marginBottom:8}}>{result.primary}</div>
-            <div style={{fontFamily:PF,fontSize:18,fontStyle:"italic",color:col,marginBottom:16}}>{p.sub}</div>
-            <div style={{fontSize:13,color:"#888",fontStyle:"italic",lineHeight:1.7}}>"{p.tagline}"</div>
-          </div>
-
-          {/* Score bars */}
-          <div style={{padding:"0 32px 28px"}}>
-            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",marginBottom:14}}>PUNTUACIÓN POR PERFIL</div>
-            {Object.entries(result.scores).sort((a,b)=>b[1]-a[1]).map(([k,v])=>(
-              <div key={k} style={{marginBottom:10}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                  <span style={{fontSize:11,letterSpacing:2,color:k===result.primary?RESULTS[k].color:"#555",fontWeight:k===result.primary?700:400}}>{k}</span>
-                  <span style={{fontSize:11,color:"#8a8a8a"}}>{v} pts</span>
-                </div>
-                <div style={{height:3,background:"#111",borderRadius:100,overflow:"hidden"}}>
-                  <div style={{height:"100%",width:`${maxScore>0?(v/maxScore)*100:0}%`,background:k===result.primary?RESULTS[k].color:"#222",borderRadius:100,transition:"width 1s ease"}}/>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{height:1,background:"#111",margin:"0 32px 28px"}}/>
-
-          {/* Identity */}
-          <div style={{padding:"0 32px 28px"}}>
-            <div style={{fontSize:11,letterSpacing:3,color:col,marginBottom:14}}>TU IDENTIDAD</div>
-            <p style={{fontSize:15,color:"#ccc",lineHeight:1.85}}>{p.identity}</p>
-          </div>
-
-          {/* Insight */}
-          <div style={{margin:"0 32px 28px",borderLeft:`2px solid ${col}`,paddingLeft:20,paddingTop:4,paddingBottom:4}}>
-            <div style={{fontSize:11,letterSpacing:3,color:col,marginBottom:10}}>LO QUE NECESITAS SABER</div>
-            <p style={{fontSize:13,color:"#888",lineHeight:1.8}}>{p.insight}</p>
-          </div>
-
-          {/* What you need */}
-          <div style={{padding:"0 32px 28px"}}>
-            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",marginBottom:14}}>HEXIS CORE {result.primary} INCLUYE</div>
-            {p.needs.map((n,i)=>(
-              <div key={i} style={{display:"flex",gap:12,marginBottom:12,alignItems:"flex-start"}}>
-                <div style={{width:6,height:6,borderRadius:"50%",background:col,marginTop:6,flexShrink:0}}/>
-                <div style={{fontSize:13,color:"#999",lineHeight:1.6}}>{n}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Program overview */}
-          <div style={{margin:"0 32px 28px",background:"#0d0d0d",borderRadius:10,padding:20}}>
-            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",marginBottom:16}}>TU PROGRAMA</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
-              {[["Días/semana",p.days+"d/sem"],["Duración","12 semanas"],["Objetivo",p.goal.split("·")[0].trim()],["Fases","3 fases"]].map(([l,v])=>(
-                <div key={l}>
-                  <div style={{fontSize:8,color:"#8a8a8a",letterSpacing:1,textTransform:"uppercase",marginBottom:3}}>{l}</div>
-                  <div style={{fontSize:13,fontWeight:600,color:"#ddd"}}>{v}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{display:"flex",gap:0}}>
-              {p.phases.map((ph,i)=>(
-                <div key={ph} style={{flex:1,textAlign:"center"}}>
-                  <div style={{height:2,background:i===0?col:"#222",marginBottom:6}}/>
-                  <div style={{fontSize:11,color:i===0?col:"#444",letterSpacing:1}}>Fase {i+1}</div>
-                  <div style={{fontSize:11,color:i===0?"#ddd":"#555",fontWeight:i===0?600:400}}>{ph}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Secondary profile */}
-          {s && (
-            <div style={{margin:"0 32px 28px",padding:"14px 18px",border:`1px solid ${s.color}33`,borderRadius:10}}>
-              <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",marginBottom:6}}>TAMBIÉN TIENES RASGOS DE</div>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div style={{width:3,height:36,background:s.color,borderRadius:100}}/>
-                <div>
-                  <div style={{fontSize:16,fontWeight:700,color:s.color}}>{result.secondary}</div>
-                  <div style={{fontSize:11,color:"#666",fontStyle:"italic"}}>{s.sub}</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div style={{height:1,background:"#111",margin:"0 32px 28px"}}/>
-
-          {/* CTA */}
-          <div style={{padding:"0 32px"}}>
-            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",marginBottom:8,textAlign:"center"}}>EL PLAN COMPLETO ESTÁ EN</div>
-            <div style={{fontFamily:PF,fontSize:22,textAlign:"center",marginBottom:6}}>HEXIS CORE</div>
-            <div style={{fontSize:12,color:"#666",textAlign:"center",marginBottom:24,lineHeight:1.7}}>
-              Macros exactos · Plan de 12 semanas · Nutrición completa<br/>Suplementación · App · De por vida
-            </div>
-
-            <button style={{width:"100%",padding:"18px 0",background:`linear-gradient(135deg,${col},#d4b85a)`,border:"none",borderRadius:3,color:BG,fontFamily:"Poppins,sans-serif",fontSize:13,fontWeight:700,letterSpacing:3,textTransform:"uppercase",cursor:"pointer",marginBottom:12}}>
-              Acceder a HEXIS CORE — 149 €
-            </button>
-
-            <button onClick={()=>{setStep("intro");setCurrent(0);setAnswers(Array(10).fill(null));setSelected(null);setResult(null);}} style={{width:"100%",padding:"14px 0",background:"transparent",border:"1px solid #222",borderRadius:3,color:"#555",fontFamily:"Poppins,sans-serif",fontSize:11,fontWeight:600,letterSpacing:2,textTransform:"uppercase",cursor:"pointer"}}>
-              Repetir el test
-            </button>
-          </div>
-          <div style={{height:32}}/>
-        </div>
-      </div>
-    );
-  }
-
-  // ── TEST ───────────────────────────────────────────────────
-  return (
-    <div style={root}>
-      {/* Progress bar */}
-      <div style={{position:"fixed",top:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,height:2,background:"#111",zIndex:100}}>
-        <div style={{height:"100%",width:`${progress}%`,background:`linear-gradient(90deg,${G},#d4b85a)`,transition:"width 0.4s ease"}}/>
-      </div>
-
-      <div style={{
-        minHeight:"100vh",display:"flex",flexDirection:"column",padding:"52px 32px 40px",
-        opacity: animIn ? 1 : 0,
-        transform: animIn ? "translateY(0)" : "translateY(16px)",
-        transition: "opacity 0.25s ease, transform 0.25s ease",
-      }}>
-        {/* Header */}
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:40}}>
-          <button onClick={handleBack} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:20,padding:0,lineHeight:1}}>←</button>
-          <div style={{textAlign:"center"}}>
-            <div style={{fontSize:11,letterSpacing:4,color:G}}>{q.cat}</div>
-            <div style={{fontSize:11,color:"#7a7a7a",marginTop:2}}>{current+1} / {QUESTIONS.length}</div>
-          </div>
-          <div style={{width:24}}/>
-        </div>
-
-        {/* Question number watermark */}
-        <div style={{position:"absolute",top:80,right:24,fontFamily:PF,fontSize:80,color:G,opacity:0.05,fontWeight:700,pointerEvents:"none",lineHeight:1}}>{q.n}</div>
-
-        {/* Question */}
-        <div style={{flex:1}}>
-          <div style={{width:28,height:1,background:G,marginBottom:20}}/>
-          <div style={{fontFamily:PF,fontSize:28,fontWeight:700,lineHeight:1.2,marginBottom:36,color:"#fff"}}>{q.q}</div>
-
-          {q.note && (
-            <div style={{fontSize:11,color:G,letterSpacing:2,marginBottom:20,paddingLeft:12,borderLeft:`1px solid ${G}44`}}>{q.note}</div>
-          )}
-
-          {/* Options */}
-          <div style={{display:"flex",flexDirection:"column",gap:10}}>
-            {q.opts.map(opt => {
-              const sel = selected === opt.l;
-              return (
-                <div key={opt.l} onClick={()=>handleSelect(opt.l)} style={{
-                  display:"flex",gap:14,alignItems:"flex-start",
-                  padding:"16px 18px",
-                  background: sel ? "rgba(200,170,80,0.08)" : "#0c0c0c",
-                  border: `1px solid ${sel ? G : "#1a1a1a"}`,
-                  borderRadius:8,cursor:"pointer",
-                  transition:"all 0.15s ease",
-                }}>
-                  <div style={{
-                    width:22,height:22,borderRadius:"50%",flexShrink:0,marginTop:1,
-                    border:`1.5px solid ${sel ? G : "#2a2a2a"}`,
-                    background: sel ? G : "transparent",
-                    display:"flex",alignItems:"center",justifyContent:"center",
-                    transition:"all 0.15s",
-                  }}>
-                    {sel && <div style={{width:8,height:8,borderRadius:"50%",background:BG}}/>}
-                  </div>
-                  <div style={{flex:1}}>
-                    <span style={{fontSize:11,fontWeight:700,color:sel?G:"#444",letterSpacing:1,marginRight:8}}>{opt.l}</span>
-                    <span style={{fontSize:13,color:sel?"#ddd":"#888",lineHeight:1.65}}>{opt.t}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Next button */}
-        <div style={{marginTop:32}}>
-          <button onClick={handleNext} disabled={!selected} style={{
-            width:"100%",padding:"17px 0",
-            background: selected ? `linear-gradient(135deg,${G},#d4b85a)` : "#111",
-            border:"none",borderRadius:3,
-            color: selected ? BG : "#333",
-            fontFamily:"Poppins,sans-serif",fontSize:12,fontWeight:700,
-            letterSpacing:3,textTransform:"uppercase",
-            cursor: selected ? "pointer" : "not-allowed",
-            transition:"all 0.2s",
-          }}>
-            {current < QUESTIONS.length-1 ? "Siguiente →" : "Ver mi perfil →"}
-          </button>
-        </div>
-      </div>
+function EntryGate({onDone}){
+  const[mode,setMode]=useState('onboarding');
+  if(mode==='restore') return <RestoreForm onBack={()=>setMode('onboarding')}/>;
+  return(
+    <div style={{position:"relative"}}>
+      <div onClick={()=>setMode('restore')} style={{position:"absolute",top:14,right:16,zIndex:20,fontSize:11,color:"#8a8a8a",textDecoration:"underline",cursor:"pointer"}}>¿Ya tienes cuenta?</div>
+      <Onboarding onDone={onDone}/>
     </div>
   );
 }
@@ -2099,13 +1838,33 @@ export default function App(){
   const [mirrorLog,setMirrorLog]=useState(()=>loadMirrorLog());
 
   useEffect(()=>{
-    ensureCloudSession().then(id=>{
+    ensureCloudSession().then(async id=>{
       if(id){
         setUserId(id);
         const p=loadProfile();
         const ud=loadUserData();
         if(p&&ud){
           syncProfileToCloud(id,{name:ud.name,archetype:p,gender:ud.gender,age:ud.age,weight:ud.weight,height:ud.height,activity:ud.activity});
+        }else{
+          // Sin perfil en este dispositivo: puede ser un móvil nuevo en el
+          // que el usuario acaba de entrar con el enlace de "Restaurar mi
+          // cuenta" (mismo user_id de siempre). Si Supabase ya tiene un
+          // perfil real para este user_id, se reconstruye aquí en vez de
+          // mandarle otra vez al test de onboarding.
+          const cloud=await fetchCloudProfile(id);
+          if(cloud){
+            const pd=calcPlan(cloud.userData,cloud.archetype);
+            setProfile(cloud.archetype);setPlan(pd);
+            saveProfile(cloud.archetype);savePlan(pd);saveUserData(cloud.userData);
+            setExercises(loadExercises(getTodayWorkout(cloud.archetype).length));
+            setHabits(loadHabits(PROFILES[cloud.archetype].habits.length));
+            const hist=await fetchCloudHistory(id);
+            restoreLocalLogs(hist);
+            if(hist.weightLog.length)setWeightLog(hist.weightLog);
+            if(hist.vo2Log.length)setVo2Log(hist.vo2Log);
+            if(hist.stepsLog.length)setStepsLog(hist.stepsLog);
+            if(hist.sleepLog.length)setSleepLog(hist.sleepLog);
+          }
         }
         fetchSubscriptionTier(id).then(tier=>setIsPro(tier==='premium'));
       }
@@ -2124,13 +1883,12 @@ export default function App(){
     });
   };
 
-  if(!profile) return <Onboarding onDone={handleDone}/>;
+  if(!profile) return <EntryGate onDone={handleDone}/>;
 
   // Sub-screens
   if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)}/>;
   if(screen==="atlas") return <AtlasMuscular onBack={()=>setScreen(null)}/>;
   if(screen==="nutdb") return <NutritionDB onBack={()=>setScreen(null)}/>;
-  if(screen==="test") return <HexisTest/>;
   if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
     if(window.confirm('¿Reiniciar la aplicación desde el principio? Se borrará todo tu progreso guardado en este dispositivo.')){
       clearAll();setProfile(null);setPlan(null);setWeightLog([]);setStreakData({current:0,best:0});setHabits([false,false,false,false]);setExercises(Array(5).fill(false));setWater(0);setScreen(null);setCycle(null);
@@ -2166,6 +1924,7 @@ export default function App(){
     }}
   />;
   if(screen==="analyze") return <AnalyzeScreen onBack={()=>setScreen(null)} isPro={isPro} onUnlocked={()=>setIsPro(true)} color={PROFILES[profile].color}/>;
+  if(screen==="progress") return <ProgressPhotosScreen onBack={()=>setScreen(null)} userId={userId} color={PROFILES[profile].color}/>;
 
   const p=PROFILES[profile];
   const w=getTodayWorkout(profile);
@@ -2378,6 +2137,14 @@ export default function App(){
               </button>
             </div>
             <div style={{fontSize:11,color:"#8a8a8a",lineHeight:1.6}}>{validW.length===0?"Introduce tu peso cada mañana para ver la tendencia real.":"La tendencia semanal importa, no el número de hoy. El peso fluctúa ±1-2kg por agua y digestión."}</div>
+          </div>
+          <div onClick={()=>setScreen("progress")} style={{background:"rgba(200,170,80,0.04)",border:"1px solid rgba(200,170,80,0.15)",borderRadius:12,padding:"16px",marginBottom:16,cursor:"pointer",display:"flex",alignItems:"center",gap:14}}>
+            <div style={{fontSize:28}}>📸</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:13,fontWeight:700,color:G,marginBottom:3}}>Antes / Después</div>
+              <div style={{fontSize:11,color:"#555"}}>Fotos de progreso privadas + feedback opcional</div>
+            </div>
+            <div style={{fontSize:18,color:"#8a8a8a"}}>→</div>
           </div>
           {isPro&&(
             <div onClick={()=>setScreen("mirror")} style={{background:"rgba(200,170,80,0.04)",border:"1px solid rgba(200,170,80,0.15)",borderRadius:12,padding:"16px",marginBottom:16,cursor:"pointer",display:"flex",alignItems:"center",gap:14}}>
