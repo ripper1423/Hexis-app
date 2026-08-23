@@ -83,21 +83,33 @@ const DAILY_QUOTES = [
 ];
 
 const FEELINGS = [
-  {id:"strong",l:"Fuerte",i:"⚡",d:"Potencia y control"},
-  {id:"light",l:"Ligero",i:"🌬",d:"Sin peso ni tensión"},
-  {id:"focused",l:"Enfocado",i:"🎯",d:"Claridad mental"},
-  {id:"confident",l:"Seguro",i:"🛡",d:"Confianza real"},
-  {id:"energetic",l:"Energético",i:"🔥",d:"Vitalidad constante"},
-  {id:"balanced",l:"Equilibrado",i:"⚖️",d:"Mente y cuerpo"},
+  {id:"strong",l:"Fuerte",i:"bolt",d:"Potencia y control"},
+  {id:"light",l:"Ligero",i:"leaf",d:"Sin peso ni tensión"},
+  {id:"focused",l:"Enfocado",i:"target",d:"Claridad mental"},
+  {id:"confident",l:"Seguro",i:"shield",d:"Confianza real"},
+  {id:"energetic",l:"Energético",i:"flame",d:"Vitalidad constante"},
+  {id:"balanced",l:"Equilibrado",i:"scale",d:"Mente y cuerpo"},
 ];
 const OBSTACLES = [
-  {id:"notime",l:"No tengo tiempo",i:"⏱"},
-  {id:"noconstancy",l:"Me cuesta ser constante",i:"🔄"},
-  {id:"confused",l:"No sé por dónde empezar",i:"🧭"},
-  {id:"stress",l:"El estrés me bloquea",i:"🌀"},
-  {id:"eating",l:"No controlo lo que como",i:"🍽"},
-  {id:"motivation",l:"Pierdo la motivación",i:"📉"},
+  {id:"notime",l:"No tengo tiempo",i:"hourglass"},
+  {id:"noconstancy",l:"Me cuesta ser constante",i:"wreath"},
+  {id:"confused",l:"No sé por dónde empezar",i:"labyrinth"},
+  {id:"stress",l:"El estrés me bloquea",i:"spiral"},
+  {id:"eating",l:"No controlo lo que como",i:"kylix"},
+  {id:"motivation",l:"Pierdo la motivación",i:"column"},
 ];
+// Iconos: recortes reales de las referencias griegas grabadas en plata que
+// diste (no son un dibujo aproximado — son la imagen exacta, con fondo
+// transparente y color intercambiable según selección).
+function ThemeIcon({name,size=24,selected=false}){
+  return(
+    <img
+      src={`/icons/${name}_${selected?"gold":"default"}.png`}
+      alt=""
+      style={{display:"block",margin:"0 auto",width:size,height:"auto",filter:"drop-shadow(0 1px 1px rgba(0,0,0,0.7))"}}
+    />
+  );
+}
 
 const typeIcon = {train:"💪",rest:"🌙",cardio:"🏃",mobility:"🧘"};
 const levelColor = {Principiante:"#8BA4A0",Intermedio:"#C8AA50",Avanzado:"#D4C5A9"};
@@ -1692,10 +1704,14 @@ function Onboarding({onDone}){
       <div style={{padding:"16px 20px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}>
           {FEELINGS.map(f=>(
-            <div key={f.id} onClick={()=>tf(f.id)} style={{background:feelings.includes(f.id)?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${feelings.includes(f.id)?G:"#1a1a1a"}`,borderRadius:12,padding:"14px 10px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
-              <div style={{fontSize:24,marginBottom:6}}>{f.i}</div>
-              <div style={{fontSize:12,fontWeight:600,color:feelings.includes(f.id)?G:"#ddd",marginBottom:3}}>{f.l}</div>
-              <div style={{fontSize:11,color:"#555"}}>{f.d}</div>
+            <div key={f.id} onClick={()=>tf(f.id)} style={{background:feelings.includes(f.id)?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${feelings.includes(f.id)?G:"#1a1a1a"}`,borderRadius:12,padding:"16px 8px 12px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+              <div style={{marginBottom:8}}><ThemeIcon name={f.i} size={50} selected={feelings.includes(f.id)}/></div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginBottom:5}}>
+                <div style={{width:14,height:1,background:feelings.includes(f.id)?G:"#333"}}/>
+                <div style={{width:3,height:3,borderRadius:"50%",background:feelings.includes(f.id)?G:"#555"}}/>
+              </div>
+              <div style={{fontFamily:PF,fontSize:12,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",color:feelings.includes(f.id)?G:"#ddd",marginBottom:3}}>{f.l}</div>
+              <div style={{fontSize:10.5,color:"#555"}}>{f.d}</div>
             </div>
           ))}
         </div>
@@ -1714,9 +1730,13 @@ function Onboarding({onDone}){
       <div style={{padding:"16px 20px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}>
           {OBSTACLES.map(o=>(
-            <div key={o.id} onClick={()=>to(o.id)} style={{background:obstacles.includes(o.id)?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${obstacles.includes(o.id)?G:"#1a1a1a"}`,borderRadius:12,padding:"14px 10px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
-              <div style={{fontSize:24,marginBottom:8}}>{o.i}</div>
-              <div style={{fontSize:12,fontWeight:600,color:obstacles.includes(o.id)?G:"#ddd"}}>{o.l}</div>
+            <div key={o.id} onClick={()=>to(o.id)} style={{background:obstacles.includes(o.id)?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${obstacles.includes(o.id)?G:"#1a1a1a"}`,borderRadius:12,padding:"16px 8px 14px",cursor:"pointer",textAlign:"center",transition:"all 0.2s"}}>
+              <div style={{marginBottom:8}}><ThemeIcon name={o.i} size={50} selected={obstacles.includes(o.id)}/></div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginBottom:5}}>
+                <div style={{width:14,height:1,background:obstacles.includes(o.id)?G:"#333"}}/>
+                <div style={{width:3,height:3,borderRadius:"50%",background:obstacles.includes(o.id)?G:"#555"}}/>
+              </div>
+              <div style={{fontFamily:PF,fontSize:11.5,fontWeight:700,letterSpacing:1,textTransform:"uppercase",color:obstacles.includes(o.id)?G:"#ddd"}}>{o.l}</div>
             </div>
           ))}
         </div>
