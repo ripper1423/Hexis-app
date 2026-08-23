@@ -83,12 +83,12 @@ const DAILY_QUOTES = [
 ];
 
 const FEELINGS = [
-  {id:"strong",l:"Fuerte",i:"bolt",d:"Potencia y control"},
-  {id:"light",l:"Ligero",i:"leaf",d:"Sin peso ni tensión"},
-  {id:"focused",l:"Enfocado",i:"target",d:"Claridad mental"},
-  {id:"confident",l:"Seguro",i:"shield",d:"Confianza real"},
-  {id:"energetic",l:"Energético",i:"flame",d:"Vitalidad constante"},
-  {id:"balanced",l:"Equilibrado",i:"scale",d:"Mente y cuerpo"},
+  {id:"strong",l:"Fuerza",i:"bolt",d:"Potencia y control"},
+  {id:"light",l:"Ligereza",i:"leaf",d:"Sin peso ni tensión"},
+  {id:"focused",l:"Enfoque",i:"target",d:"Claridad mental"},
+  {id:"confident",l:"Seguridad",i:"shield",d:"Confianza real"},
+  {id:"energetic",l:"Energía",i:"flame",d:"Vitalidad constante"},
+  {id:"balanced",l:"Equilibrio",i:"scale",d:"Mente y cuerpo"},
 ];
 const OBSTACLES = [
   {id:"notime",l:"No tengo tiempo",i:"hourglass"},
@@ -167,8 +167,9 @@ function Hero({Fig,img,imgPos,children,h=220}){
       {img?(
         <img src={img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:imgPos||"center 20%",filter:"grayscale(35%) brightness(0.8)"}}/>
       ):(
-        <Fig/>
+        <div style={{position:"absolute",inset:0,filter:"brightness(1.5)"}}><Fig/></div>
       )}
+      {!img&&<img src="/logo/hexis_logo.jpg" alt="HEXIS" style={{position:"absolute",top:14,left:18,width:60,height:"auto",opacity:0.85,zIndex:3}}/>}
       <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(5,5,5,0) 20%,rgba(5,5,5,0.8) 65%,rgba(5,5,5,1) 100%)"}}/>
       <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"0 20px 18px",zIndex:3}}>{children}</div>
     </div>
