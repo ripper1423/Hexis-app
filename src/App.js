@@ -1658,10 +1658,14 @@ function Onboarding({onDone}){
   if(step===1) return(
     <div style={scr}>
       <PBar pct={pct} fixed/>
-      <Hero Fig={FigW} h={195}>
-        <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>Antes de empezar</div>
-        <div style={{fontFamily:PF,fontSize:22,fontWeight:700}}>¿Cuál es tu <em style={{color:G,fontStyle:"italic"}}>sexo biológico?</em></div>
-      </Hero>
+      <div style={{position:"relative",height:195,overflow:"hidden",flexShrink:0,background:"#000"}}>
+        <img src="/logo/hexis_logo.jpg" alt="HEXIS" style={{position:"absolute",top:"42%",left:"50%",transform:"translate(-50%,-50%)",width:"66%",maxWidth:280,display:"block"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(5,5,5,0) 20%,rgba(5,5,5,0.8) 65%,rgba(5,5,5,1) 100%)"}}/>
+        <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"0 20px 18px",zIndex:3}}>
+          <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>Antes de empezar</div>
+          <div style={{fontFamily:PF,fontSize:22,fontWeight:700}}>¿Cuál es tu <em style={{color:G,fontStyle:"italic"}}>sexo biológico?</em></div>
+        </div>
+      </div>
       <div style={{padding:"16px 20px"}}>
         <div style={{fontSize:12,color:"#666",lineHeight:1.7,marginBottom:16}}>Lo usamos para calcular tu plan con precisión — metabolismo, calorías y tu arquetipo HEXIS.</div>
         <div style={{position:"relative",borderRadius:12,overflow:"hidden",border:"1px solid #1a1a1a",marginBottom:2}}>
