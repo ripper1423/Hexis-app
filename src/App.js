@@ -23,6 +23,27 @@ import { analyzePhotoRemote } from './api';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
 import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
 
+// ── ACCESO DE PROPIETARIO (testing interno) ─────────────────────────
+// Visitar la app una vez con ?hexisOwner=<token> desbloquea HEXIS PRO
+// de forma permanente en ESE dispositivo/navegador (queda guardado en
+// localStorage, no depende de cuenta ni de conexión). Pensado solo para
+// que el propio equipo pueda probar la app en cualquier móvil/ordenador
+// sin canjear un código cada vez. No lo compartas: cualquiera con este
+// enlace desbloquea PRO gratis en su dispositivo.
+const OWNER_UNLOCK_TOKEN = 'hx-oscar-9f31c7';
+const OWNER_UNLOCK_KEY = 'hexis_owner_unlocked';
+function checkOwnerUnlock() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('hexisOwner') === OWNER_UNLOCK_TOKEN) {
+      localStorage.setItem(OWNER_UNLOCK_KEY, '1');
+    }
+    return localStorage.getItem(OWNER_UNLOCK_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
 const G = "#C8AA50";
 const PF = "'Playfair Display',Georgia,serif";
 const BG = "#050505";
@@ -1827,7 +1848,7 @@ export default function App(){
   const streakDay=streakData.current;
   const streakBest=streakData.best;
   const [userId,setUserId]=useState(null);
-  const [isPro,setIsPro]=useState(false);
+  const [isPro,setIsPro]=useState(()=>checkOwnerUnlock());
   const [setLogs,setSetLogs]=useState(()=>loadSetLogs());
   const [vo2Log,setVo2Log]=useState(()=>loadVo2Log());
   const [loggingIdx,setLoggingIdx]=useState(null);
@@ -1867,7 +1888,7 @@ export default function App(){
             if(hist.sleepLog.length)setSleepLog(hist.sleepLog);
           }
         }
-        fetchSubscriptionTier(id).then(tier=>setIsPro(tier==='premium'));
+        fetchSubscriptionTier(id).then(tier=>setIsPro(tier==='premium'||checkOwnerUnlock()));
       }
     });
   },[]);
