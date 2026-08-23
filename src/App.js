@@ -1663,16 +1663,15 @@ function Onboarding({onDone}){
         <div style={{fontFamily:PF,fontSize:22,fontWeight:700}}>¿Cuál es tu <em style={{color:G,fontStyle:"italic"}}>sexo biológico?</em></div>
       </Hero>
       <div style={{padding:"16px 20px"}}>
-        <div style={{fontSize:12,color:"#666",lineHeight:1.7,marginBottom:20}}>Lo usamos para calcular tu plan con precisión — metabolismo, calorías y tu arquetipo HEXIS.</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}>
-          <div onClick={()=>setFd(p=>({...p,gender:"male"}))} style={{background:fd.gender==="male"?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${fd.gender==="male"?G:"#1a1a1a"}`,borderRadius:12,padding:"22px 10px",cursor:"pointer",textAlign:"center"}}>
-            <div style={{fontSize:26,marginBottom:8}}>♂</div>
-            <div style={{fontSize:13,fontWeight:600,color:fd.gender==="male"?G:"#ddd"}}>Hombre</div>
-          </div>
-          <div onClick={()=>setFd(p=>({...p,gender:"female"}))} style={{background:fd.gender==="female"?"rgba(200,170,80,0.08)":"#0c0c0c",border:`1px solid ${fd.gender==="female"?G:"#1a1a1a"}`,borderRadius:12,padding:"22px 10px",cursor:"pointer",textAlign:"center"}}>
-            <div style={{fontSize:26,marginBottom:8}}>♀</div>
-            <div style={{fontSize:13,fontWeight:600,color:fd.gender==="female"?G:"#ddd"}}>Mujer</div>
-          </div>
+        <div style={{fontSize:12,color:"#666",lineHeight:1.7,marginBottom:16}}>Lo usamos para calcular tu plan con precisión — metabolismo, calorías y tu arquetipo HEXIS.</div>
+        <div style={{position:"relative",borderRadius:12,overflow:"hidden",border:"1px solid #1a1a1a",marginBottom:2}}>
+          <img src="/estatuas/estatua_pareja_griega.jpg" alt="" style={{width:"100%",display:"block"}}/>
+          <div onClick={()=>setFd(p=>({...p,gender:"female"}))} style={{position:"absolute",left:0,top:0,width:"50%",height:"100%",cursor:"pointer"}}/>
+          <div onClick={()=>setFd(p=>({...p,gender:"male"}))} style={{position:"absolute",right:0,top:0,width:"50%",height:"100%",cursor:"pointer"}}/>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",marginBottom:20}}>
+          <div onClick={()=>setFd(p=>({...p,gender:"female"}))} style={{textAlign:"center",padding:"10px 0",cursor:"pointer",fontSize:13,fontWeight:600,color:fd.gender==="female"?G:"#ddd"}}>{fd.gender==="female"?"✓ ":"♀ "}Mujer</div>
+          <div onClick={()=>setFd(p=>({...p,gender:"male"}))} style={{textAlign:"center",padding:"10px 0",cursor:"pointer",fontSize:13,fontWeight:600,color:fd.gender==="male"?G:"#ddd"}}>{fd.gender==="male"?"✓ ":"♂ "}Hombre</div>
         </div>
         <Btn label="Continuar" onClick={next} disabled={!fd.gender}/>
       </div>
