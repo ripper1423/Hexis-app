@@ -864,9 +864,12 @@ function BodyMap({gender,view,activeZone,onZoneClick}){
     {id:"gemelos",x:33,y:69,w:13,h:17,label:"Gemelos"},
     {id:"gemelos",x:54,y:69,w:13,h:17,label:"Gemelos"},
   ];
+  // Sufijo _v2 (24 ago) para forzar refresco — Cloudflare cacheaba en el
+  // edge la imagen anterior en la misma ruta y el navegador la seguía
+  // sirviendo aunque el archivo en GitHub ya fuera el nuevo.
   const img = gender==="female"
-    ? (view==="front" ? "/estatuas/cuerpo_mujer_frente.png" : "/estatuas/cuerpo_mujer_espalda.png")
-    : (view==="front" ? "/estatuas/cuerpo_hombre_frente.png" : "/estatuas/cuerpo_hombre_espalda.png");
+    ? (view==="front" ? "/estatuas/cuerpo_mujer_frente_v2.png" : "/estatuas/cuerpo_mujer_espalda_v2.png")
+    : (view==="front" ? "/estatuas/cuerpo_hombre_frente_v2.png" : "/estatuas/cuerpo_hombre_espalda_v2.png");
   // Las 4 imágenes (18 ago) vienen del mismo recorte 347×954 — mismo
   // aspect-ratio para las 4, así las zonas (en %) no se desplazan.
   const [dw,dh]=[347,954];
