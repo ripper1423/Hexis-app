@@ -174,7 +174,7 @@ const FIGS={
 // ── UI COMPONENTS ────────────────────────────────────────────────
 function Hero({Fig,img,imgPos,children,h=220}){
   return(
-    <div style={{position:"relative",height:h,overflow:"hidden",flexShrink:0,background:BG}}>
+    <div style={{position:"relative",height:h,overflow:"hidden",flexShrink:0,background:BG,isolation:"isolate",transform:"translateZ(0)"}}>
       {img?(
         <img src={img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:imgPos||"center 20%",filter:"grayscale(35%) brightness(0.8)"}}/>
       ):(
@@ -187,7 +187,7 @@ function Hero({Fig,img,imgPos,children,h=220}){
 }
 
 function PBar({pct,h=3,fixed=false}){
-  const s=fixed?{position:"fixed",top:0,left:0,right:0,height:h,background:"#111",zIndex:100}:{background:"#111",borderRadius:100,height:h,overflow:"hidden"};
+  const s=fixed?{position:"fixed",top:0,left:0,right:0,height:h,background:"#111",zIndex:100,transform:"translateZ(0)",WebkitBackfaceVisibility:"hidden"}:{background:"#111",borderRadius:100,height:h,overflow:"hidden"};
   return(<div style={s}><div style={{height:"100%",width:`${pct}%`,background:`linear-gradient(90deg,${G},#E8C870)`,transition:"width 0.4s",borderRadius:100}}/></div>);
 }
 
@@ -1666,8 +1666,8 @@ function EntryGate({onDone}){
   const[mode,setMode]=useState('onboarding');
   if(mode==='restore') return <RestoreForm onBack={()=>setMode('onboarding')}/>;
   return(
-    <div style={{position:"relative"}}>
-      <div onClick={()=>setMode('restore')} style={{position:"absolute",top:14,right:16,zIndex:20,fontSize:11,color:"#8a8a8a",textDecoration:"underline",cursor:"pointer"}}>¿Ya tienes cuenta?</div>
+    <div style={{position:"relative",isolation:"isolate"}}>
+      <div onClick={()=>setMode('restore')} style={{position:"absolute",top:14,right:16,zIndex:20,fontSize:11,color:"#8a8a8a",textDecoration:"underline",cursor:"pointer",transform:"translateZ(0)"}}>¿Ya tienes cuenta?</div>
       <Onboarding onDone={onDone}/>
     </div>
   );
