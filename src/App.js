@@ -154,7 +154,6 @@ function calcPlan(d,id){
 function FigW(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fw" cx="50%" cy="28%" r="68%"><stop offset="0%" stopColor="#221808"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fw)"/><ellipse cx="150" cy="100" rx="27" ry="33" fill="#1e1a10"/><ellipse cx="150" cy="96" rx="21" ry="25" fill="#231f13" opacity="0.8"/><rect x="130" y="130" width="40" height="22" rx="8" fill="#181410"/><rect x="122" y="150" width="56" height="85" rx="6" fill="#161208"/><rect x="94" y="156" width="24" height="68" rx="8" fill="#121008"/><rect x="182" y="156" width="24" height="68" rx="8" fill="#121008"/><ellipse cx="106" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><ellipse cx="194" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><rect x="126" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="152" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="182" y="185" width="3" height="120" rx="1" fill="#C8AA50" opacity="0.35"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 function FigG(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fgo" cx="50%" cy="25%" r="68%"><stop offset="0%" stopColor="#1a1408"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fgo)"/><ellipse cx="150" cy="100" rx="22" ry="28" fill="#1c1810"/><ellipse cx="150" cy="86" rx="26" ry="14" fill="#161210"/><path d="M120 142 Q150 130 180 142 L190 270 Q150 285 110 270 Z" fill="#141210"/><path d="M110 155 Q92 175 88 215 L110 222 Z" fill="#121008"/><path d="M190 155 Q208 175 212 215 L190 222 Z" fill="#121008"/><path d="M110 268 Q150 286 190 268 L196 400 Q150 414 104 400 Z" fill="#111008"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 function FigA(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fat" cx="50%" cy="20%" r="72%"><stop offset="0%" stopColor="#221a08"/><stop offset="100%" stopColor="#060606"/></radialGradient></defs><rect width="300" height="480" fill="url(#fat)"/><ellipse cx="150" cy="96" rx="28" ry="34" fill="#201c0e"/><ellipse cx="150" cy="140" rx="46" ry="17" fill="#1c1810"/><ellipse cx="132" cy="172" rx="19" ry="22" fill="#181408"/><ellipse cx="168" cy="172" rx="19" ry="22" fill="#181408"/><rect x="132" y="192" width="12" height="9" rx="4" fill="#161206"/><rect x="156" y="192" width="12" height="9" rx="4" fill="#161206"/><rect x="132" y="205" width="12" height="9" rx="4" fill="#141004"/><rect x="156" y="205" width="12" height="9" rx="4" fill="#141004"/><rect x="128" y="228" width="22" height="105" rx="8" fill="#111008"/><rect x="150" y="228" width="22" height="105" rx="8" fill="#111008"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
-function FigB(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fbk" cx="50%" cy="32%" r="62%"><stop offset="0%" stopColor="#1c1810"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fbk)"/><ellipse cx="150" cy="98" rx="22" ry="27" fill="#1c1810"/><path d="M130 123 Q150 112 170 123 L182 146 Q150 155 118 146 Z" fill="#181610"/><path d="M118 146 Q112 180 114 228 Q128 242 150 246 Q172 242 186 228 Q188 180 182 146 Q150 155 118 146 Z" fill="#161410"/><ellipse cx="132" cy="182" rx="17" ry="22" fill="#1a1810" opacity="0.55"/><ellipse cx="168" cy="182" rx="17" ry="22" fill="#1a1810" opacity="0.55"/><rect x="147" y="150" width="6" height="84" rx="3" fill="#1e1c12" opacity="0.5"/><path d="M114 244 Q150 262 186 244 L188 350 Q150 364 112 350 Z" fill="#111008"/><rect x="120" y="348" width="24" height="96" rx="8" fill="#0f0d06"/><rect x="156" y="348" width="24" height="96" rx="8" fill="#0f0d06"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 
 // Fotos reales de estatua por arquetipo — ya en blanco y negro, brillo
 // igualado entre las 6 y fondo fundido a negro (procesadas fuera de la app,
@@ -2011,7 +2010,6 @@ export default function App(){
   const p=PROFILES[profile];
   const w=getTodayWorkout(profile);
   const meals=MEALS[profile];
-  const Fig=FIGS[profile];
   const done=exercises.filter(Boolean).length;
   const pct=done===0?0:Math.round(done/w.length*100);
   const habitsDone=habits.filter(Boolean).length;
@@ -2066,7 +2064,7 @@ export default function App(){
     {tab==="inicio"&&(
       <div style={scr}>
         <div style={{position:"relative"}}>
-          <Hero Fig={Fig} h={240}>
+          <Hero img="/estatuas/columnas_1.jpg" imgPos="center 35%" h={240}>
             <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}</div>
             <div style={{fontSize:28,fontWeight:900,letterSpacing:2,marginBottom:3}}>{profile}</div>
             <div style={{fontSize:11,color:"#666"}}>{p.sub} · {p.goal}</div>
@@ -2261,7 +2259,7 @@ export default function App(){
 
     {tab==="entreno"&&(
       <div style={scr}>
-        <Hero Fig={FigB} h={200}>
+        <Hero img="/estatuas/columnas_2.jpg" imgPos="center 40%" h={200}>
           <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}</div>
           <div style={{fontSize:18,fontWeight:700,marginBottom:2}}>{profile} · Sesión de hoy</div>
           <div style={{fontSize:11,color:"#555"}}>{w.length} ejercicios · {p.days} días/semana</div>
@@ -2459,7 +2457,7 @@ export default function App(){
 
     {tab==="nutricion"&&(
       <div style={scr}>
-        <Hero Fig={FigG} h={190}>
+        <Hero img="/estatuas/columnas_3.jpg" imgPos="center 40%" h={190}>
           <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>Nutrición · Hoy</div>
           <div style={{fontSize:18,fontWeight:700}}>{meals.reduce((s,m)=>s+m.kcal,0)} kcal · {meals.length} comidas</div>
         </Hero>
@@ -2540,7 +2538,7 @@ export default function App(){
 
     {tab==="tips"&&(
       <div style={scr}>
-        <Hero img="/estatuas/estatua_femenina_busto.jpg" imgPos="center 25%" h={190}>
+        <Hero img="/estatuas/columnas_4.jpg" imgPos="center 30%" h={190}>
           <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>Conocimiento · Ciencia · Filosofía</div>
           <div style={{fontSize:18,fontWeight:700}}>HEXIS Tips</div>
         </Hero>
