@@ -13,7 +13,7 @@ export const PROFILES = {
       {day:"L",focus:"Empuje · Pecho y Hombros",type:"train",done:true,split:"empuje"},
       {day:"M",focus:"Tirón · Espalda y Bíceps",type:"train",done:true,split:"tiron"},
       {day:"X",focus:"Descanso activo",type:"rest",done:true},
-      {day:"J",focus:"Pierna · Quad y Glúteo",type:"train",done:false,today:true,split:"pierna"},
+      {day:"J",focus:"Pierna · Quad y Glúteo",type:"train",done:false,split:"pierna"},
       {day:"V",focus:"Hombros y Tríceps",type:"train",done:false,split:"hombros_triceps"},
       {day:"S",focus:"Full Body o Cardio",type:"train",done:false,split:"fullbody"},
       {day:"D",focus:"Descanso total",type:"rest",done:false},
@@ -32,7 +32,7 @@ export const PROFILES = {
     weekPlan:[
       {day:"L",focus:"Inferior · Glúteo y Pierna",type:"train",done:true,split:"inferior"},
       {day:"M",focus:"Superior · Pecho y Espalda",type:"train",done:true,split:"superior_pecho_espalda"},
-      {day:"X",focus:"Cardio LISS 30 min",type:"cardio",done:false,today:true},
+      {day:"X",focus:"Cardio LISS 30 min",type:"cardio",done:false},
       {day:"J",focus:"Inferior · Isquios y Glúteo",type:"train",done:false,split:"inferior"},
       {day:"V",focus:"Superior · Hombros y Brazos",type:"train",done:false,split:"superior_hombros_brazos"},
       {day:"S",focus:"Descanso activo",type:"rest",done:false},
@@ -52,7 +52,7 @@ export const PROFILES = {
     weekPlan:[
       {day:"L",focus:"Full Body suave",type:"train",done:true,split:"fullbody_suave"},
       {day:"M",focus:"Movilidad y stretching",type:"mobility",done:true},
-      {day:"X",focus:"Caminar 45 min",type:"cardio",done:false,today:true},
+      {day:"X",focus:"Caminar 45 min",type:"cardio",done:false},
       {day:"J",focus:"Full Body moderado",type:"train",done:false,split:"fullbody_moderado"},
       {day:"V",focus:"Yoga o movilidad",type:"mobility",done:false},
       {day:"S",focus:"Actividad libre",type:"cardio",done:false},
@@ -72,7 +72,7 @@ export const PROFILES = {
     weekPlan:[
       {day:"L",focus:"Full Body A · Fuerza",type:"train",done:true,split:"a_fuerza"},
       {day:"M",focus:"Cardio HIIT 20 min",type:"cardio",done:true},
-      {day:"X",focus:"Full Body B · Volumen",type:"train",done:false,today:true,split:"b_volumen"},
+      {day:"X",focus:"Full Body B · Volumen",type:"train",done:false,split:"b_volumen"},
       {day:"J",focus:"Descanso activo",type:"rest",done:false},
       {day:"V",focus:"Full Body C · Potencia",type:"train",done:false,split:"c_potencia"},
       {day:"S",focus:"Cardio moderado 30 min",type:"cardio",done:false},
@@ -92,7 +92,7 @@ export const PROFILES = {
     weekPlan:[
       {day:"L",focus:"Full Body A · Compuestos pesados",type:"train",done:true,split:"fullbody_a"},
       {day:"M",focus:"Descanso activo",type:"rest",done:true},
-      {day:"X",focus:"Full Body B · Compuestos pesados",type:"train",done:false,today:true,split:"fullbody_b"},
+      {day:"X",focus:"Full Body B · Compuestos pesados",type:"train",done:false,split:"fullbody_b"},
       {day:"J",focus:"Descanso activo",type:"rest",done:false},
       {day:"V",focus:"Full Body C · Compuestos pesados",type:"train",done:false,split:"fullbody_c"},
       {day:"S",focus:"Actividad libre",type:"cardio",done:false},
@@ -112,7 +112,7 @@ export const PROFILES = {
     weekPlan:[
       {day:"L",focus:"Full Body suave A",type:"train",done:true,split:"fullbody_suave"},
       {day:"M",focus:"Caminar 30 min",type:"cardio",done:true},
-      {day:"X",focus:"Yoga o movilidad",type:"mobility",done:false,today:true},
+      {day:"X",focus:"Yoga o movilidad",type:"mobility",done:false},
       {day:"J",focus:"Full Body suave B",type:"train",done:false,split:"fullbody_suave_b"},
       {day:"V",focus:"Caminar 30 min",type:"cardio",done:false},
       {day:"S",focus:"Movilidad libre",type:"mobility",done:false},
@@ -335,13 +335,23 @@ export const WORKOUTS = {
   },
 };
 
+// "Hoy" tiene que salir de la fecha real, no de un dato fijo dentro del
+// perfil (antes cada perfil traía un día marcado a mano como today:true,
+// así que "hoy" no cambiaba nunca aunque pasaran los días — 24 ago, bug
+// reportado por Oscar). weekPlan va L,M,X,J,V,S,D (índice 0=lunes); el
+// getDay() nativo va domingo=0..sábado=6, así que se traduce con +6 %7.
+export function getTodayIndex(){
+  return (new Date().getDay()+6)%7;
+}
+
 // Devuelve la lista de ejercicios correcta para el día de hoy de un perfil,
-// según el "split" marcado en su weekPlan. Si no hay día de entreno marcado
-// como hoy, cae al primer split disponible del perfil.
+// según el "split" marcado en su weekPlan. Si el día de hoy no es de
+// entreno (descanso/cardio) o no tiene split, cae al primer split
+// disponible del perfil.
 export function getTodayWorkout(profileId){
   const p = PROFILES[profileId];
   if(!p) return [];
-  const today = p.weekPlan.find(d=>d.today);
+  const today = p.weekPlan[getTodayIndex()];
   const splits = WORKOUTS[profileId] || {};
   if(today && today.split && splits[today.split]) return splits[today.split];
   const first = Object.values(splits)[0];
