@@ -1785,11 +1785,10 @@ function Onboarding({onDone}){
 
   if(step===4&&dp){
     const p=PROFILES[dp];
-    const revealImg=MALE_PROFILES.includes(dp)?"/estatuas/estatua_masculina_hercules_v2.jpg":"/estatuas/estatua_femenina_justicia.jpg";
     return(
       <div style={scr}>
         <PBar pct={pct} fixed/>
-        <Hero Fig={DFig} img={revealImg} imgPos="center 15%" h={210}>
+        <Hero Fig={DFig} h={210}>
           <div style={{fontSize:11,letterSpacing:4,color:pc,textTransform:"uppercase",marginBottom:4}}>Tu arquetipo</div>
           <div style={{fontFamily:PF,fontSize:22,fontWeight:700}}>Hemos encontrado<br/><em style={{color:pc,fontStyle:"italic"}}>tu perfil.</em></div>
         </Hero>
