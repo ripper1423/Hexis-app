@@ -154,11 +154,22 @@ function calcPlan(d,id){
 function FigW(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fw" cx="50%" cy="28%" r="68%"><stop offset="0%" stopColor="#221808"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fw)"/><ellipse cx="150" cy="100" rx="27" ry="33" fill="#1e1a10"/><ellipse cx="150" cy="96" rx="21" ry="25" fill="#231f13" opacity="0.8"/><rect x="130" y="130" width="40" height="22" rx="8" fill="#181410"/><rect x="122" y="150" width="56" height="85" rx="6" fill="#161208"/><rect x="94" y="156" width="24" height="68" rx="8" fill="#121008"/><rect x="182" y="156" width="24" height="68" rx="8" fill="#121008"/><ellipse cx="106" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><ellipse cx="194" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><rect x="126" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="152" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="182" y="185" width="3" height="120" rx="1" fill="#C8AA50" opacity="0.35"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 function FigG(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fgo" cx="50%" cy="25%" r="68%"><stop offset="0%" stopColor="#1a1408"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fgo)"/><ellipse cx="150" cy="100" rx="22" ry="28" fill="#1c1810"/><ellipse cx="150" cy="86" rx="26" ry="14" fill="#161210"/><path d="M120 142 Q150 130 180 142 L190 270 Q150 285 110 270 Z" fill="#141210"/><path d="M110 155 Q92 175 88 215 L110 222 Z" fill="#121008"/><path d="M190 155 Q208 175 212 215 L190 222 Z" fill="#121008"/><path d="M110 268 Q150 286 190 268 L196 400 Q150 414 104 400 Z" fill="#111008"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 function FigA(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fat" cx="50%" cy="20%" r="72%"><stop offset="0%" stopColor="#221a08"/><stop offset="100%" stopColor="#060606"/></radialGradient></defs><rect width="300" height="480" fill="url(#fat)"/><ellipse cx="150" cy="96" rx="28" ry="34" fill="#201c0e"/><ellipse cx="150" cy="140" rx="46" ry="17" fill="#1c1810"/><ellipse cx="132" cy="172" rx="19" ry="22" fill="#181408"/><ellipse cx="168" cy="172" rx="19" ry="22" fill="#181408"/><rect x="132" y="192" width="12" height="9" rx="4" fill="#161206"/><rect x="156" y="192" width="12" height="9" rx="4" fill="#161206"/><rect x="132" y="205" width="12" height="9" rx="4" fill="#141004"/><rect x="156" y="205" width="12" height="9" rx="4" fill="#141004"/><rect x="128" y="228" width="22" height="105" rx="8" fill="#111008"/><rect x="150" y="228" width="22" height="105" rx="8" fill="#111008"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
-function FigAn(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fan" cx="50%" cy="28%" r="65%"><stop offset="0%" stopColor="#141210"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fan)"/><circle cx="150" cy="88" r="24" fill="none" stroke="#C8AA50" strokeWidth="1.5" opacity="0.22"/><ellipse cx="150" cy="105" rx="20" ry="26" fill="#1c1812"/><path d="M150 135 Q112 115 76 100 Q94 126 112 155 Q128 145 150 140 Z" fill="#141210" opacity="0.85"/><path d="M150 135 Q188 115 224 100 Q206 126 188 155 Q172 145 150 140 Z" fill="#141210" opacity="0.85"/><path d="M130 140 Q150 130 170 140 L178 265 Q150 278 122 265 Z" fill="#161210"/><path d="M122 263 Q150 280 178 263 L184 395 Q150 408 116 395 Z" fill="#111008"/><rect x="180" y="105" width="3" height="185" rx="1" fill="#C8AA50" opacity="0.22"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
 function FigB(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fbk" cx="50%" cy="32%" r="62%"><stop offset="0%" stopColor="#1c1810"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fbk)"/><ellipse cx="150" cy="98" rx="22" ry="27" fill="#1c1810"/><path d="M130 123 Q150 112 170 123 L182 146 Q150 155 118 146 Z" fill="#181610"/><path d="M118 146 Q112 180 114 228 Q128 242 150 246 Q172 242 186 228 Q188 180 182 146 Q150 155 118 146 Z" fill="#161410"/><ellipse cx="132" cy="182" rx="17" ry="22" fill="#1a1810" opacity="0.55"/><ellipse cx="168" cy="182" rx="17" ry="22" fill="#1a1810" opacity="0.55"/><rect x="147" y="150" width="6" height="84" rx="3" fill="#1e1c12" opacity="0.5"/><path d="M114 244 Q150 262 186 244 L188 350 Q150 364 112 350 Z" fill="#111008"/><rect x="120" y="348" width="24" height="96" rx="8" fill="#0f0d06"/><rect x="156" y="348" width="24" height="96" rx="8" fill="#0f0d06"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
-function FigAtenea(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fae" cx="50%" cy="26%" r="66%"><stop offset="0%" stopColor="#141a20"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fae)"/><rect x="60" y="70" width="180" height="1" fill="#7C8FA6" opacity="0.15"/><ellipse cx="150" cy="98" rx="24" ry="29" fill="#161c22"/><rect x="128" y="128" width="44" height="20" rx="7" fill="#131820"/><rect x="118" y="146" width="64" height="80" rx="6" fill="#11151b"/><rect x="92" y="152" width="22" height="64" rx="8" fill="#0f1319"/><rect x="186" y="152" width="22" height="64" rx="8" fill="#0f1319"/><rect x="128" y="224" width="20" height="92" rx="7" fill="#0e1218"/><rect x="152" y="224" width="20" height="92" rx="7" fill="#0e1218"/><rect x="60" y="180" width="1" height="140" fill="#7C8FA6" opacity="0.18"/><rect x="240" y="180" width="1" height="140" fill="#7C8FA6" opacity="0.18"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#7C8FA6" opacity="0.22" letterSpacing="7">HEXIS</text></svg>)}
 
-const FIGS={ALPHA:FigW,HERA:FigG,ZEN:FigAn,SHAPE:FigA,ATENEA:FigAtenea,GAIA:FigB};
+// Fotos reales de estatua por arquetipo — ya en blanco y negro, brillo
+// igualado entre las 6 y fondo fundido a negro (procesadas fuera de la app,
+// nada de recorte de silueta para evitar bordes/halos raros).
+function ArchImg({src,pos}){
+  return <img src={src} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:pos}}/>;
+}
+const FIGS={
+  ALPHA:()=><ArchImg src="/estatuas/arquetipo_alpha.jpg" pos="38% 71%"/>,
+  HERA:()=><ArchImg src="/estatuas/arquetipo_hera.jpg" pos="50% 24%"/>,
+  ZEN:()=><ArchImg src="/estatuas/arquetipo_zen.jpg" pos="52% 20%"/>,
+  SHAPE:()=><ArchImg src="/estatuas/arquetipo_shape.jpg" pos="55% 22%"/>,
+  ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.jpg" pos="58% 20%"/>,
+  GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.jpg" pos="58% 16%"/>,
+};
 
 // ── UI COMPONENTS ────────────────────────────────────────────────
 function Hero({Fig,img,imgPos,children,h=220}){
@@ -167,9 +178,8 @@ function Hero({Fig,img,imgPos,children,h=220}){
       {img?(
         <img src={img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:imgPos||"center 20%",filter:"grayscale(35%) brightness(0.8)"}}/>
       ):(
-        <div style={{position:"absolute",inset:0,filter:"brightness(1.5)"}}><Fig/></div>
+        <Fig/>
       )}
-      {!img&&<img src="/logo/hexis_logo.jpg" alt="HEXIS" style={{position:"absolute",top:14,left:18,width:60,height:"auto",opacity:0.85,zIndex:3}}/>}
       <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(5,5,5,0) 20%,rgba(5,5,5,0.8) 65%,rgba(5,5,5,1) 100%)"}}/>
       <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"0 20px 18px",zIndex:3}}>{children}</div>
     </div>
@@ -857,24 +867,54 @@ function BodyMap({gender,view,activeZone,onZoneClick}){
   const img = gender==="female"
     ? (view==="front" ? "/estatuas/cuerpo_mujer_frente.png" : "/estatuas/cuerpo_mujer_espalda.png")
     : (view==="front" ? "/estatuas/cuerpo_hombre_frente.png" : "/estatuas/cuerpo_hombre_espalda.png");
-  // Dimensiones reales de cada recorte — el contenedor usa el aspect-ratio
-  // exacto de la imagen activa para que las zonas (en %) no se desplacen
-  // por el letterboxing de object-fit:contain sobre un marco genérico.
-  const DIMS={female:{front:[275,1024],back:[260,1024]},male:{front:[305,1024],back:[305,1024]}};
-  const [dw,dh]=DIMS[gender][view];
+  // Las 4 imágenes (18 ago) vienen del mismo recorte 347×954 — mismo
+  // aspect-ratio para las 4, así las zonas (en %) no se desplazan.
+  const [dw,dh]=[347,954];
+  const az = zones.find(z=>z.id===activeZone);
   return(
-    <div style={{position:"relative",width:"100%",maxWidth:180,aspectRatio:`${dw} / ${dh}`,margin:"0 auto"}}>
-      <img src={img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",filter:"grayscale(15%) contrast(1.08) brightness(1.05)"}}/>
+    <div style={{position:"relative",width:"100%",maxWidth:220,aspectRatio:`${dw} / ${dh}`,margin:"0 auto"}}>
+      <img src={img} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover"}}/>
       {zones.map((z,i)=>(
-        <div key={i} onClick={()=>onZoneClick(z.id)} style={{position:"absolute",left:`${z.x}%`,top:`${z.y}%`,width:`${z.w}%`,height:`${z.h}%`,borderRadius:4,cursor:"pointer",
-          background:activeZone===z.id?`${G}33`:"transparent",
-          border:`1px solid ${activeZone===z.id?G:"transparent"}`,
-          display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s"
-        }}>
-          {activeZone===z.id&&<span style={{fontSize:9,fontWeight:700,color:G,background:"#050505cc",padding:"1px 5px",borderRadius:100,whiteSpace:"nowrap"}}>{z.label}</span>}
-        </div>
+        <div key={i} onClick={()=>onZoneClick(z.id)} style={{position:"absolute",left:`${z.x}%`,top:`${z.y}%`,width:`${z.w}%`,height:`${z.h}%`,cursor:"pointer"}}/>
       ))}
+      {az&&(
+        <>
+          <div style={{position:"absolute",left:`calc(${az.x+az.w/2}% - 7px)`,top:`calc(${az.y+az.h/2}% - 7px)`,width:14,height:14,borderRadius:"50%",background:"#fff",boxShadow:"0 0 14px 4px rgba(255,255,255,0.85), 0 0 30px 12px rgba(255,255,255,0.3)",zIndex:5,pointerEvents:"none"}}/>
+          <div style={{position:"absolute",left:`calc(${az.x+az.w/2}% + 7px)`,top:`calc(${az.y+az.h/2}% - 21px)`,width:38,height:1,background:"#fff",opacity:0.75,transform:"rotate(-33deg)",transformOrigin:"0 0",zIndex:4,pointerEvents:"none"}}/>
+          <div style={{position:"absolute",left:`calc(${az.x+az.w/2}% + 39px)`,top:`calc(${az.y+az.h/2}% - 42px)`,width:5,height:5,borderRadius:"50%",background:"#fff",opacity:0.8,zIndex:4,pointerEvents:"none"}}/>
+        </>
+      )}
     </div>
+  );
+}
+
+// Bottom sheet del músculo tocado — nombre + ejercicios relacionados
+// (datos reales de EXERCISES, nada inventado). La sección "Funciones"
+// queda pendiente del texto que dé Oscar por músculo.
+function MuscleSheet({zone,onClose}){
+  if(!zone) return null;
+  const m=MUSCLE_GROUPS[zone];
+  const exs=EXERCISES.filter(e=>e.muscle===zone);
+  return(
+    <>
+      <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:90}}/>
+      <div style={{position:"fixed",left:0,right:0,bottom:0,maxWidth:430,margin:"0 auto",background:"#0a0a0a",border:"1px solid #1a1a1a",borderBottom:"none",borderRadius:"20px 20px 0 0",padding:"20px 20px 28px",zIndex:91,maxHeight:"65vh",overflowY:"auto"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+          <div style={{fontFamily:PF,fontSize:17,fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}>{m.label}</div>
+          <div onClick={onClose} style={{fontSize:16,color:"#666",cursor:"pointer",padding:"4px 6px"}}>✕</div>
+        </div>
+        <div style={{fontSize:10,letterSpacing:3,color:"#555",textTransform:"uppercase",marginBottom:8}}>Ejercicios relacionados</div>
+        {exs.length===0?(
+          <div style={{fontSize:12,color:"#555"}}>Aún no hay ejercicios de este grupo en la base de datos.</div>
+        ):exs.map(e=>(
+          <div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 4px",borderBottom:"1px solid #161616"}}>
+            <div style={{fontSize:18,flexShrink:0}}>{e.icon}</div>
+            <div style={{flex:1,fontSize:12.5,fontWeight:600,color:"#ddd",letterSpacing:0.5,textTransform:"uppercase"}}>{e.name}</div>
+            <div style={{fontSize:13,color:"#555"}}>›</div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -1290,27 +1330,31 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
   );
 }
 
-function ExerciseDB({onBack}){
+function ExerciseDB({onBack,initialTab}){
+  const [tab,setTab]=useState(initialTab||"musculos");
   const [gender,setGender]=useState("male");
   const [view,setView]=useState("front");
   const [zone,setZone]=useState(null);
+  const [showInfo,setShowInfo]=useState(false);
+  const [openGroup,setOpenGroup]=useState(null);
   const [selEx,setSelEx]=useState(null);
   const [matFilter,setMatFilter]=useState("all");
   const mats=["all","Barra","Mancuernas","Máquina","Cable","Peso corporal"];
-  const filtered=EXERCISES.filter(e=>(!zone||e.muscle===zone)&&(matFilter==="all"||e.mat===matFilter));
+  const filtered=EXERCISES.filter(e=>matFilter==="all"||e.mat===matFilter);
+  const counts={};
+  Object.keys(MUSCLE_GROUPS).forEach(k=>{ counts[k]=EXERCISES.filter(e=>e.muscle===k).length; });
+  const TABS=[["musculos","Músculos"],["grupos","Grupos"],["ejercicios","Ejercicios"]];
+
   return(
-    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:80}}>
-      <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
-        <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
-        <div>
-          <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase"}}>Cuerpo Griego</div>
-          <div style={{fontSize:16,fontWeight:700}}>Ejercicios por zona</div>
+    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:92}}>
+      {tab==="musculos"&&(<>
+        <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"14px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
+          <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
+          <div style={{flex:1,textAlign:"center",fontSize:11,letterSpacing:4,color:"#ddd",textTransform:"uppercase"}}>Vista {view==="front"?"frontal":"posterior"}</div>
+          <div onClick={()=>setShowInfo(s=>!s)} style={{width:24,height:24,borderRadius:"50%",border:"1px solid #444",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#888",cursor:"pointer",flexShrink:0}}>i</div>
         </div>
-      </div>
-      <div style={{padding:"16px 20px 0"}}>
-        <div style={{fontSize:11,color:"#555",marginBottom:14}}>Toca una zona del cuerpo para filtrar por músculo</div>
-        {/* gender+view toggle */}
-        <div style={{display:"flex",gap:8,marginBottom:14}}>
+        {showInfo&&<div style={{padding:"12px 20px",fontSize:11,color:"#777",lineHeight:1.6,borderBottom:"1px solid #111"}}>Toca una zona del cuerpo para ver el músculo y sus ejercicios recomendados.</div>}
+        <div style={{padding:"16px 20px 0",display:"flex",gap:8}}>
           <div style={{display:"flex",background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:8,overflow:"hidden",flex:1}}>
             {["male","female"].map(g=>(
               <div key={g} onClick={()=>setGender(g)} style={{flex:1,padding:"8px 0",textAlign:"center",fontSize:11,fontWeight:600,color:gender===g?"#050505":"#555",background:gender===g?G:"transparent",cursor:"pointer",transition:"all 0.2s"}}>
@@ -1326,57 +1370,101 @@ function ExerciseDB({onBack}){
             ))}
           </div>
         </div>
-        {/* body map */}
-        <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+        <div style={{padding:"18px 20px 30px"}}>
           <BodyMap gender={gender} view={view} activeZone={zone} onZoneClick={z=>setZone(zone===z?null:z)}/>
-          <div style={{textAlign:"center",marginTop:8,fontSize:11,color:zone?G:"#444",letterSpacing:zone?2:1}}>
-            {zone?`${MUSCLE_GROUPS[zone]?.label} · ${EXERCISES.filter(e=>e.muscle===zone).length} ejercicios`:"Toca una zona del cuerpo"}
+        </div>
+        <MuscleSheet zone={zone} onClose={()=>setZone(null)}/>
+      </>)}
+
+      {tab==="grupos"&&(<>
+        <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
+          <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
+          <div>
+            <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase"}}>Cuerpo Griego</div>
+            <div style={{fontSize:16,fontWeight:700}}>Grupos musculares</div>
           </div>
         </div>
-        {/* muscle chips */}
-        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:10}}>
-          <div onClick={()=>setZone(null)} style={{flexShrink:0,padding:"5px 12px",borderRadius:100,border:`1px solid ${!zone?G:"#1a1a1a"}`,background:!zone?"rgba(200,170,80,0.1)":"transparent",color:!zone?G:"#555",fontSize:11,cursor:"pointer"}}>Todos</div>
+        <div style={{padding:"16px 20px 0"}}>
+          <SLabel text="Grupos musculares" right={`${Object.keys(MUSCLE_GROUPS).length} en total`}/>
           {Object.entries(MUSCLE_GROUPS).map(([k,m])=>(
-            <div key={k} onClick={()=>setZone(zone===k?null:k)} style={{flexShrink:0,padding:"5px 12px",borderRadius:100,border:`1px solid ${zone===k?m.color:"#1a1a1a"}`,background:zone===k?`${m.color}22`:"transparent",color:zone===k?m.color:"#555",fontSize:11,cursor:"pointer",whiteSpace:"nowrap"}}>{m.icon} {m.label}</div>
-          ))}
-        </div>
-        {/* material filter */}
-        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:14}}>
-          {mats.map(m=>(
-            <div key={m} onClick={()=>setMatFilter(m)} style={{flexShrink:0,padding:"4px 10px",borderRadius:100,border:`1px solid ${matFilter===m?G:"#111"}`,background:matFilter===m?"rgba(200,170,80,0.08)":"transparent",color:matFilter===m?G:"#444",fontSize:11,letterSpacing:1,cursor:"pointer",whiteSpace:"nowrap"}}>{m==="all"?"Todos":m}</div>
-          ))}
-        </div>
-        <SLabel text={`${filtered.length} ejercicios${zone?` · ${MUSCLE_GROUPS[zone]?.label}`:""}`}/>
-        {filtered.map(ex=>(
-          <div key={ex.id} onClick={()=>setSelEx(selEx?.id===ex.id?null:ex)} style={{background:"#0c0c0c",border:`1px solid ${selEx?.id===ex.id?G+"44":"#1a1a1a"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer"}}>
-            <div style={{display:"flex",alignItems:"center",gap:12}}>
-              <div style={{fontSize:22,flexShrink:0}}>{ex.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#ddd",marginBottom:4}}>{ex.name}</div>
-                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                  <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:MUSCLE_GROUPS[ex.muscle]?.color||G}}>{MUSCLE_GROUPS[ex.muscle]?.label}</span>
-                  <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:"#666"}}>{ex.mat}</span>
-                  <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:levelColor[ex.level]||"#888"}}>{ex.level}</span>
-                  <span style={{fontSize:11,color:"#8a8a8a"}}>{ex.sets}</span>
+            <div key={k} onClick={()=>setOpenGroup(openGroup===k?null:k)} style={{background:"#0c0c0c",border:`1px solid ${openGroup===k?m.color+"55":"#1a1a1a"}`,borderRadius:12,padding:"12px 16px",marginBottom:8,cursor:"pointer"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <div style={{fontSize:20}}>{m.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#ddd"}}>{m.label}</div>
+                  <div style={{fontSize:11,color:"#666"}}>{counts[k]} ejercicio{counts[k]!==1?"s":""} en la base de datos</div>
                 </div>
+                <div style={{fontSize:14,color:"#7a7a7a"}}>{openGroup===k?"−":"+"}</div>
               </div>
-              <div style={{fontSize:14,color:"#7a7a7a"}}>{selEx?.id===ex.id?"−":"+"}</div>
-            </div>
-            {selEx?.id===ex.id&&(
-              <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid #1a1a1a"}}>
-                <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>¿Por qué funciona?</div><div style={{fontSize:12,color:"#777",lineHeight:1.7}}>{ex.science}</div></div>
-                <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Cómo ejecutarlo</div><div style={{fontSize:12,color:"#666",lineHeight:1.7}}>{ex.cues}</div></div>
-                <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Contexto científico</div><div style={{fontSize:12,color:"#555",lineHeight:1.7}}>{ex.why}</div></div>
-                <div style={{display:"flex",gap:8}}>
-                  {[["Series/Reps",ex.sets],["Descanso",ex.rest]].map(([l,v])=>(
-                    <div key={l} style={{background:"#111",borderRadius:8,padding:"8px 12px",flex:1}}>
-                      <div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>{l}</div>
-                      <div style={{fontSize:12,fontWeight:600,color:"#bbb"}}>{v}</div>
-                    </div>
+              {openGroup===k&&(
+                <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #1a1a1a",display:"flex",flexWrap:"wrap",gap:6}}>
+                  {counts[k]===0?(
+                    <div style={{fontSize:12,color:"#666"}}>Aún no hay ejercicios de este grupo en la base de datos.</div>
+                  ):EXERCISES.filter(e=>e.muscle===k).map(e=>(
+                    <span key={e.id} style={{fontSize:11,padding:"4px 10px",borderRadius:100,background:"#111",color:m.color}}>{e.icon} {e.name}</span>
                   ))}
                 </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </>)}
+
+      {tab==="ejercicios"&&(<>
+        <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
+          <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
+          <div>
+            <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase"}}>Cuerpo Griego</div>
+            <div style={{fontSize:16,fontWeight:700}}>Todos los ejercicios</div>
+          </div>
+        </div>
+        <div style={{padding:"16px 20px 0"}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:14}}>
+            {mats.map(m=>(
+              <div key={m} onClick={()=>setMatFilter(m)} style={{flexShrink:0,padding:"4px 10px",borderRadius:100,border:`1px solid ${matFilter===m?G:"#111"}`,background:matFilter===m?"rgba(200,170,80,0.08)":"transparent",color:matFilter===m?G:"#444",fontSize:11,letterSpacing:1,cursor:"pointer",whiteSpace:"nowrap"}}>{m==="all"?"Todos":m}</div>
+            ))}
+          </div>
+          <SLabel text={`${filtered.length} ejercicios`}/>
+          {filtered.map(ex=>(
+            <div key={ex.id} onClick={()=>setSelEx(selEx?.id===ex.id?null:ex)} style={{background:"#0c0c0c",border:`1px solid ${selEx?.id===ex.id?G+"44":"#1a1a1a"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <div style={{fontSize:22,flexShrink:0}}>{ex.icon}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#ddd",marginBottom:4}}>{ex.name}</div>
+                  <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                    <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:MUSCLE_GROUPS[ex.muscle]?.color||G}}>{MUSCLE_GROUPS[ex.muscle]?.label}</span>
+                    <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:"#666"}}>{ex.mat}</span>
+                    <span style={{fontSize:11,padding:"2px 8px",borderRadius:100,background:"#111",color:levelColor[ex.level]||"#888"}}>{ex.level}</span>
+                    <span style={{fontSize:11,color:"#8a8a8a"}}>{ex.sets}</span>
+                  </div>
+                </div>
+                <div style={{fontSize:14,color:"#7a7a7a"}}>{selEx?.id===ex.id?"−":"+"}</div>
               </div>
-            )}
+              {selEx?.id===ex.id&&(
+                <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid #1a1a1a"}}>
+                  <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>¿Por qué funciona?</div><div style={{fontSize:12,color:"#777",lineHeight:1.7}}>{ex.science}</div></div>
+                  <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Cómo ejecutarlo</div><div style={{fontSize:12,color:"#666",lineHeight:1.7}}>{ex.cues}</div></div>
+                  <div style={{marginBottom:10}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Contexto científico</div><div style={{fontSize:12,color:"#555",lineHeight:1.7}}>{ex.why}</div></div>
+                  <div style={{display:"flex",gap:8}}>
+                    {[["Series/Reps",ex.sets],["Descanso",ex.rest]].map(([l,v])=>(
+                      <div key={l} style={{background:"#111",borderRadius:8,padding:"8px 12px",flex:1}}>
+                        <div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>{l}</div>
+                        <div style={{fontSize:12,fontWeight:600,color:"#bbb"}}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </>)}
+
+      <div style={{position:"fixed",left:0,right:0,bottom:0,maxWidth:430,margin:"0 auto",background:"#0a0a0a",borderTop:"1px solid #1a1a1a",display:"flex",zIndex:80}}>
+        {TABS.map(([k,l])=>(
+          <div key={k} onClick={()=>setTab(k)} style={{flex:1,textAlign:"center",padding:"10px 0 12px",cursor:"pointer",color:tab===k?G:"#555"}}>
+            <div style={{fontSize:16,marginBottom:2}}>{k==="musculos"?"◈":k==="grupos"?"◎":"▤"}</div>
+            <div style={{fontSize:10,fontWeight:600,letterSpacing:1,textTransform:"uppercase"}}>{l}</div>
           </div>
         ))}
       </div>
@@ -1384,60 +1472,6 @@ function ExerciseDB({onBack}){
   );
 }
 
-// ── ATLAS MUSCULAR ───────────────────────────────────────────────
-// Pantalla educativa (18 ago), separada del Cuerpo Griego interactivo.
-// El Cuerpo Griego es para FILTRAR ejercicios tocando el cuerpo; el Atlas
-// es para APRENDER — muestra el esquema real de Oscar (20 grupos exactos,
-// con subdivisiones anatómicas que el cuerpo interactivo no puede mostrar
-// por ser una silueta plana, ej. las 3 cabezas del tríceps o las fibras
-// del glúteo mayor) y, para cada uno de los 21 grupos de HEXIS, qué
-// ejercicios reales de la base de datos lo trabajan — cero contenido
-// simulado, es una lectura directa de EXERCISES.
-function AtlasMuscular({onBack}){
-  const [openGroup,setOpenGroup]=useState(null);
-  const counts={};
-  Object.keys(MUSCLE_GROUPS).forEach(k=>{ counts[k]=EXERCISES.filter(e=>e.muscle===k).length; });
-  return(
-    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:80}}>
-      <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
-        <div onClick={onBack} style={{fontSize:18,cursor:"pointer",color:"#555"}}>←</div>
-        <div>
-          <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase"}}>Cuerpo Griego</div>
-          <div style={{fontSize:16,fontWeight:700}}>Atlas muscular</div>
-        </div>
-      </div>
-      <div style={{padding:"16px 20px 0"}}>
-        <div style={{fontSize:12,color:"#777",lineHeight:1.7,marginBottom:14}}>Los 20 grupos musculares reales que usa HEXIS, con sus subdivisiones anatómicas. Toca un grupo para ver qué ejercicios de la base de datos lo trabajan.</div>
-        <div style={{borderRadius:12,overflow:"hidden",border:"1px solid #1a1a1a",marginBottom:20}}>
-          <img src="/estatuas/esquema_20_grupos_musculares.png" alt="Esquema de los 20 grupos musculares" style={{width:"100%",display:"block"}}/>
-        </div>
-        <SLabel text="Grupos musculares" right={`${Object.keys(MUSCLE_GROUPS).length} en total`}/>
-        {Object.entries(MUSCLE_GROUPS).map(([k,m])=>(
-          <div key={k} onClick={()=>setOpenGroup(openGroup===k?null:k)} style={{background:"#0c0c0c",border:`1px solid ${openGroup===k?m.color+"55":"#1a1a1a"}`,borderRadius:12,padding:"12px 16px",marginBottom:8,cursor:"pointer"}}>
-            <div style={{display:"flex",alignItems:"center",gap:12}}>
-              <div style={{fontSize:20}}>{m.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#ddd"}}>{m.label}</div>
-                <div style={{fontSize:11,color:"#666"}}>{counts[k]} ejercicio{counts[k]!==1?"s":""} en la base de datos</div>
-              </div>
-              <div style={{fontSize:14,color:"#7a7a7a"}}>{openGroup===k?"−":"+"}</div>
-            </div>
-            {openGroup===k&&(
-              <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #1a1a1a",display:"flex",flexWrap:"wrap",gap:6}}>
-                {counts[k]===0?(
-                  <div style={{fontSize:12,color:"#666"}}>Aún no hay ejercicios de este grupo en la base de datos.</div>
-                ):EXERCISES.filter(e=>e.muscle===k).map(e=>(
-                  <span key={e.id} style={{fontSize:11,padding:"4px 10px",borderRadius:100,background:"#111",color:m.color}}>{e.icon} {e.name}</span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-        <div style={{fontSize:11,color:"#555",lineHeight:1.7,marginTop:8,marginBottom:20}}>Algunos grupos (trapecio completo, glúteo superior/inferior, sóleo, otros) no tienen zona propia en el cuerpo interactivo porque se solapan casi por completo con un grupo vecino en una silueta plana — aquí, en el Atlas, sí puedes filtrar por cada uno de los 21.</div>
-      </div>
-    </div>
-  );
-}
 
 // ── NUTRITION DB SCREEN ──────────────────────────────────────────
 function NutritionDB({onBack}){
@@ -1932,8 +1966,8 @@ export default function App(){
   if(!profile) return <EntryGate onDone={handleDone}/>;
 
   // Sub-screens
-  if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)}/>;
-  if(screen==="atlas") return <AtlasMuscular onBack={()=>setScreen(null)}/>;
+  if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="musculos"/>;
+  if(screen==="atlas") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="grupos"/>;
   if(screen==="nutdb") return <NutritionDB onBack={()=>setScreen(null)}/>;
   if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
     if(window.confirm('¿Reiniciar la aplicación desde el principio? Se borrará todo tu progreso guardado en este dispositivo.')){
