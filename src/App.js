@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getCardioProtocol, getMobilityProtocol } from './data/profiles';
+import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getTodayIndex, getCardioProtocol, getMobilityProtocol } from './data/profiles';
 import { BREATHING_PROTOCOLS, SLEEP_PREP } from './data/wellness';
 import {
   saveProfile, loadProfile, savePlan, loadPlan, saveUserData, loadUserData,
@@ -2016,7 +2016,18 @@ export default function App(){
   const done=exercises.filter(Boolean).length;
   const pct=done===0?0:Math.round(done/w.length*100);
   const habitsDone=habits.filter(Boolean).length;
-  const today=p.weekPlan.find(d=>d.today);
+  const todayIdx=getTodayIndex();
+  const today=p.weekPlan[todayIdx];
+  // Fechas reales de la semana actual (lunes=idx0..domingo=idx6), para
+  // cruzar cada día de entreno del plan con el historial real de sets
+  // (hexis_set_logs, ya tiene fecha por registro) y saber si de verdad se
+  // entrenó ese día — antes "hecho" también era un dato fijo por perfil,
+  // igual que "hoy" (ver getTodayIndex). Descanso/cardio/movilidad no
+  // generan set_logs, así que para esos días se respeta el dato del plan.
+  const _monday=new Date(); _monday.setDate(_monday.getDate()-todayIdx); _monday.setHours(0,0,0,0);
+  const weekDates=Array.from({length:7},(_,i)=>{ const d=new Date(_monday); d.setDate(_monday.getDate()+i); return d.toISOString().split('T')[0]; });
+  const trainedDates=new Set(setLogs.filter(l=>l.profile===profile).map(l=>l.date));
+  const weekPlanDone=(d,i)=> d.type==="train" ? trainedDates.has(weekDates[i]) : d.done;
   const quoteIdx=streakDay%DAILY_QUOTES.length;
   const validW=weightLog.map(e=>e.value);
   const wTrend=validW.length>1?(validW[validW.length-1]-validW[0]).toFixed(1):0;
@@ -2111,16 +2122,20 @@ export default function App(){
               </div>
             </>
           )}
-          <SLabel text="Esta semana" right={`${p.weekPlan.filter(d=>d.done&&d.type==="train").length}/${p.weekPlan.filter(d=>d.type==="train").length} entrenos`}/>
+          <SLabel text="Esta semana" right={`${p.weekPlan.filter((d,i)=>weekPlanDone(d,i)&&d.type==="train").length}/${p.weekPlan.filter(d=>d.type==="train").length} entrenos`}/>
           <div style={{display:"flex",gap:5,marginBottom:16}}>
-            {p.weekPlan.map((d,i)=>(
-              <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                <div style={{width:"100%",aspectRatio:1,borderRadius:8,background:d.today?"rgba(200,170,80,0.12)":d.done?"rgba(200,170,80,0.06)":"#0c0c0c",border:`1px solid ${d.today?G:d.done?"rgba(200,170,80,0.25)":"#111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11}}>
-                  {d.done?(d.type==="rest"?"🌙":"✓"):(d.today?"→":"·")}
+            {p.weekPlan.map((d,i)=>{
+              const isToday=i===todayIdx;
+              const isDone=weekPlanDone(d,i);
+              return(
+                <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{width:"100%",aspectRatio:1,borderRadius:8,background:isToday?"rgba(200,170,80,0.12)":isDone?"rgba(200,170,80,0.06)":"#0c0c0c",border:`1px solid ${isToday?G:isDone?"rgba(200,170,80,0.25)":"#111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11}}>
+                    {isDone?(d.type==="rest"?"🌙":"✓"):(isToday?"→":"·")}
+                  </div>
+                  <span style={{fontSize:8,color:isToday?G:isDone?"#555":"#2a2a2a"}}>{d.day}</span>
                 </div>
-                <span style={{fontSize:8,color:d.today?G:d.done?"#555":"#2a2a2a"}}>{d.day}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <SLabel text="Entreno · vista rápida" right={`${done}/${w.length} · ${pct}%`}/>
           <PBar pct={pct} h={3}/>
@@ -2378,20 +2393,22 @@ export default function App(){
           </div>
           <SLabel text="Plan semanal" right="Toca un día de cardio para ver el protocolo"/>
           {p.weekPlan.map((d,i)=>{
+            const isToday=i===todayIdx;
+            const isDone=weekPlanDone(d,i);
             const cardioProto=d.type==="cardio"?getCardioProtocol(d.focus):null;
             const mobilityProto=d.type==="mobility"?getMobilityProtocol(d.focus):null;
             const dayProto=cardioProto||mobilityProto;
             return(
-            <div key={i} onClick={()=>dayProto&&setExpandDay(expandDay===i?null:i)} style={{background:d.today?"rgba(200,170,80,0.04)":"#0a0a0a",border:`1px solid ${expandDay===i?"rgba(200,170,80,0.3)":d.today?G:"#111"}`,borderRadius:10,padding:"11px 14px",marginBottom:6,cursor:dayProto?"pointer":"default"}}>
+            <div key={i} onClick={()=>dayProto&&setExpandDay(expandDay===i?null:i)} style={{background:isToday?"rgba(200,170,80,0.04)":"#0a0a0a",border:`1px solid ${expandDay===i?"rgba(200,170,80,0.3)":isToday?G:"#111"}`,borderRadius:10,padding:"11px 14px",marginBottom:6,cursor:dayProto?"pointer":"default"}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div style={{width:28,height:28,borderRadius:"50%",background:d.done?(d.type==="rest"?"#0a0808":"rgba(200,170,80,0.1)"):"#0c0c0c",border:`1px solid ${d.done?(d.type==="rest"?"#1a1008":G):"#111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>
-                  {d.done?(d.type==="rest"?"🌙":"✓"):(d.today?"→":typeIcon[d.type]||"·")}
+                <div style={{width:28,height:28,borderRadius:"50%",background:isDone?(d.type==="rest"?"#0a0808":"rgba(200,170,80,0.1)"):"#0c0c0c",border:`1px solid ${isDone?(d.type==="rest"?"#1a1008":G):"#111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>
+                  {isDone?(d.type==="rest"?"🌙":"✓"):(isToday?"→":typeIcon[d.type]||"·")}
                 </div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:12,fontWeight:600,color:d.today?G:d.done?"#555":"#888"}}>{d.day}</div>
-                  <div style={{fontSize:11,color:d.today?"#777":"#3a3a3a"}}>{d.focus}{dayProto&&" 🔬"}</div>
+                  <div style={{fontSize:12,fontWeight:600,color:isToday?G:isDone?"#555":"#888"}}>{d.day}</div>
+                  <div style={{fontSize:11,color:isToday?"#777":"#3a3a3a"}}>{d.focus}{dayProto&&" 🔬"}</div>
                 </div>
-                {d.today&&<div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",border:`1px solid ${G}`,padding:"2px 8px",borderRadius:100,opacity:0.7}}>HOY</div>}
+                {isToday&&<div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",border:`1px solid ${G}`,padding:"2px 8px",borderRadius:100,opacity:0.7}}>HOY</div>}
               </div>
               {expandDay===i&&dayProto&&(
                 <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>
