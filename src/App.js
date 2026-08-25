@@ -1638,7 +1638,7 @@ function RestoreForm({onBack}){
   };
 
   return(
-    <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",display:"flex",flexDirection:"column",justifyContent:"center",padding:24}}>
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",display:"flex",flexDirection:"column",justifyContent:"center",padding:24}}>
       <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:8,textAlign:"center"}}>Restaurar mi cuenta</div>
       <div style={{fontFamily:PF,fontSize:22,fontWeight:700,textAlign:"center",marginBottom:16,lineHeight:1.3}}>Recupera tus datos<br/><em style={{color:G,fontStyle:"italic"}}>en este móvil</em></div>
       {status==='sent'?(
@@ -1666,7 +1666,7 @@ function EntryGate({onDone}){
   const[mode,setMode]=useState('onboarding');
   if(mode==='restore') return <RestoreForm onBack={()=>setMode('onboarding')}/>;
   return(
-    <div style={{position:"relative"}}>
+    <div style={{position:"relative",maxWidth:430,margin:"0 auto",background:BG}}>
       <div onClick={()=>setMode('restore')} style={{position:"absolute",top:14,right:16,zIndex:20,fontSize:11,color:"#8a8a8a",textDecoration:"underline",cursor:"pointer"}}>¿Ya tienes cuenta?</div>
       <Onboarding onDone={onDone}/>
     </div>
