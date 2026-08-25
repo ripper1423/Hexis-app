@@ -1886,7 +1886,7 @@ function Onboarding({onDone}){
 export default function App(){
   const [profile,setProfile]=useState(()=>loadProfile());
   const [plan,setPlan]=useState(()=>loadPlan());
-  const [tab,setTab]=useState("inicio");
+  const [tab,setTab]=useState(()=>{try{return localStorage.getItem("hexis_tab")||"inicio";}catch(e){return "inicio";}}); useEffect(()=>{try{localStorage.setItem("hexis_tab",tab);}catch(e){}},[tab]);
   const [screen,setScreen]=useState(null); // "exdb" | "nutdb"
   const [habits,setHabits]=useState(()=>{ const p=loadProfile(); return p&&PROFILES[p]?loadHabits(PROFILES[p].habits.length):[false,false,false,false]; });
   const [exercises,setExercises]=useState(()=>{ const p=loadProfile(); return p&&WORKOUTS[p]?loadExercises(getTodayWorkout(p).length):Array(5).fill(false); });
