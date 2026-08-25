@@ -600,7 +600,7 @@ function ProgressPhotosScreen({onBack,userId,color}){
     <div style={{flex:1,minWidth:0}}>
       <div style={{fontSize:11,letterSpacing:2,color:"#8a8a8a",textTransform:"uppercase",marginBottom:8}}>{icon} {label}</div>
       <label style={{display:"block",border:"1px dashed #333",borderRadius:12,padding:list.length?0:20,textAlign:"center",cursor:uploading?"default":"pointer",marginBottom:10,overflow:"hidden",minHeight:list.length?0:90}}>
-        <input type="file" accept="image/*" capture="environment" disabled={uploading} onChange={e=>onFileChange(e,type)} style={{display:"none"}}/>
+        <input type="file" accept="image/*" disabled={uploading} onChange={e=>onFileChange(e,type)} style={{display:"none"}}/>
         {uploading&&pendingType===type?(
           <div style={{fontSize:11,color:"#666",padding:"30px 0"}}>Subiendo...</div>
         ):(
