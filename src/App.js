@@ -1688,7 +1688,7 @@ function Onboarding({onDone}){
   const scr={minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
 
   if(step===0) return(
-    <div style={{...scr,position:"relative",display:"flex",flexDirection:"column",overflow:"auto"}}>
+    <div key={step} style={{...scr,position:"relative",display:"flex",flexDirection:"column",overflow:"auto"}}>
       <div style={{position:"relative",padding:"36px 20px 0",display:"flex",justifyContent:"center"}}>
         <img src="/estatuas/estatua_reclinada_kalokagathia.jpg" alt="" style={{width:"100%",maxWidth:400,height:"auto",display:"block",filter:"brightness(1.14)"}}/>
         <div style={{position:"absolute",left:0,right:0,bottom:0,height:140,background:"linear-gradient(to bottom,rgba(5,5,5,0) 0%,rgba(5,5,5,0.75) 45%,rgba(5,5,5,1) 78%)"}}/>
@@ -1705,7 +1705,7 @@ function Onboarding({onDone}){
   );
 
   if(step===1) return(
-    <div style={scr}>
+    <div key={step} style={scr}>
       <PBar pct={pct} fixed/>
       <div style={{position:"relative",height:195,overflow:"hidden",flexShrink:0,background:"#000"}}>
         <img src="/logo/hexis_logo.jpg" alt="HEXIS" style={{position:"absolute",top:"42%",left:"50%",transform:"translate(-50%,-50%)",width:"66%",maxWidth:280,display:"block"}}/>
@@ -1732,7 +1732,7 @@ function Onboarding({onDone}){
   );
 
   if(step===2) return(
-    <div style={scr}>
+    <div key={step} style={scr}>
       <PBar pct={pct} fixed/>
       <Hero Fig={FigG} h={195}>
         <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>Paso 2 de 5</div>
@@ -1758,7 +1758,7 @@ function Onboarding({onDone}){
   );
 
   if(step===3) return(
-    <div style={scr}>
+    <div key={step} style={scr}>
       <PBar pct={pct} fixed/>
       <Hero Fig={FigA} h={195}>
         <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>Paso 3 de 5</div>
@@ -1785,7 +1785,7 @@ function Onboarding({onDone}){
   if(step===4&&dp){
     const p=PROFILES[dp];
     return(
-      <div style={scr}>
+      <div key={step} style={scr}>
         <PBar pct={pct} fixed/>
         <Hero Fig={DFig} h={210}>
           <div style={{fontSize:11,letterSpacing:4,color:pc,textTransform:"uppercase",marginBottom:4}}>Tu arquetipo</div>
@@ -1811,7 +1811,7 @@ function Onboarding({onDone}){
   }
 
   if(step===5) return(
-    <div style={scr}>
+    <div key={step} style={scr}>
       <PBar pct={pct} fixed/>
       <Hero img="/estatuas/estatua_zeus_kalokagathia.png" imgPos="center 12%" h={195}>
         <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>La filosofía HEXIS</div>
@@ -1835,7 +1835,7 @@ function Onboarding({onDone}){
   );
 
   if(step===6) return(
-    <div style={{...scr,padding:"72px 24px 40px",overflowY:"auto"}}>
+    <div key={step} style={{...scr,padding:"72px 24px 40px",overflowY:"auto"}}>
       <PBar pct={pct} fixed/>
       <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:8,textAlign:"center"}}>Paso 4 de 5</div>
       <div style={{fontFamily:PF,fontSize:26,fontWeight:700,textAlign:"center",marginBottom:24}}>Tus datos <em style={{color:G,fontStyle:"italic"}}>personales</em></div>
@@ -1864,7 +1864,7 @@ function Onboarding({onDone}){
     const r=calcPlan(fd,dp);
     const pc2=PROFILES[dp].color;
     return(
-      <div style={scr}>
+      <div key={step} style={scr}>
         <PBar pct={100} fixed/>
         <Hero Fig={FIGS[dp]} h={210}>
           <div style={{fontSize:11,letterSpacing:4,color:pc2,textTransform:"uppercase",marginBottom:4}}>{dp} · Plan calculado</div>
