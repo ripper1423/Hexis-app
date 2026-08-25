@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>HEXIS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,5 +24,33 @@
   <body>
     <noscript>Necesitas JavaScript para usar HEXIS.</noscript>
     <div id="root"></div>
+    <script>
+      (function () {
+        var lastY = 0;
+        document.addEventListener(
+          "touchstart",
+          function (e) {
+            if (e.touches.length !== 1) return;
+            lastY = e.touches[0].clientY;
+          },
+          { passive: true }
+        );
+        document.addEventListener(
+          "touchmove",
+          function (e) {
+            var y = e.touches[0].clientY;
+            var scrollTop =
+              window.scrollY ||
+              document.documentElement.scrollTop ||
+              document.body.scrollTop;
+            if (scrollTop <= 0 && y > lastY) {
+              e.preventDefault();
+            }
+            lastY = y;
+          },
+          { passive: false }
+        );
+      })();
+    </script>
   </body>
 </html>
