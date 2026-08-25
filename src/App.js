@@ -1,6 +1,3 @@
-// probe2
-// probe
-imgPos="center 72%"// cache-bust
 import { useState, useEffect } from 'react';
 import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getTodayIndex, getCardioProtocol, getMobilityProtocol } from './data/profiles';
 import { BREATHING_PROTOCOLS, SLEEP_PREP } from './data/wellness';
