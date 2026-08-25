@@ -517,7 +517,7 @@ function AnalyzeScreen({onBack,isPro,onUnlocked,color}){
         </div>
 
         <label style={{display:"block",border:"1px dashed #333",borderRadius:12,padding:preview?0:30,textAlign:"center",cursor:"pointer",marginBottom:16,overflow:"hidden"}}>
-          <input type="file" accept="image/*" capture="environment" onChange={onFileChange} style={{display:"none"}}/>
+          <input type="file" accept="image/*" onChange={onFileChange} style={{display:"none"}}/>
           {preview?(
             <img src={preview} alt="" style={{width:"100%",display:"block",maxHeight:280,objectFit:"cover"}}/>
           ):(
