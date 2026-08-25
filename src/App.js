@@ -1813,10 +1813,7 @@ function Onboarding({onDone}){
   if(step===5) return(
     <div key={step} style={scr}>
       <PBar pct={pct} fixed/>
-      <Hero img="/estatuas/estatua_zeus_kalokagathia.png" imgPos="center 12%" h={195}>
-        <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase",marginBottom:4}}>La filosofía HEXIS</div>
-        <div style={{fontFamily:PF,fontSize:20,fontWeight:700}}>El sistema que trabaja<br/><em style={{color:G,fontStyle:"italic"}}>con tu naturaleza.</em></div>
-      </Hero>
+      <Hero img="/estatuas/estatua_zeus_kalokagathia.png" imgPos="center 12%" h={195}/>
       <div style={{padding:"16px 20px",overflowY:"auto"}}>
         {PRINCIPLES.slice(0,4).map(pr=>(
           <div key={pr.n} style={{background:"#0a0a0a",border:"1px solid #1a1a1a",borderRadius:10,padding:14,marginBottom:8,display:"flex",gap:12,alignItems:"flex-start"}}>
