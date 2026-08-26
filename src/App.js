@@ -162,12 +162,12 @@ function ArchImg({src,pos}){
   return <img src={src} alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:pos}}/>;
 }
 const FIGS={
-  ALPHA:()=><ArchImg src="/estatuas/arquetipo_alpha_v2.png" pos="50% 0%"/>,
-  HERA:()=><ArchImg src="/estatuas/arquetipo_hera.png" pos="50% 0%"/>,
-  ZEN:()=><ArchImg src="/estatuas/arquetipo_zen.png" pos="50% 0%"/>,
-  SHAPE:()=><ArchImg src="/estatuas/arquetipo_shape.png" pos="50% 0%"/>,
-  ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.png" pos="50% 0%"/>,
-  GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.png" pos="50% 0%"/>,
+  ALPHA:()=><ArchImg src="/estatuas/arquetipo_alpha_v2.png" pos="100% 0%"/>,
+  HERA:()=><ArchImg src="/estatuas/arquetipo_hera.png" pos="100% 0%"/>,
+  ZEN:()=><ArchImg src="/estatuas/arquetipo_zen.png" pos="100% 0%"/>,
+  SHAPE:()=><ArchImg src="/estatuas/arquetipo_shape.png" pos="100% 0%"/>,
+  ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.png" pos="100% 0%"/>,
+  GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.png" pos="100% 0%"/>,
 };
 
 // ── UI COMPONENTS ────────────────────────────────────────────────
