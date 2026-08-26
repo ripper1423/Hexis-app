@@ -149,6 +149,25 @@ function calcPlan(d,id){
   const carbs=Math.round((cal-prot*4-fat*9)/4);
   return {tdee,cal,prot,fat,carbs};
 }
+function parseRestSeconds(str){
+  if(!str) return 90;
+  const parts=String(str).toLowerCase().split('-');
+  let fallbackUnit='seg';
+  for(let i=0;i<parts.length;i++){
+    const m=parts[i].match(/([0-9]+(?:[.][0-9]+)?)[ ]*(min|seg)?/);
+    if(m&&m[2]) fallbackUnit=m[2];
+  }
+  const secs=[];
+  for(let i=0;i<parts.length;i++){
+    const m=parts[i].match(/([0-9]+(?:[.][0-9]+)?)[ ]*(min|seg)?/);
+    if(!m) continue;
+    const u=m[2]||fallbackUnit;
+    const n=parseFloat(m[1]);
+    secs.push(u==='min'?n*60:n);
+  }
+  if(!secs.length) return 90;
+  return Math.max.apply(null,secs);
+}
 
 // ── SVG FIGURES ──────────────────────────────────────────────────
 function FigW(){return(<svg viewBox="0 0 300 480" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}><defs><radialGradient id="fw" cx="50%" cy="28%" r="68%"><stop offset="0%" stopColor="#221808"/><stop offset="100%" stopColor="#050505"/></radialGradient></defs><rect width="300" height="480" fill="url(#fw)"/><ellipse cx="150" cy="100" rx="27" ry="33" fill="#1e1a10"/><ellipse cx="150" cy="96" rx="21" ry="25" fill="#231f13" opacity="0.8"/><rect x="130" y="130" width="40" height="22" rx="8" fill="#181410"/><rect x="122" y="150" width="56" height="85" rx="6" fill="#161208"/><rect x="94" y="156" width="24" height="68" rx="8" fill="#121008"/><rect x="182" y="156" width="24" height="68" rx="8" fill="#121008"/><ellipse cx="106" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><ellipse cx="194" cy="172" rx="13" ry="15" fill="#1a1610" opacity="0.7"/><rect x="126" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="152" y="233" width="22" height="95" rx="7" fill="#111008"/><rect x="182" y="185" width="3" height="120" rx="1" fill="#C8AA50" opacity="0.35"/><text x="150" y="455" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#C8AA50" opacity="0.18" letterSpacing="7">HEXIS</text></svg>)}
@@ -1909,6 +1928,7 @@ export default function App(){
   const [vo2Log,setVo2Log]=useState(()=>loadVo2Log());
   const [loggingIdx,setLoggingIdx]=useState(null);
   const [logForm,setLogForm]=useState({weight:'',reps:'',rir:'2'});
+  const [restTimer,setRestTimer]=useState(null);
   const [stepsLog,setStepsLog]=useState(()=>loadStepsLog());
   const [sleepLog,setSleepLog]=useState(()=>loadSleepLog());
   const [goalWeight,setGoalWeight]=useState(()=>loadGoalWeight());
@@ -2001,6 +2021,19 @@ export default function App(){
       setGoalWeight(v);
     }}
   />;
+  useEffect(()=>{
+    if(!restTimer) return;
+    if(restTimer.secondsLeft<=0){
+      let next=null;
+      for(let j=restTimer.forIdx+1;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } }
+      if(next===null){ for(let j=0;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } } }
+      setExpandEx(next);
+      setRestTimer(null);
+      return;
+    }
+    const t=setTimeout(()=>setRestTimer(r=>r?{...r,secondsLeft:r.secondsLeft-1}:null),1000);
+    return ()=>clearTimeout(t);
+  },[restTimer,exercises]);
   if(screen==="analyze") return <AnalyzeScreen onBack={()=>setScreen(null)} isPro={isPro} onUnlocked={()=>setIsPro(true)} color={PROFILES[profile].color}/>;
   if(screen==="progress") return <ProgressPhotosScreen onBack={()=>setScreen(null)} userId={userId} color={PROFILES[profile].color}/>;
 
@@ -2367,9 +2400,17 @@ export default function App(){
                         setSetLogs(saveSetLog(entry));
                         const newE=exercises.map((v,j)=>j===i?true:v);
                         setExercises(newE);saveExercises(newE);
-                        logExerciseToCloud(userId,{name,weight:wgt,reps:rp,sets:parseInt(sets)||1,rir});
+                        logExerciseToCloud(userId,{name,weight:wgt,reps:rp,sets:parseInt(sets)||1,rir});setRestTimer({forIdx:i,total:parseRestSeconds(rest),secondsLeft:parseRestSeconds(rest)});
                         setLoggingIdx(null);
                       }} style={{textAlign:"center",padding:"11px",borderRadius:8,background:p.color,color:"#050505",fontSize:12,fontWeight:700,letterSpacing:1,cursor:"pointer"}}>Registrar serie ✓</div>
+                    </div>
+                  )}
+                  {restTimer&&restTimer.forIdx===i&&(
+                    <div style={{marginTop:12,background:"#080808",border:"1px solid #151515",borderRadius:10,padding:12,textAlign:"center"}}>
+                      <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:8}}>Descanso</div>
+                      <div style={{fontSize:28,fontWeight:700,color:p.color,marginBottom:8}}>{Math.floor(restTimer.secondsLeft/60)}:{String(restTimer.secondsLeft%60).padStart(2,'0')}</div>
+                      <PBar pct={100-Math.round(restTimer.secondsLeft/restTimer.total*100)} h={4}/>
+                      <div onClick={()=>{let next=null;for(let j=i+1;j<exercises.length;j++){if(!exercises[j]){next=j;break;}}if(next===null){for(let j=0;j<exercises.length;j++){if(!exercises[j]){next=j;break;}}}setExpandEx(next);setRestTimer(null);}} style={{marginTop:10,fontSize:11,color:"#777",cursor:"pointer",textDecoration:"underline"}}>Saltar descanso →</div>
                     </div>
                   )}
                 </div>
