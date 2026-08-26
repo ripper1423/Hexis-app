@@ -15,7 +15,8 @@ import {
   fetchCloudProfile, fetchCloudHistory, restoreLocalLogs,
   uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto,
   saveFoodLogEntry, loadFoodLog, removeFoodLogEntry,
-  saveMeasurement, loadMeasurementLog
+  saveMeasurement, loadMeasurementLog,
+  savePushSubscriptionToCloud, removePushSubscriptionFromCloud,
 } from './storage';
 import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Category, weeklyCaloriesBurned, weeklySleep, volumeByMuscleGroup, weightTrend, computeHexisAge } from './adaptive';
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
@@ -34,6 +35,19 @@ import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
 // enlace desbloquea PRO gratis en su dispositivo.
 const OWNER_UNLOCK_TOKEN = 'hx-oscar-9f31c7';
 const OWNER_UNLOCK_KEY = 'hexis_owner_unlocked';
+
+// -- NOTIFICACIONES PUSH (Web Push / VAPID) --
+// Clave publica VAPID (no es secreta, puede ir en el frontend). La
+// clave privada correspondiente vive solo en el backend (Render).
+const VAPID_PUBLIC_KEY = 'BOwrgMc6ZEsGUW5RjPc1KajbpZCAJUbcq3zTDtcNnbDGS2IS6Yrw9yUv8uz8EJgGWBHVgC0Uf-Gw6X4PfjT7m1A';
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
 function checkOwnerUnlock() {
   try {
     const params = new URLSearchParams(window.location.search);
@@ -1377,8 +1391,35 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
   );
 }
 
-function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle}){
+function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId}){
   const cycleProgress=getCycleProgress(cycle);
+  const [pushStatus,setPushStatus]=useState('checking');
+  useEffect(()=>{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)){ setPushStatus('unsupported'); return; }
+    navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{ setPushStatus(sub?'on':'off'); }).catch(()=>setPushStatus('off'));
+  },[]);
+  const handleEnablePush=async()=>{
+    if(!userId){ window.alert('Espera un momento a que se cargue tu cuenta e intentalo de nuevo.'); return; }
+    setPushStatus('saving');
+    try{
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){ setPushStatus('off'); return; }
+      await navigator.serviceWorker.register('/sw.js');
+      const readyReg=await navigator.serviceWorker.ready;
+      const sub=await readyReg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
+      const ok=await savePushSubscriptionToCloud(userId,sub);
+      setPushStatus(ok?'on':'error');
+    }catch(e){ console.warn('HEXIS push: fallo activando',e.message); setPushStatus('error'); }
+  };
+  const handleDisablePush=async()=>{
+    setPushStatus('saving');
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.getSubscription();
+      if(sub){ await removePushSubscriptionFromCloud(sub.endpoint); await sub.unsubscribe(); }
+      setPushStatus('off');
+    }catch(e){ console.warn('HEXIS push: fallo desactivando',e.message); setPushStatus('error'); }
+  };
   return(
     <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:80}}>
       <div style={{background:"#0a0a0a",borderBottom:"1px solid #111",padding:"16px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:50}}>
@@ -1442,6 +1483,17 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Datos y almacenamiento</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24,fontSize:12,color:"#777",lineHeight:1.7}}>
           Tu progreso (peso, ejercicios, hábitos, racha) se guarda al instante en este dispositivo, y también se respalda en la nube en segundo plano. Para poder recuperarlo si cambias de móvil, vincula tu email arriba.
+        </div>
+
+        <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Notificaciones</div>
+        <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
+          <div style={{fontSize:13,fontWeight:600,color:"#ccc",marginBottom:6}}>Avisos de HEXIS</div>
+          <div style={{fontSize:11,color:"#888",lineHeight:1.6,marginBottom:14}}>Activa los avisos en este dispositivo para recibir notificaciones de HEXIS.</div>
+          {pushStatus==='unsupported'&&<div style={{fontSize:11,color:"#666"}}>Tu navegador no soporta notificaciones.</div>}
+          {(pushStatus==='off'||pushStatus==='error')&&<div onClick={handleEnablePush} style={{textAlign:"center",padding:"12px",borderRadius:8,border:`1px solid ${G}`,color:G,fontSize:12,fontWeight:600,letterSpacing:1,cursor:"pointer"}}>Activar notificaciones</div>}
+          {pushStatus==='on'&&<div onClick={handleDisablePush} style={{textAlign:"center",padding:"12px",borderRadius:8,border:"1px solid #333",color:"#888",fontSize:12,fontWeight:600,letterSpacing:1,cursor:"pointer"}}>Desactivar notificaciones</div>}
+          {pushStatus==='saving'&&<div style={{textAlign:"center",padding:"12px",fontSize:12,color:"#666"}}>Un momento...</div>}
+          {pushStatus==='error'&&<div style={{fontSize:11,color:"#e0a0a0",marginTop:8}}>No se pudo activar. Intentalo de nuevo.</div>}
         </div>
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Reiniciar</div>
@@ -2266,7 +2318,7 @@ export default function App(){
   if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="musculos"/>;
   if(screen==="atlas") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="grupos"/>;
   if(screen==="nutdb") return <NutritionDB onBack={()=>setScreen(null)}/>;
-  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
+  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} userId={userId} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
     if(window.confirm('¿Reiniciar la aplicación desde el principio? Se borrará todo tu progreso guardado en este dispositivo.')){
       clearAll();setProfile(null);setPlan(null);setWeightLog([]);setStreakData({current:0,best:0});setHabits([false,false,false,false]);setExercises(Array(5).fill(false));setWater(0);setScreen(null);setCycle(null);
     }

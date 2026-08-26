@@ -615,3 +615,30 @@ export function loadMeasurementLog() {
   const l = localStorage.getItem(STORAGE_KEYS.MEASURE_LOG);
   return l ? JSON.parse(l) : [];
 }
+
+
+// -- NOTIFICACIONES PUSH: guardar/borrar suscripcion en Supabase --
+export async function savePushSubscriptionToCloud(userId, subscription) {
+  try {
+    if (!userId || !subscription) return false;
+    const json = subscription.toJSON ? subscription.toJSON() : subscription;
+    const keys = json.keys || {};
+    const { error } = await supabase.from('push_subscriptions').upsert({
+      user_id: userId,
+      endpoint: json.endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth,
+    }, { onConflict: 'endpoint' });
+    if (error) { console.warn('HEXIS push: no se pudo guardar la suscripcion', error.message); return false; }
+    return true;
+  } catch (e) { console.warn('HEXIS push: fallo guardando suscripcion', e.message); return false; }
+}
+
+export async function removePushSubscriptionFromCloud(endpoint) {
+  try {
+    if (!endpoint) return false;
+    const { error } = await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
+    if (error) { console.warn('HEXIS push: no se pudo borrar la suscripcion', error.message); return false; }
+    return true;
+  } catch (e) { console.warn('HEXIS push: fallo borrando suscripcion', e.message); return false; }
+}
