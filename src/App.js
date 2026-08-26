@@ -1981,6 +1981,19 @@ export default function App(){
     });
   };
 
+  useEffect(()=>{
+    if(!restTimer) return;
+    if(restTimer.secondsLeft<=0){
+      let next=null;
+      for(let j=restTimer.forIdx+1;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } }
+      if(next===null){ for(let j=0;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } } }
+      setExpandEx(next);
+      setRestTimer(null);
+      return;
+    }
+    const t=setTimeout(()=>setRestTimer(r=>r?{...r,secondsLeft:r.secondsLeft-1}:null),1000);
+    return ()=>clearTimeout(t);
+  },[restTimer,exercises]);
   if(!profile) return <EntryGate onDone={handleDone}/>;
 
   // Sub-screens
@@ -2021,19 +2034,6 @@ export default function App(){
       setGoalWeight(v);
     }}
   />;
-  useEffect(()=>{
-    if(!restTimer) return;
-    if(restTimer.secondsLeft<=0){
-      let next=null;
-      for(let j=restTimer.forIdx+1;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } }
-      if(next===null){ for(let j=0;j<exercises.length;j++){ if(!exercises[j]){ next=j; break; } } }
-      setExpandEx(next);
-      setRestTimer(null);
-      return;
-    }
-    const t=setTimeout(()=>setRestTimer(r=>r?{...r,secondsLeft:r.secondsLeft-1}:null),1000);
-    return ()=>clearTimeout(t);
-  },[restTimer,exercises]);
   if(screen==="analyze") return <AnalyzeScreen onBack={()=>setScreen(null)} isPro={isPro} onUnlocked={()=>setIsPro(true)} color={PROFILES[profile].color}/>;
   if(screen==="progress") return <ProgressPhotosScreen onBack={()=>setScreen(null)} userId={userId} color={PROFILES[profile].color}/>;
 
