@@ -19,6 +19,7 @@ const STORAGE_KEYS = {
   SLEEP_LOG:  'hexis_sleep_log',   // [ { date, hours } ] — sueño diario
   CYCLE:      'hexis_cycle',       // { id, startDate } — ciclo activo (Arquitectura de Dominio)
   MIRROR_LOG: 'hexis_mirror_log',  // [ { date, note, score, label } ] — Espejo de Coherencia
+  FOOD_LOG:   'hexis_food_log',    // [ { id, date, category, name, kcal, prot, carbs, fat, qty, source } ] — registro real diario de alimentos
 };
 
 function today() {
@@ -207,6 +208,27 @@ export function loadSetLogs() {
 export function removeSetLog(exerciseName, date = today()) {
   const log = loadSetLogs().filter(e => !(e.date === date && e.exercise === exerciseName));
   localStorage.setItem(STORAGE_KEYS.SET_LOGS, JSON.stringify(log));
+  return log;
+}
+
+// ── REGISTRO DIARIO DE ALIMENTOS (registro real, no el plan fijo) ─
+// Cada vez que el usuario añade un alimento (manual o por código de
+// barras) se guarda aquí, con fecha, categoría y macros reales.
+export function saveFoodLogEntry(entry) {
+  const log = loadFoodLog();
+  const withId = { id: entry.id || (Date.now() + '_' + Math.random().toString(36).slice(2)), date: entry.date || today(), ...entry };
+  log.push(withId);
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-2000);
+  localStorage.setItem(STORAGE_KEYS.FOOD_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadFoodLog() {
+  const l = localStorage.getItem(STORAGE_KEYS.FOOD_LOG);
+  return l ? JSON.parse(l) : [];
+}
+export function removeFoodLogEntry(id) {
+  const log = loadFoodLog().filter(e => e.id !== id);
+  localStorage.setItem(STORAGE_KEYS.FOOD_LOG, JSON.stringify(log));
   return log;
 }
 

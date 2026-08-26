@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getTodayIndex, getCardioProtocol, getMobilityProtocol } from './data/profiles';
 import { BREATHING_PROTOCOLS, SLEEP_PREP } from './data/wellness';
 import {
@@ -13,7 +13,8 @@ import {
   saveCycle, loadCycle, saveMirrorEntry, loadMirrorLog,
   getAccountStatus, linkEmailToAccount, restoreAccountByEmail,
   fetchCloudProfile, fetchCloudHistory, restoreLocalLogs,
-  uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto
+  uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto,
+  saveFoodLogEntry, loadFoodLog, removeFoodLogEntry
 } from './storage';
 import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Category, weeklyCaloriesBurned, weeklySleep, volumeByMuscleGroup, weightTrend, computeHexisAge } from './adaptive';
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
@@ -1501,6 +1502,98 @@ function NutritionDB({onBack}){
   const [selFood,setSelFood]=useState(null);
   const [selSupp,setSelSupp]=useState(null);
   const [expMacro,setExpMacro]=useState(null);
+  const [foodLog,setFoodLog]=useState(()=>loadFoodLog());
+  const [scanning,setScanning]=useState(false);
+  const [scanResult,setScanResult]=useState(null);
+  const [scanQty,setScanQty]=useState(100);
+  const [scanError,setScanError]=useState(null);
+  const [scanLoading,setScanLoading]=useState(false);
+  const videoRef=useRef(null);
+  const scanControlsRef=useRef(null);
+  const todayStr=new Date().toISOString().split('T')[0];
+  const todayEntries=foodLog.filter(e=>e.date===todayStr);
+  const todayTotals=todayEntries.reduce((s,e)=>({kcal:s.kcal+(e.kcal||0),prot:s.prot+(e.prot||0),carbs:s.carbs+(e.carbs||0),fat:s.fat+(e.fat||0)}),{kcal:0,prot:0,carbs:0,fat:0});
+  function inferCategory(prot,carbs,fat){
+    const pk=prot*4,ck=carbs*4,fk=fat*9;
+    if(fk>=pk&&fk>=ck) return "grasas";
+    if(pk>=ck) return "proteina";
+    return "carbohidratos";
+  }
+  function stopScan(){
+    if(scanControlsRef.current){ try{scanControlsRef.current.stop();}catch(e){} scanControlsRef.current=null; }
+    setScanning(false);
+  }
+  async function lookupBarcode(code){
+    setScanLoading(true);
+    setScanError(null);
+    try{
+      const res=await fetch("https://world.openfoodfacts.org/api/v2/product/"+code+".json");
+      const j=await res.json();
+      if(j.status!==1||!j.product){
+        setScanError('Producto no encontrado en la base de datos (código '+code+').');
+        setScanLoading(false);
+        return;
+      }
+      const n=j.product.nutriments||{};
+      setScanResult({
+        code,
+        name:j.product.product_name||j.product.generic_name||'Producto sin nombre',
+        per100:{
+          kcal:Math.round(n['energy-kcal_100g']||n['energy-kcal']||0),
+          prot:Math.round((n['proteins_100g']||0)*10)/10,
+          carbs:Math.round((n['carbohydrates_100g']||0)*10)/10,
+          fat:Math.round((n['fat_100g']||0)*10)/10,
+        }
+      });
+      setScanQty(100);
+    }catch(e){
+      setScanError('Error al consultar el producto: '+e.message);
+    }
+    setScanLoading(false);
+  }
+  async function startScan(){
+    setScanError(null);
+    setScanResult(null);
+    setScanning(true);
+    try{
+      if(!window.ZXingBrowser){
+        await new Promise((resolve,reject)=>{
+          const s=document.createElement('script');
+          s.src='https://unpkg.com/@zxing/browser@0.2.1/umd/zxing-browser.min.js';
+          s.onload=resolve;
+          s.onerror=()=>reject(new Error('No se pudo cargar el lector'));
+          document.head.appendChild(s);
+        });
+      }
+      const reader=new window.ZXingBrowser.BrowserMultiFormatReader();
+      const controls=await reader.decodeFromConstraints({video:{facingMode:"environment"}},videoRef.current,(result)=>{
+        if(result){
+          controls.stop();
+          scanControlsRef.current=null;
+          setScanning(false);
+          lookupBarcode(result.getText());
+        }
+      });
+      scanControlsRef.current=controls;
+    }catch(e){
+      setScanError('No se pudo acceder a la cámara: '+e.message);
+      setScanning(false);
+    }
+  }
+  function addScanResult(){
+    if(!scanResult) return;
+    const factor=scanQty/100;
+    const kcal=Math.round(scanResult.per100.kcal*factor);
+    const prot=Math.round(scanResult.per100.prot*factor*10)/10;
+    const carbs=Math.round(scanResult.per100.carbs*factor*10)/10;
+    const fat=Math.round(scanResult.per100.fat*factor*10)/10;
+    const cat=inferCategory(prot,carbs,fat);
+    setFoodLog(saveFoodLogEntry({date:todayStr,category:cat,name:scanResult.name,kcal,prot,carbs,fat,qty:scanQty+"g",source:"barcode"}));
+    setScanResult(null);
+  }
+  function removeEntry(id){
+    setFoodLog(removeFoodLogEntry(id));
+  }
   const foods=activeSection?FOODS[activeSection]||[]:Object.values(FOODS).flat();
   return(
     <div style={{minHeight:"100vh",background:BG,color:"#fff",fontFamily:"Poppins,sans-serif",paddingBottom:80}}>
@@ -1520,6 +1613,40 @@ function NutritionDB({onBack}){
 
         {dbTab==="foods"&&(
           <>
+            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase"}}>Registro de hoy</div>
+                <div onClick={startScan} style={{display:"flex",alignItems:"center",gap:6,background:G,color:"#050505",borderRadius:100,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer"}}>📷 Escanear</div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginBottom:todayEntries.length?12:0}}>
+                {[[Math.round(todayTotals.kcal),"kcal","Cal",G],[Math.round(todayTotals.prot*10)/10,"g","Prot","#fff"],[Math.round(todayTotals.carbs*10)/10,"g","Carb","#fff"],[Math.round(todayTotals.fat*10)/10,"g","Gras","#fff"]].map(([v,u,l,c])=>(
+                  <div key={l} style={{textAlign:"center"}}>
+                    <div style={{fontSize:14,fontWeight:700,color:c}}>{v}{u}</div>
+                    <div style={{fontSize:10,color:"#666"}}>{l}</div>
+                  </div>
+                ))}
+              </div>
+              {todayEntries.length===0?(
+                <div style={{fontSize:11,color:"#555",textAlign:"center"}}>Aún no has registrado nada hoy.</div>
+              ):(
+                todayEntries.map((e)=>(
+                  <div key={e.id} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderTop:"1px solid #161616"}}>
+                    <div style={{flex:1,fontSize:12,color:"#ccc"}}>{e.name} <span style={{color:"#555"}}>· {e.qty}</span></div>
+                    <div style={{fontSize:11,color:"#888"}}>{Math.round(e.kcal)} kcal</div>
+                    <div onClick={()=>removeEntry(e.id)} style={{fontSize:14,color:"#555",cursor:"pointer",padding:"0 4px"}}>×</div>
+                  </div>
+                ))
+              )}
+              {scanError&&!scanning&&(
+                <div style={{marginTop:10,background:"#2a1010",border:"1px solid #4a1a1a",borderRadius:8,padding:"10px 12px",fontSize:11,color:"#e88"}}>
+                  {scanError}
+                  <span onClick={()=>setScanError(null)} style={{marginLeft:8,color:"#888",cursor:"pointer",textDecoration:"underline"}}>Cerrar</span>
+                </div>
+              )}
+              {scanLoading&&(
+                <div style={{marginTop:10,fontSize:11,color:"#888",textAlign:"center"}}>Buscando producto…</div>
+              )}
+            </div>
             <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:14,padding:"16px 20px",marginBottom:12}}>
               <div style={{fontSize:11,color:"#555",textAlign:"center",marginBottom:10}}>Toca el plato para filtrar</div>
               <PlateModel active={activeSection} onSection={s=>setActiveSection(activeSection===s?null:s)}/>
@@ -1587,6 +1714,7 @@ function NutritionDB({onBack}){
                     <div style={{marginBottom:8}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Micronutrientes</div><div style={{fontSize:12,color:"#666",lineHeight:1.6}}>{f.micro}</div></div>
                     {f.gi&&f.gi!=="—"&&<div style={{marginBottom:8}}><div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:4}}>Índice glucémico</div><div style={{fontSize:12,color:"#666"}}>{f.gi}</div></div>}
                     <div style={{borderLeft:`2px solid ${G}`,background:"#080808",borderRadius:"0 8px 8px 0",padding:"10px 12px"}}><div style={{fontSize:11,color:"#666",lineHeight:1.6}}>💡 {f.tip}</div></div>
+                    <div onClick={(e)=>{e.stopPropagation(); const cat=activeSection||Object.keys(FOODS).find(k=>FOODS[k].some(x=>x.name===f.name))||"proteina"; setFoodLog(saveFoodLogEntry({date:todayStr,category:cat,name:f.name,kcal:f.rdata.kcal,prot:f.rdata.prot,carbs:f.rdata.carbs,fat:f.rdata.fat,qty:f.ration,source:"manual"}));}} style={{marginTop:10,textAlign:"center",background:`${G}22`,border:`1px solid ${G}55`,color:G,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Añadir a mi registro de hoy</div>
                   </div>
                 )}
               </div>
@@ -1632,6 +1760,38 @@ function NutritionDB({onBack}){
           </>
         )}
       </div>
+      {scanning&&(
+        <div style={{position:"fixed",inset:0,background:"#000",zIndex:200,display:"flex",flexDirection:"column"}}>
+          <video ref={videoRef} style={{flex:1,width:"100%",objectFit:"cover"}} muted playsInline/>
+          <div onClick={stopScan} style={{position:"absolute",top:16,right:16,width:36,height:36,borderRadius:"50%",background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#fff",cursor:"pointer"}}>×</div>
+          <div style={{position:"absolute",bottom:40,left:0,right:0,textAlign:"center",color:"#fff",fontSize:12,letterSpacing:2,textTransform:"uppercase"}}>Apunta al código de barras</div>
+        </div>
+      )}
+      {scanResult&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:200,display:"flex",alignItems:"flex-end"}}>
+          <div style={{background:"#0c0c0c",borderTop:`1px solid ${G}44`,borderRadius:"16px 16px 0 0",padding:20,width:"100%"}}>
+            <div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:6}}>Producto escaneado</div>
+            <div style={{fontSize:15,fontWeight:700,marginBottom:12}}>{scanResult.name}</div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <div style={{fontSize:11,color:"#888"}}>Cantidad</div>
+              <input type="number" value={scanQty} onChange={(e)=>setScanQty(parseInt(e.target.value)||0)} style={{width:70,background:"#111",border:"1px solid #222",borderRadius:6,color:"#fff",padding:"6px 8px",fontSize:13}}/>
+              <div style={{fontSize:11,color:"#888"}}>g</div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginBottom:16}}>
+              {[[Math.round(scanResult.per100.kcal*scanQty/100),"kcal","Cal",G],[Math.round(scanResult.per100.prot*scanQty/100*10)/10,"g","Prot","#fff"],[Math.round(scanResult.per100.carbs*scanQty/100*10)/10,"g","Carb","#fff"],[Math.round(scanResult.per100.fat*scanQty/100*10)/10,"g","Gras","#fff"]].map(([v,u,l,c])=>(
+                <div key={l} style={{textAlign:"center"}}>
+                  <div style={{fontSize:14,fontWeight:700,color:c}}>{v}{u}</div>
+                  <div style={{fontSize:10,color:"#666"}}>{l}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:10}}>
+              <div onClick={()=>setScanResult(null)} style={{flex:1,textAlign:"center",padding:"12px",borderRadius:8,border:"1px solid #222",color:"#888",fontSize:13,cursor:"pointer"}}>Cancelar</div>
+              <div onClick={addScanResult} style={{flex:2,textAlign:"center",padding:"12px",borderRadius:8,background:G,color:"#050505",fontWeight:700,fontSize:13,cursor:"pointer"}}>+ Añadir a mi registro</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
