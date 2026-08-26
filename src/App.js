@@ -14,7 +14,8 @@ import {
   getAccountStatus, linkEmailToAccount, restoreAccountByEmail,
   fetchCloudProfile, fetchCloudHistory, restoreLocalLogs,
   uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto,
-  saveFoodLogEntry, loadFoodLog, removeFoodLogEntry
+  saveFoodLogEntry, loadFoodLog, removeFoodLogEntry,
+  saveMeasurement, loadMeasurementLog
 } from './storage';
 import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Category, weeklyCaloriesBurned, weeklySleep, volumeByMuscleGroup, weightTrend, computeHexisAge } from './adaptive';
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
@@ -210,6 +211,80 @@ function PBar({pct,h=3,fixed=false}){
   return(<div style={s}><div style={{height:"100%",width:`${pct}%`,background:`linear-gradient(90deg,${G},#E8C870)`,transition:"width 0.4s",borderRadius:100}}/></div>);
 }
 
+// ── EVOLUCIÓN A LARGO PLAZO (peso, medidas, coherencia) ────────────
+// Gráfica de línea genérica reutilizable + selector de rango. Nada
+// de librerías nuevas: SVG a mano, igual de ligero que el resto.
+function filterByRange(log,range){
+  if(range==='all') return log;
+  const days={'7':7,'30':30,'90':90,'365':365}[range]||90;
+  const cutoff=new Date();
+  cutoff.setDate(cutoff.getDate()-days);
+  const cutoffStr=cutoff.toISOString().split('T')[0];
+  return log.filter(e=>e.date>=cutoffStr);
+}
+function RangeChips({value,onChange}){
+  const opts=[["7","7D"],["30","30D"],["90","90D"],["365","1A"],["all","Todo"]];
+  return(
+    <div style={{display:"flex",gap:6,marginBottom:10}}>
+      {opts.map(([v,l])=>(
+        <div key={v} onClick={()=>onChange(v)} style={{flex:1,textAlign:"center",padding:"5px 0",borderRadius:100,border:`1px solid ${value===v?G:"#1a1a1a"}`,background:value===v?"rgba(200,170,80,0.1)":"transparent",color:value===v?G:"#555",fontSize:10,cursor:"pointer"}}>{l}</div>
+      ))}
+    </div>
+  );
+}
+function EvoChart({data,color,unit,decimals,goal}){
+  const h=90;
+  const dec=decimals===undefined?1:decimals;
+  if(!data||data.length<2){
+    return <div style={{fontSize:12,color:"#666",padding:"14px 0",textAlign:"center"}}>Necesitas al menos 2 registros en este rango para ver la evolución.</div>;
+  }
+  const values=data.map(d=>d.value);
+  const allVals=(goal!=null)?[...values,goal]:values;
+  const min=Math.min(...allVals);
+  const max=Math.max(...allVals);
+  const pad=(max-min)*0.15||1;
+  const lo=min-pad, hi=max+pad;
+  const w=300;
+  const n=data.length;
+  const x=(i)=>n===1?w/2:(i/(n-1))*w;
+  const y=(v)=>h-((v-lo)/(hi-lo))*h;
+  const pts=data.map((d,i)=>x(i)+","+y(d.value)).join(' ');
+  const areaPts=pts+" "+w+","+h+" 0,"+h;
+  const first=data[0], last=data[data.length-1];
+  const delta=Math.round((last.value-first.value)*Math.pow(10,dec))/Math.pow(10,dec);
+  return(
+    <div>
+      <svg viewBox={"0 0 "+w+" "+h} style={{width:"100%",height:h,display:"block"}} preserveAspectRatio="none">
+        <polygon points={areaPts} fill={color} opacity="0.12"/>
+        {goal!=null&&(<line x1="0" y1={y(goal)} x2={w} y2={y(goal)} stroke="#555" strokeDasharray="4,3" strokeWidth="1"/>)}
+        <polyline points={pts} fill="none" stroke={color} strokeWidth="2"/>
+        {data.map((d,i)=>(<circle key={d.date+i} cx={x(i)} cy={y(d.value)} r={i===n-1?3:1.6} fill={i===n-1?color:"#666"}/>))}
+      </svg>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#555",marginTop:4}}>
+        <div>{first.date.slice(5)}</div>
+        <div>{last.date.slice(5)}</div>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
+        <div>
+          <div style={{fontSize:9,color:"#8a8a8a",letterSpacing:1,textTransform:"uppercase"}}>Actual</div>
+          <div style={{fontSize:15,fontWeight:700}}>{last.value}{unit}</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div style={{fontSize:9,color:"#8a8a8a",letterSpacing:1,textTransform:"uppercase"}}>Cambio en el periodo</div>
+          <div style={{fontSize:15,fontWeight:700,color:delta<0?"#8BA4A0":delta>0?"#C8AA50":"#888"}}>{delta>0?"+":""}{delta}{unit}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+const MEASURE_TYPES={
+  cintura:{label:"Cintura",icon:"📏"},
+  pecho:{label:"Pecho",icon:"📐"},
+  brazo:{label:"Brazo",icon:"💪"},
+  muslo:{label:"Muslo",icon:"🦵"},
+  cadera:{label:"Cadera",icon:"⭕"},
+};
+
 function MacroGrid({cal,prot,carbs,fat,color}){
   return(
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:16}}>
@@ -379,6 +454,7 @@ function MirrorScreen({onBack,isPro,onUnlocked,archetype,color,stats,mirrorLog,o
   const already=mirrorLog.find(e=>e.date===today);
   const [note,setNote]=useState(already?.note||'');
   const [saved,setSaved]=useState(!!already);
+  const [mirrorRange,setMirrorRange]=useState('90');
 
   if(!isPro){
     return(
@@ -452,6 +528,12 @@ function MirrorScreen({onBack,isPro,onUnlocked,archetype,color,stats,mirrorLog,o
 
         <div onClick={handleSave} style={{textAlign:"center",padding:"13px",borderRadius:8,background:saved?"#111":color,color:saved?"#8a8a8a":"#050505",fontSize:12,fontWeight:700,letterSpacing:1,cursor:"pointer",marginBottom:24}}>
           {saved?"✓ Día cerrado":"Cerrar el día"}
+        </div>
+
+        <SLabel text="Evolución de tu coherencia" right="Score histórico"/>
+        <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:20}}>
+          <RangeChips value={mirrorRange} onChange={setMirrorRange}/>
+          <EvoChart data={filterByRange(mirrorLog,mirrorRange).map(e=>({date:e.date,value:e.score}))} color={color} unit="" decimals={0}/>
         </div>
 
         {recent.length>0&&(
@@ -1013,12 +1095,16 @@ function HexisAgeCard({result,color}){
   );
 }
 
-function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,onLogVo2,stepsLog,sleepLog,weightLog,goalWeight,bodyWeightKg,p,habitsDone,habitsTotal,exDone,exTotal,onLogSteps,onLogSleep,onSetGoalWeight}){
+function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,onLogVo2,stepsLog,sleepLog,weightLog,goalWeight,bodyWeightKg,p,habitsDone,habitsTotal,exDone,exTotal,onLogSteps,onLogSleep,onSetGoalWeight,measureLog,onLogMeasurement}){
   const [vo2Input,setVo2Input]=useState('');
   const [stepsInput,setStepsInput]=useState('');
   const [sleepInput,setSleepInput]=useState('');
   const [goalInput,setGoalInput]=useState(goalWeight?String(goalWeight):'');
   const [editingGoal,setEditingGoal]=useState(false);
+  const [weightRange,setWeightRange]=useState('90');
+  const [measureType,setMeasureType]=useState('cintura');
+  const [measureInput,setMeasureInput]=useState('');
+  const [measureRange,setMeasureRange]=useState('90');
 
   if(!isPro){
     return(
@@ -1195,6 +1281,10 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
         </div>
 
         <SLabel text="Peso y objetivo" right={lastWeight?`Actual: ${lastWeight}kg`:"Sin datos"}/>
+        <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:14}}>
+          <RangeChips value={weightRange} onChange={setWeightRange}/>
+          <EvoChart data={filterByRange(weightLog,weightRange).map(e=>({date:e.date,value:e.value}))} color={color} unit="kg" goal={goalWeight}/>
+        </div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:20}}>
           {validW.length<2?(
             <div style={{fontSize:12,color:"#666",marginBottom:12}}>Registra tu peso en Inicio varios días para ver tu evolución aquí.</div>
@@ -1244,6 +1334,21 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
               <div style={{fontSize:10,color:"#666",marginTop:8,lineHeight:1.5}}>Basado en medias móviles de 7 días. La proyección es una extrapolación simple de tu tendencia actual, no una promesa.</div>
             </div>
           )}
+        </div>
+
+        <SLabel text="Medidas corporales" right={measureLog.filter(e=>e.type===measureType).length?`Último: ${measureLog.filter(e=>e.type===measureType).slice(-1)[0].value}cm`:"Sin datos"}/>
+        <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:20}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:12}}>
+            {Object.entries(MEASURE_TYPES).map(([k,m])=>(
+              <div key={k} onClick={()=>setMeasureType(k)} style={{flexShrink:0,padding:"5px 12px",borderRadius:100,border:`1px solid ${measureType===k?color:"#1a1a1a"}`,background:measureType===k?`${color}22`:"transparent",color:measureType===k?color:"#555",fontSize:11,cursor:"pointer"}}>{m.icon} {m.label}</div>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            <input type="number" step="0.5" placeholder={"Nueva medida (cm)"} value={measureInput} onChange={(e)=>setMeasureInput(e.target.value)} style={{...inp,marginBottom:0,flex:1}}/>
+            <button onClick={()=>{const v=parseFloat(measureInput);if(!v||v<10||v>300)return;onLogMeasurement(measureType,v);setMeasureInput('');}} style={{padding:"0 16px",background:color,border:"none",borderRadius:6,color:"#050505",fontFamily:"Poppins,sans-serif",fontSize:11,fontWeight:700,cursor:"pointer"}}>Registrar</button>
+          </div>
+          <RangeChips value={measureRange} onChange={setMeasureRange}/>
+          <EvoChart data={filterByRange(measureLog.filter(e=>e.type===measureType),measureRange).map(e=>({date:e.date,value:e.value}))} color={color} unit="cm"/>
         </div>
 
         <SLabel text="Resultados vs. objetivos" right="Esta semana"/>
@@ -2094,6 +2199,7 @@ export default function App(){
   const [goalWeight,setGoalWeight]=useState(()=>loadGoalWeight());
   const [cycle,setCycle]=useState(()=>loadCycle());
   const [mirrorLog,setMirrorLog]=useState(()=>loadMirrorLog());
+  const [measureLog,setMeasureLog]=useState(()=>loadMeasurementLog());
 
   useEffect(()=>{
     ensureCloudSession().then(async id=>{
@@ -2168,7 +2274,7 @@ export default function App(){
   if(screen==="metrics") return <MetricsScreen
     isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)}
     setLogs={setLogs} vo2Log={vo2Log} stepsLog={stepsLog} sleepLog={sleepLog}
-    weightLog={weightLog} goalWeight={goalWeight}
+    weightLog={weightLog} goalWeight={goalWeight} measureLog={measureLog}
     color={PROFILES[profile].color} gender={(loadUserData()||{}).gender} age={(loadUserData()||{}).age}
     bodyWeightKg={(weightLog.length?weightLog[weightLog.length-1].value:null)||parseFloat((loadUserData()||{}).weight)||75}
     p={PROFILES[profile]} habitsDone={habits.filter(Boolean).length} habitsTotal={habits.length}
@@ -2192,6 +2298,10 @@ export default function App(){
     onSetGoalWeight={(v)=>{
       saveGoalWeight(v);
       setGoalWeight(v);
+    }}
+    onLogMeasurement={(type,value)=>{
+      const log=saveMeasurement({date:new Date().toISOString().split('T')[0],type,value});
+      setMeasureLog(log);
     }}
   />;
   if(screen==="analyze") return <AnalyzeScreen onBack={()=>setScreen(null)} isPro={isPro} onUnlocked={()=>setIsPro(true)} color={PROFILES[profile].color}/>;

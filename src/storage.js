@@ -20,6 +20,7 @@ const STORAGE_KEYS = {
   CYCLE:      'hexis_cycle',       // { id, startDate } — ciclo activo (Arquitectura de Dominio)
   MIRROR_LOG: 'hexis_mirror_log',  // [ { date, note, score, label } ] — Espejo de Coherencia
   FOOD_LOG:   'hexis_food_log',    // [ { id, date, category, name, kcal, prot, carbs, fat, qty, source } ] — registro real diario de alimentos
+  MEASURE_LOG: 'hexis_measure_log', // [ { date, type, value } ] — medidas corporales (cintura, pecho, brazo, muslo, cadera) en cm
 };
 
 function today() {
@@ -596,4 +597,21 @@ export async function deleteProgressPhoto(photoId, storagePath) {
     console.warn('HEXIS cloud: no se pudo borrar la foto de progreso', e.message);
     return { ok: false, error: e.message || 'unknown' };
   }
+}
+
+
+// ── MEDIDAS CORPORALES (evolución a largo plazo) ────────────────────
+// Un registro por tipo de medida y fecha (cintura, pecho, brazo, muslo,
+// cadera, en cm) — igual que el peso, pero para el resto del cuerpo.
+export function saveMeasurement(entry) {
+  const log = loadMeasurementLog();
+  const idx = log.findIndex(e => e.date === entry.date && e.type === entry.type);
+  if (idx >= 0) log[idx] = entry; else log.push(entry);
+  const sorted = log.sort((a,b) => a.date.localeCompare(b.date)).slice(-2000);
+  localStorage.setItem(STORAGE_KEYS.MEASURE_LOG, JSON.stringify(sorted));
+  return sorted;
+}
+export function loadMeasurementLog() {
+  const l = localStorage.getItem(STORAGE_KEYS.MEASURE_LOG);
+  return l ? JSON.parse(l) : [];
 }
