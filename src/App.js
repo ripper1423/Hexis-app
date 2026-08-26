@@ -1396,7 +1396,7 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
   const [pushStatus,setPushStatus]=useState('checking');
   useEffect(()=>{
     if(!('serviceWorker' in navigator)||!('PushManager' in window)){ setPushStatus('unsupported'); return; }
-    navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{ setPushStatus(sub?'on':'off'); }).catch(()=>setPushStatus('off'));
+    navigator.serviceWorker.getRegistration().then(reg=>{ if(!reg){ setPushStatus('off'); return; } return reg.pushManager.getSubscription().then(sub=>{ setPushStatus(sub?'on':'off'); }); }).catch(()=>setPushStatus('off'));
   },[]);
   const handleEnablePush=async()=>{
     if(!userId){ window.alert('Espera un momento a que se cargue tu cuenta e intentalo de nuevo.'); return; }
