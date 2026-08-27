@@ -869,7 +869,7 @@ function ProTeaser({isPro,onUnlocked}){
             :"El sistema completo, más allá del plan inicial. Estas funciones se irán desbloqueando en próximas versiones."}
         </div>
         {PRO_FEATURES.map((f,i)=>(<ProFeatureRow key={i} {...f} unlocked={isPro}/>))}
-        {!isPro&&<ProCodeInput onUnlocked={onUnlocked}/>}
+        {!isPro&&(<div style={{fontSize:11,color:"#8a8a8a",lineHeight:1.6,marginBottom:12,paddingBottom:12,borderBottom:"1px solid rgba(200,170,80,0.1)"}}>Hay dos formas de tener PRO: comprando el infoproducto (pago único, acceso de por vida) o suscribiéndote aquí mismo (pago mensual, cancelable — disponible próximamente). El primer pago se realiza al confirmar la compra; después, la suscripción se renueva automáticamente cada mes por el importe correspondiente hasta que la canceles. Puedes cancelar en cualquier momento desde tu perfil, y el acceso sigue activo hasta el final del periodo ya pagado.</div>)}{!isPro&&<ProCodeInput onUnlocked={onUnlocked}/>}
       </div>
     </>
   );
