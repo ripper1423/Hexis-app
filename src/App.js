@@ -1484,6 +1484,9 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24,fontSize:12,color:"#777",lineHeight:1.7}}>
           Tu progreso (peso, ejercicios, hábitos, racha) se guarda al instante en este dispositivo, y también se respalda en la nube en segundo plano. Para poder recuperarlo si cambias de móvil, vincula tu email arriba.
         </div>
+                    <div onClick={()=>downloadDataBackup()} style={{textAlign:"center",padding:"12px",borderRadius:8,border:"1px solid #3a3a3a",color:"#ccc",fontSize:12,fontWeight:600,letterSpacing:1,cursor:"pointer",marginBottom:24}}>
+          Exportar mis datos
+        </div>
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Notificaciones</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
