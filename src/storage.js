@@ -642,3 +642,31 @@ export async function removePushSubscriptionFromCloud(endpoint) {
     return true;
   } catch (e) { console.warn('HEXIS push: fallo borrando suscripcion', e.message); return false; }
 }
+
+
+// -- EXPORTAR / BACKUP DE DATOS --
+export function exportAllData() {
+  const data = {};
+  Object.entries(STORAGE_KEYS).forEach(([label, key]) => {
+    const raw = localStorage.getItem(key);
+    if (raw !== null) {
+      try { data[label] = JSON.parse(raw); } catch (e) { data[label] = raw; }
+    }
+  });
+  return { app: 'HEXIS', exportedAt: new Date().toISOString(), version: 1, data };
+}
+
+export function downloadDataBackup() {
+  const backup = exportAllData();
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hexis_backup_${today()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  return backup;
+}
