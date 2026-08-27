@@ -5,7 +5,7 @@ import {
   saveProfile, loadProfile, savePlan, loadPlan, saveUserData, loadUserData,
   saveHabits, loadHabits, saveExercises, loadExercises,
   saveWater, loadWater, saveWeight, loadWeightLog,
-  updateStreak, loadStreak, clearAll,
+  updateStreak, loadStreak, clearAll, downloadDataBackup,
   ensureCloudSession, syncProfileToCloud, logExerciseToCloud, logWeightToCloud,
   fetchSubscriptionTier, redeemProCode,
   saveSetLog, loadSetLogs, removeSetLog, saveVo2Test, loadVo2Log, logVo2ToCloud,
