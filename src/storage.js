@@ -496,19 +496,24 @@ export async function logWeightToCloud(userId, weightKg) {
 
 // ── HEXIS PRO — nivel de suscripción y canje de código ────────────
 export async function fetchSubscriptionTier(userId) {
-  if (!userId) return 'start';
-  try {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('subscription_tier')
-      .eq('id', userId)
-      .single();
-    if (error) throw error;
-    return (data && data.subscription_tier) || 'start';
-  } catch (e) {
-    console.warn('HEXIS cloud: no se pudo leer el nivel de suscripción', e.message);
-    return 'start';
-  }
+    if (!userId) return 'start';
+    try {
+          const { data, error } = await supabase
+            .from('user_profiles')
+            .select('subscription_tier,subscription_status,subscription_period_end')
+            .eq('id', userId)
+            .single();
+          if (error) throw error;
+          if (!data) return 'start';
+          const tier = data.subscription_tier || 'start';
+          if (data.subscription_status === 'cancelled' && data.subscription_period_end) {
+                  if (new Date(data.subscription_period_end).getTime() < Date.now()) return 'start';
+          }
+          return tier;
+    } catch (e) {
+          console.warn('HEXIS cloud: no se pudo leer el nivel de suscripción', e.message);
+          return 'start';
+    }
 }
 
 // Devuelve { ok: true } o { ok: false, error: 'invalid_code' | 'already_used' | 'no_session' }
