@@ -66,6 +66,26 @@ export function computeCoherenceScore(archetype, stats) {
       { label: 'Movimiento suave (NEAT)', pct: stepsPct, w: 0.35 },
       { label: 'Constancia sin presión', pct: streakPct, w: 0.3 },
     ],
+    ATLAS: [
+      { label: 'Hábitos de alimentación', pct: habitsPct, w: 0.4 },
+      { label: 'Rumbo hacia tu meta', pct: weightPct, w: 0.35 },
+      { label: 'Movimiento diario (NEAT)', pct: stepsPct, w: 0.25 },
+    ],
+    ATALANTA: [
+      { label: 'Hábitos de alimentación', pct: habitsPct, w: 0.4 },
+      { label: 'Rumbo hacia tu meta', pct: weightPct, w: 0.35 },
+      { label: 'Constancia (racha)', pct: streakPct, w: 0.25 },
+    ],
+    'HÉRCULES': [
+      { label: 'Entrenos completados por fase', pct: exPct, w: 0.4 },
+      { label: 'Esfuerzo real (RIR)', pct: effortPct, w: 0.3 },
+      { label: 'Precisión nutricional', pct: habitsPct, w: 0.3 },
+    ],
+    ARTEMISA: [
+      { label: 'Entrenos completados por fase', pct: exPct, w: 0.4 },
+      { label: 'Precisión nutricional', pct: habitsPct, w: 0.35 },
+      { label: 'Esfuerzo real (RIR)', pct: effortPct, w: 0.25 },
+    ],
   };
   const pillars = PILLARS[archetype] || PILLARS.ALPHA;
   const score = clamp(pillars.reduce((s, p) => s + p.pct * p.w, 0));
@@ -83,4 +103,8 @@ export const MIRROR_PROMPTS = {
   SHAPE: '¿Hoy fuiste paciente contigo mismo/a?',
   ATENEA: '¿Hoy el sistema rindió más que el caos?',
   GAIA: '¿Hoy escuchaste a tu cuerpo en vez de compararlo?',
+  ATLAS: '¿Hoy comiste con conciencia, no en piloto automático?',
+  ATALANTA: '¿Hoy avanzaste a tu ritmo, sin compararte con nadie?',
+  'HÉRCULES': '¿Hoy tu entreno respondió al plan, no al ánimo?',
+  ARTEMISA: '¿Hoy afinaste un detalle más hacia tu punto final?',
 };
