@@ -2275,6 +2275,12 @@ export default function App(){
   const [measureLog,setMeasureLog]=useState(()=>loadMeasurementLog());
 
   useEffect(()=>{
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    }
+  },[]);
+
+  useEffect(()=>{
     ensureCloudSession().then(async id=>{
       if(id){
         setUserId(id);
