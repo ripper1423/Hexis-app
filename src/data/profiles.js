@@ -413,6 +413,112 @@ export const WORKOUTS = {
       {name:"Rotación de core tumbada",sets:"3",reps:"10 por lado",weight:0,unit:"pc",muscle:"Core",rpe:"5/10",lastWeek:0,rest:"45-60 seg",how:"Tumbada con las rodillas flexionadas, deja caer las rodillas suavemente a un lado sin forzar, vuelve al centro."},
     ],
   },
+  ATLAS: {
+    fullbody_a: [
+      {name:"Sentadilla goblet",sets:"3",reps:"12",weight:16,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Mancuerna pegada al pecho, baja hasta que los muslos queden paralelos al suelo, espalda recta todo el recorrido."},
+      {name:"Remo con mancuerna a una mano",sets:"3",reps:"12",weight:14,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:12,rest:"90 seg",how:"Apoya rodilla y mano en el banco, tira del codo hacia atrás sin rotar el torso."},
+      {name:"Press de pecho con mancuernas",sets:"3",reps:"12",weight:12,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:10,rest:"90 seg",how:"Tumbado, baja controlado hasta sentir estiramiento, empuja sin bloquear los codos de golpe."},
+      {name:"Zancadas alternas",sets:"3",reps:"10 por pierna",weight:8,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:6,rest:"90 seg",how:"Paso amplio, rodilla trasera casi roza el suelo, empuja con el talón delantero para volver."},
+      {name:"Plancha",sets:"3",reps:"40 seg",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:30,rest:"60 seg",how:"Cuerpo en línea recta de cabeza a talones, aprieta glúteo y abdomen, no dejes caer la cadera."},
+    ],
+    fullbody_b: [
+      {name:"Peso muerto rumano con mancuernas",sets:"3",reps:"12",weight:16,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Piernas casi rectas, baja las mancuernas pegadas a las piernas hasta sentir tensión en isquios, espalda neutra."},
+      {name:"Jalón al pecho",sets:"3",reps:"12",weight:35,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:30,rest:"90 seg",how:"Tira la barra hasta la altura de la clavícula, pecho alto, sin balancear el cuerpo."},
+      {name:"Press inclinado mancuernas",sets:"3",reps:"12",weight:10,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:9,rest:"90 seg",how:"Banco a 30°, baja hasta sentir estiramiento en pecho superior."},
+      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:6,unit:"kg",muscle:"Hombros",rpe:"6/10",lastWeek:5,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Elevación de rodillas",sets:"3",reps:"12",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:10,rest:"60 seg",how:"Sube las rodillas al pecho sin balancear, controla la bajada."},
+    ],
+  },
+  ATALANTA: {
+    fullbody_a: [
+      {name:"Sentadilla goblet",sets:"3",reps:"12",weight:10,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:8,rest:"90 seg",how:"Mancuerna pegada al pecho, baja hasta que los muslos queden paralelos al suelo, espalda recta todo el recorrido."},
+      {name:"Remo con mancuerna a una mano",sets:"3",reps:"12",weight:8,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:6,rest:"90 seg",how:"Apoya rodilla y mano en el banco, tira del codo hacia atrás sin rotar el torso."},
+      {name:"Press de pecho con mancuernas",sets:"3",reps:"12",weight:7,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:6,rest:"90 seg",how:"Tumbada, baja controlado hasta sentir estiramiento, empuja sin bloquear los codos de golpe."},
+      {name:"Zancadas alternas",sets:"3",reps:"10 por pierna",weight:5,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:4,rest:"90 seg",how:"Paso amplio, rodilla trasera casi roza el suelo, empuja con el talón delantero para volver."},
+      {name:"Plancha",sets:"3",reps:"30 seg",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:20,rest:"60 seg",how:"Cuerpo en línea recta de cabeza a talones, aprieta glúteo y abdomen, no dejes caer la cadera."},
+    ],
+    fullbody_b: [
+      {name:"Peso muerto rumano con mancuernas",sets:"3",reps:"12",weight:10,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:8,rest:"90 seg",how:"Piernas casi rectas, baja las mancuernas pegadas a las piernas hasta sentir tensión en isquios, espalda neutra."},
+      {name:"Jalón al pecho",sets:"3",reps:"12",weight:25,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:22,rest:"90 seg",how:"Tira la barra hasta la altura de la clavícula, pecho alto, sin balancear el cuerpo."},
+      {name:"Press inclinado mancuernas",sets:"3",reps:"12",weight:6,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:5,rest:"90 seg",how:"Banco a 30°, baja hasta sentir estiramiento en pecho superior."},
+      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:4,unit:"kg",muscle:"Hombros",rpe:"6/10",lastWeek:3,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Elevación de rodillas",sets:"3",reps:"10",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:8,rest:"60 seg",how:"Sube las rodillas al pecho sin balancear, controla la bajada."},
+    ],
+  },
+  'HÉRCULES': {
+    empuje: [
+      {name:"Press banca plano",sets:"4",reps:"8",weight:75,unit:"kg",muscle:"Pecho",rpe:"8/10",lastWeek:72.5,rest:"2-3 min",how:"Baja controlado hasta rozar el pecho, codos a ~45°. Empuja explosivo sin despegar los glúteos del banco."},
+      {name:"Press inclinado mancuernas",sets:"3",reps:"10",weight:26,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:24,rest:"90 seg",how:"Banco a 30-45°. Baja hasta sentir estiramiento en pecho superior, sin bloquear los codos arriba."},
+      {name:"Press militar",sets:"4",reps:"8",weight:45,unit:"kg",muscle:"Hombros",rpe:"8/10",lastWeek:42.5,rest:"2-3 min",how:"De pie o sentado, barra desde clavícula hasta bloqueo de codos. Core apretado, sin arquear la espalda baja."},
+      {name:"Elevaciones laterales",sets:"4",reps:"15",weight:10,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:9,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso. Controla la bajada 2 seg."},
+      {name:"Fondos en paralelas",sets:"3",reps:"10",weight:0,unit:"kg",muscle:"Tríceps",rpe:"7/10",lastWeek:0,rest:"90 seg",how:"Baja hasta 90° de codo, torso ligeramente inclinado adelante, empuja sin bloquear de golpe."},
+    ],
+    tiron: [
+      {name:"Dominadas",sets:"4",reps:"8",weight:0,unit:"kg",muscle:"Espalda",rpe:"8/10",lastWeek:0,rest:"2-3 min",how:"Agarre prono, sube hasta que la barbilla pase la barra, baja con control completo."},
+      {name:"Remo con barra",sets:"4",reps:"8",weight:70,unit:"kg",muscle:"Espalda",rpe:"8/10",lastWeek:67.5,rest:"2 min",how:"Torso a 45°, tira la barra hacia el ombligo, aprieta el omóplato arriba."},
+      {name:"Remo con mancuerna a una mano",sets:"3",reps:"10",weight:30,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:28,rest:"90 seg",how:"Apoya rodilla y mano en el banco, tira del codo hacia atrás sin rotar el torso."},
+      {name:"Curl de bíceps con barra",sets:"3",reps:"10",weight:30,unit:"kg",muscle:"Bíceps",rpe:"7/10",lastWeek:27.5,rest:"60-90 seg",how:"Codos fijos junto al torso, sube sin balancear la espalda, baja controlado."},
+      {name:"Face pull",sets:"3",reps:"15",weight:15,unit:"kg",muscle:"Espalda",rpe:"6/10",lastWeek:12,rest:"60 seg",how:"Tira de la cuerda hacia la cara, codos altos, aprieta omóplatos al final."},
+    ],
+    pierna: [
+      {name:"Sentadilla trasera con barra",sets:"4",reps:"8",weight:90,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:87.5,rest:"2-3 min",how:"Barra en trapecio, baja hasta paralelo o más, rodillas siguen la dirección de los pies."},
+      {name:"Peso muerto rumano",sets:"4",reps:"8",weight:80,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:77.5,rest:"2-3 min",how:"Piernas casi rectas, barra pegada a las piernas, baja hasta sentir tensión en isquios."},
+      {name:"Prensa de piernas",sets:"3",reps:"10",weight:140,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:130,rest:"90 seg",how:"Baja hasta 90° de rodilla, empuja sin bloquear las rodillas del todo arriba."},
+      {name:"Zancadas con mancuernas",sets:"3",reps:"10 por pierna",weight:16,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Paso amplio, rodilla trasera casi roza el suelo, vuelve empujando con el talón."},
+      {name:"Elevación de gemelos",sets:"4",reps:"15",weight:40,unit:"kg",muscle:"Gemelo",rpe:"7/10",lastWeek:35,rest:"60 seg",how:"Sube hasta la punta del pie, aguanta 1 seg arriba, baja hasta estirar completo."},
+    ],
+    hombros_brazos: [
+      {name:"Press militar sentado",sets:"4",reps:"8",weight:40,unit:"kg",muscle:"Hombros",rpe:"8/10",lastWeek:37.5,rest:"2 min",how:"Espalda apoyada, empuja hasta bloqueo de codos sin arquear la zona lumbar."},
+      {name:"Elevaciones laterales",sets:"4",reps:"15",weight:10,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:9,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Curl de bíceps con mancuernas",sets:"3",reps:"10",weight:14,unit:"kg",muscle:"Bíceps",rpe:"7/10",lastWeek:12,rest:"60-90 seg",how:"Codos fijos junto al torso, sube alternando o a la vez, sin balancear."},
+      {name:"Press francés",sets:"3",reps:"10",weight:20,unit:"kg",muscle:"Tríceps",rpe:"7/10",lastWeek:18,rest:"60-90 seg",how:"Tumbado, baja la barra hacia la frente flexionando solo el codo, sin mover el hombro."},
+      {name:"Curl martillo",sets:"3",reps:"12",weight:12,unit:"kg",muscle:"Bíceps",rpe:"6/10",lastWeek:10,rest:"60 seg",how:"Agarre neutro, sube sin balancear el torso, controla la bajada."},
+    ],
+    fullbody: [
+      {name:"Sentadilla goblet",sets:"3",reps:"10",weight:24,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:22,rest:"90 seg",how:"Mancuerna pegada al pecho, baja hasta paralelo, espalda recta todo el recorrido."},
+      {name:"Dominadas",sets:"3",reps:"8",weight:0,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:0,rest:"2 min",how:"Agarre prono, sube hasta que la barbilla pase la barra, baja con control."},
+      {name:"Press banca",sets:"3",reps:"8",weight:70,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:67.5,rest:"2 min",how:"Baja controlado hasta rozar el pecho, empuja sin despegar los glúteos del banco."},
+      {name:"Peso muerto rumano",sets:"3",reps:"10",weight:70,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:67.5,rest:"90 seg",how:"Piernas casi rectas, barra pegada a las piernas, baja hasta sentir tensión en isquios."},
+      {name:"Plancha con peso",sets:"3",reps:"40 seg",weight:5,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:0,rest:"60 seg",how:"Disco sobre la espalda baja, cuerpo en línea recta, aprieta glúteo y abdomen."},
+    ],
+  },
+  ARTEMISA: {
+    empuje: [
+      {name:"Press banca plano",sets:"3",reps:"10",weight:30,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:27.5,rest:"90 seg",how:"Baja controlado hasta rozar el pecho, empuja sin despegar los glúteos del banco."},
+      {name:"Press inclinado mancuernas",sets:"3",reps:"12",weight:12,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:10,rest:"90 seg",how:"Banco a 30-45°. Baja hasta sentir estiramiento en pecho superior."},
+      {name:"Press militar con mancuernas",sets:"3",reps:"10",weight:16,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:14,rest:"90 seg",how:"Sentada o de pie, empuja hasta bloqueo de codos sin arquear la espalda baja."},
+      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:6,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:5,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Fondos en banco",sets:"3",reps:"12",weight:0,unit:"kg",muscle:"Tríceps",rpe:"6/10",lastWeek:0,rest:"60-90 seg",how:"Manos en el banco detrás de ti, baja flexionando el codo, empuja sin bloquear de golpe."},
+    ],
+    tiron: [
+      {name:"Jalón al pecho",sets:"4",reps:"10",weight:35,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:32,rest:"90 seg",how:"Tira la barra hasta la altura de la clavícula, pecho alto, sin balancear el cuerpo."},
+      {name:"Remo con mancuerna a una mano",sets:"3",reps:"12",weight:14,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:12,rest:"90 seg",how:"Apoya rodilla y mano en el banco, tira del codo hacia atrás sin rotar el torso."},
+      {name:"Remo en máquina",sets:"3",reps:"12",weight:30,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:27,rest:"90 seg",how:"Pecho apoyado, tira hacia el abdomen, aprieta omóplatos al final del recorrido."},
+      {name:"Curl de bíceps con mancuernas",sets:"3",reps:"12",weight:8,unit:"kg",muscle:"Bíceps",rpe:"6/10",lastWeek:7,rest:"60 seg",how:"Codos fijos junto al torso, sube sin balancear, controla la bajada."},
+      {name:"Face pull",sets:"3",reps:"15",weight:10,unit:"kg",muscle:"Espalda",rpe:"6/10",lastWeek:8,rest:"60 seg",how:"Tira de la cuerda hacia la cara, codos altos, aprieta omóplatos al final."},
+    ],
+    pierna: [
+      {name:"Sentadilla búlgara",sets:"4",reps:"10 por pierna",weight:12,unit:"kg",muscle:"Glúteo",rpe:"7/10",lastWeek:10,rest:"90 seg",how:"Pie trasero elevado en el banco, baja recto hasta que el muslo delantero quede paralelo."},
+      {name:"Hip thrust",sets:"4",reps:"10",weight:60,unit:"kg",muscle:"Glúteo",rpe:"8/10",lastWeek:55,rest:"2 min",how:"Espalda apoyada en el banco, empuja la cadera arriba apretando glúteo, sin arquear la lumbar."},
+      {name:"Prensa de piernas",sets:"3",reps:"12",weight:100,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:90,rest:"90 seg",how:"Baja hasta 90° de rodilla, empuja sin bloquear las rodillas del todo arriba."},
+      {name:"Peso muerto rumano",sets:"3",reps:"10",weight:40,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:35,rest:"90 seg",how:"Piernas casi rectas, mancuernas pegadas a las piernas, baja hasta sentir tensión en isquios."},
+      {name:"Zancadas caminando",sets:"3",reps:"12 por pierna",weight:10,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:8,rest:"90 seg",how:"Paso amplio hacia delante, rodilla trasera casi roza el suelo, avanza empujando con el talón."},
+    ],
+    hombros_brazos: [
+      {name:"Press militar con mancuernas",sets:"3",reps:"10",weight:14,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:12,rest:"90 seg",how:"Sentada o de pie, empuja hasta bloqueo de codos sin arquear la espalda baja."},
+      {name:"Elevaciones laterales",sets:"3",reps:"15",weight:5,unit:"kg",muscle:"Hombros",rpe:"6/10",lastWeek:4,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin impulso."},
+      {name:"Curl de bíceps con barra Z",sets:"3",reps:"12",weight:16,unit:"kg",muscle:"Bíceps",rpe:"6/10",lastWeek:14,rest:"60 seg",how:"Codos fijos junto al torso, sube sin balancear la espalda, baja controlado."},
+      {name:"Press francés",sets:"3",reps:"12",weight:12,unit:"kg",muscle:"Tríceps",rpe:"6/10",lastWeek:10,rest:"60-90 seg",how:"Tumbada, baja la mancuerna hacia la frente flexionando solo el codo."},
+      {name:"Patada de tríceps",sets:"3",reps:"15",weight:6,unit:"kg",muscle:"Tríceps",rpe:"6/10",lastWeek:5,rest:"60 seg",how:"Torso inclinado, codo fijo pegado al cuerpo, extiende el antebrazo atrás sin balancear."},
+    ],
+    fullbody: [
+      {name:"Sentadilla goblet",sets:"3",reps:"12",weight:14,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:12,rest:"90 seg",how:"Mancuerna pegada al pecho, baja hasta paralelo, espalda recta todo el recorrido."},
+      {name:"Jalón al pecho",sets:"3",reps:"10",weight:30,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:27,rest:"90 seg",how:"Tira la barra hasta la altura de la clavícula, pecho alto, sin balancear el cuerpo."},
+      {name:"Press de pecho con mancuernas",sets:"3",reps:"10",weight:10,unit:"kg",muscle:"Pecho",rpe:"7/10",lastWeek:9,rest:"90 seg",how:"Tumbada, baja controlado hasta sentir estiramiento, empuja sin bloquear los codos de golpe."},
+      {name:"Hip thrust",sets:"3",reps:"12",weight:40,unit:"kg",muscle:"Glúteo",rpe:"7/10",lastWeek:35,rest:"90 seg",how:"Espalda apoyada en el banco, empuja la cadera arriba apretando glúteo."},
+      {name:"Plancha",sets:"3",reps:"40 seg",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:30,rest:"60 seg",how:"Cuerpo en línea recta de cabeza a talones, aprieta glúteo y abdomen."},
+    ],
+  },
 };
 
 // "Hoy" tiene que salir de la fecha real, no de un dato fijo dentro del
