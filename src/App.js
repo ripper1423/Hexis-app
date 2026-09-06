@@ -877,6 +877,21 @@ function ProTeaser({isPro,onUnlocked}){
 
 // Vincular email — para no perder los datos si el usuario cambia de móvil,
 // borra el navegador o reinstala. Solo lo pide una vez, sin contraseña.
+function UnlinkedBanner({onOpenPerfil,color}){
+  const[status,setStatus]=useState(null);
+  useEffect(()=>{ getAccountStatus().then(setStatus); },[]);
+  if(!status||status.linked)return null;
+  return(
+    <div onClick={onOpenPerfil} style={{background:"#0c0c0c",border:`1px solid ${color}55`,borderRadius:12,padding:"12px 16px",marginBottom:16,cursor:"pointer",display:"flex",alignItems:"center",gap:10}}>
+      <div style={{width:8,height:8,borderRadius:"50%",background:color,flexShrink:0}}/>
+      <div style={{flex:1}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#fff"}}>Protege tu progreso</div>
+        <div style={{fontSize:11,color:"#666",marginTop:2}}>Vincula tu email para no perderlo si cambias de móvil o borras la app. Toca aquí.</div>
+      </div>
+    </div>
+  );
+}
+
 function AccountLinkCard(){
   const[status,setStatus]=useState(null); // null (cargando) | { linked, email }
   const[showInput,setShowInput]=useState(false);
@@ -2441,6 +2456,7 @@ export default function App(){
               <div style={{fontSize:11,color:"#555"}}>{habitsDone}/{habits.length} hábitos</div>
             </div>
           </div>
+          <UnlinkedBanner onOpenPerfil={()=>setScreen("perfil")} color={p.color}/>
           <SLabel text="Tu progreso"/>
           <RankBadge color={p.color} habitsDone={habitsDone} habitsTotal={habits.length} exDone={done} exTotal={w.length} water={water} streakDay={streakDay}/>
           {isPro&&(
