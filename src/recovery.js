@@ -36,6 +36,26 @@ const TONE = {
     ok:   "Cuerpo y ritmo en calma. Sigue como hoy toca, sin comparar con nada ni nadie.",
     low:  "Tienes energía disponible. Puedes moverte un poco más hoy si el cuerpo lo pide.",
   },
+  ATLAS: {
+    high: "Tu cuerpo lleva demasiado tiempo en modo exigencia. Hoy prioriza dormir y ordenar tus comidas — el progreso no depende de entrenar más fuerte.",
+    ok:   "Vas construyendo el hábito con constancia. Sigue así, sin buscar atajos.",
+    low:  "Tienes margen de sobra. Buen día para moverte un poco más de lo habitual.",
+  },
+  ATALANTA: {
+    high: "Tu cuerpo pide orden, no más esfuerzo. Hoy prioriza descanso y estructura en tus comidas.",
+    ok:   "Vas a tu ritmo, y el sistema está funcionando. Sigue sin compararte.",
+    low:  "Tienes energía disponible. Es un buen momento para sumar algo de movimiento extra.",
+  },
+  'HÉRCULES': {
+    high: "La fase exige precisión, no sacrificio ciego. Hoy modera el volumen y prioriza dormir — la puesta a punto se construye, no se fuerza.",
+    ok:   "La fase avanza según lo planeado. Sigue con la estructura, sin desviarte.",
+    low:  "Tienes margen real. Buen momento para el bloque más exigente de esta fase.",
+  },
+  ARTEMISA: {
+    high: "Estás cerca del límite de lo que el cuerpo puede sostener hoy. Prioriza sueño y ajusta el volumen — la definición se pierde por exceso, no por descanso.",
+    ok:   "La fase avanza en calma. Sigue con el plan tal como está trazado.",
+    low:  "Tienes margen de sobra. Aprovecha para el trabajo más exigente de la semana.",
+  },
 };
 
 const LABEL = { high: "Prioriza recuperación", ok: "Recuperación en rango", low: "Margen para más carga" };
