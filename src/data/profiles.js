@@ -581,4 +581,28 @@ export const MEALS = {
     {time:"17:00",name:"Merienda",items:"Fruta de temporada · frutos secos 20g",kcal:260,prot:8,why:"Snack simple y real. Sin ultraprocesados, sin necesidad de contar nada."},
     {time:"20:00",name:"Cena ligera",items:"Crema de verduras · pescado blanco 150g",kcal:400,prot:32,why:"Cena ligera y cálida que facilita el descanso nocturno."},
   ],
+  ATLAS:[
+    {time:"08:00",name:"Desayuno ordenado",items:"3 huevos + 2 claras revueltos · pan integral 70g · aguacate 1/2",kcal:520,prot:35,why:"Proteína y grasas buenas para llegar sin hambre a la siguiente comida — nada de picoteo a media mañana."},
+    {time:"13:30",name:"Almuerzo",items:"Pollo 220g · arroz integral 150g · verduras al vapor · AOVE",kcal:700,prot:55,why:"Comida principal con ración fija — no hay margen para improvisar con lo que haya en la nevera."},
+    {time:"17:30",name:"Merienda",items:"Yogur griego natural 200g · fruta · nueces 15g",kcal:380,prot:28,why:"Cierra el hueco de la tarde con algo planeado, para no llegar a la cena con hambre acumulada."},
+    {time:"21:00",name:"Cena",items:"Pescado blanco 220g · patata cocida 200g · ensalada",kcal:650,prot:55,why:"Proteína y volumen para saciar sin cargar antes de dormir."},
+  ],
+  ATALANTA:[
+    {time:"08:00",name:"Desayuno ordenado",items:"2 huevos + 3 claras · pan integral 50g · aguacate 1/4",kcal:430,prot:30,why:"Proteína y grasas buenas para llegar sin hambre a la siguiente comida — nada de picoteo a media mañana."},
+    {time:"13:30",name:"Almuerzo",items:"Pollo o pavo 220g · arroz integral 110g · verduras · AOVE",kcal:680,prot:55,why:"Comida principal con ración fija — no hay margen para improvisar con lo que haya en la nevera."},
+    {time:"17:30",name:"Merienda",items:"Yogur griego natural 200g · fruta · nueces 10g",kcal:340,prot:28,why:"Cierra el hueco de la tarde con algo planeado, para no llegar a la cena con hambre acumulada."},
+    {time:"21:00",name:"Cena",items:"Pescado blanco 220g · boniato 150g · ensalada",kcal:580,prot:60,why:"Proteína y volumen para saciar sin cargar antes de dormir."},
+  ],
+  'HÉRCULES':[
+    {time:"07:30",name:"Desayuno fuerza",items:"5 huevos + 2 claras revueltos · avena 90g · plátano",kcal:720,prot:45,why:"Alta proteína + carbos de absorción lenta para empezar con energía sostenida en fase de volumen."},
+    {time:"13:00",name:"Almuerzo",items:"Pollo 250g · arroz basmati 180g · verduras · AOVE",kcal:800,prot:55,why:"Comida principal. Carbos para rellenar glucógeno y proteína para síntesis muscular en la fase."},
+    {time:"17:00",name:"Pre-entreno",items:"Fruta · batido proteína · creatina 5g",kcal:320,prot:25,why:"Carbos rápidos para el entreno + proteína para evitar catabolismo."},
+    {time:"21:00",name:"Cena recuperación",items:"Ternera magra o salmón 220g · patata 200g · ensalada",kcal:580,prot:45,why:"Proteína de digestión lenta para recuperación nocturna durante la fase de hipertrofia."},
+  ],
+  ARTEMISA:[
+    {time:"08:00",name:"Desayuno",items:"3 huevos + 2 claras · tostada integral · aguacate",kcal:480,prot:32,why:"Alta proteína + grasas buenas para empezar con energía sostenida en fase de volumen."},
+    {time:"13:00",name:"Almuerzo",items:"Pollo o pavo 220g · arroz integral 150g · verduras · AOVE",kcal:720,prot:55,why:"Comida principal. Carbos para rellenar glucógeno y proteína para síntesis muscular en la fase."},
+    {time:"17:00",name:"Pre-entreno",items:"Fruta · batido proteína",kcal:300,prot:25,why:"Carbos rápidos para el entreno + proteína para evitar catabolismo."},
+    {time:"21:00",name:"Cena",items:"Salmón o merluza 220g · patata dulce · ensalada",kcal:620,prot:50,why:"Proteína de digestión lenta para recuperación nocturna durante la fase de hipertrofia."},
+  ],
 };
