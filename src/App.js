@@ -152,13 +152,13 @@ function calcPlan(d,id){
   const w=parseFloat(d.weight)||75,h=parseFloat(d.height)||175,a=parseFloat(d.age)||28,act=parseFloat(d.activity)||1.55;
   const bmr=d.gender==="female"?10*w+6.25*h-5*a-161:10*w+6.25*h-5*a+5;
   const tdee=Math.round(bmr*act);
-  const m={ALPHA:1.095,HERA:0.9,ZEN:1,SHAPE:0.85,ATENEA:1.0,GAIA:0.95};
+  const m={ALPHA:1.095,HERA:0.9,ZEN:1,SHAPE:0.85,ATENEA:1.0,GAIA:0.95,ATLAS:0.85,ATALANTA:0.85,'HÉRCULES':1.08,ARTEMISA:1.08};
   // g de proteína por kg de peso/día. Rango general 1.4-2.0 g/kg (ISSN
   // Position Stand, Jäger et al. 2017) para quien entrena fuerza; sube a
   // 2.3-3.1 g/kg en fase de déficit para proteger la masa magra (mismo
   // documento). HERA y SHAPE están en déficit -> banda alta. ALPHA en
   // superávit se queda cerca del techo general para maximizar síntesis.
-  const pg={ALPHA:2.2,HERA:2.3,ZEN:1.8,SHAPE:2.4,ATENEA:2.0,GAIA:1.9};
+  const pg={ALPHA:2.2,HERA:2.3,ZEN:1.8,SHAPE:2.4,ATENEA:2.0,GAIA:1.9,ATLAS:2.3,ATALANTA:2.3,'HÉRCULES':2.2,ARTEMISA:2.2};
   const cal=Math.round(tdee*(m[id]||1));
   const prot=Math.round(w*(pg[id]||1.8));
   const fat=Math.round(cal*0.27/9);
