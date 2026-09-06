@@ -2016,11 +2016,11 @@ function Onboarding({onDone}){
   const [feelings,setFeelings]=useState([]);
   const [obstacles,setObstacles]=useState([]);
   const [dp,setDp]=useState(null);
-  const [fd,setFd]=useState({name:"",age:"",weight:"",height:"",gender:"",activity:""});
+  const [fd,setFd]=useState({name:"",age:"",weight:"",height:"",gender:"",activity:"",email:""});
   const tf=id=>setFeelings(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
   const to=id=>setObstacles(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
   const next=()=>{if(step===3){setDp(detect(feelings,obstacles,fd.gender));}setStep(s=>s+1);};
-  const ok=fd.name&&fd.age&&fd.weight&&fd.height&&fd.activity;
+  const ok=fd.name&&fd.age&&fd.weight&&fd.height&&fd.activity&&fd.email&&fd.email.includes("@");
   const pc=dp?PROFILES[dp].color:G;
   const DFig=dp?FIGS[dp]:FigW;
   const pct=[0,10,22,35,48,60,72,86,100][step]||0;
@@ -2177,6 +2177,9 @@ function Onboarding({onDone}){
       <div style={{fontFamily:PF,fontSize:26,fontWeight:700,textAlign:"center",marginBottom:24}}>Tus datos <em style={{color:G,fontStyle:"italic"}}>personales</em></div>
       <div style={{fontSize:11,letterSpacing:2,color:"#8a8a8a",textTransform:"uppercase",marginBottom:6}}>Tu nombre</div>
       <input style={inp} type="text" placeholder="Cómo te llamas" value={fd.name} onChange={e=>setFd(p=>({...p,name:e.target.value}))}/>
+      <div style={{fontSize:11,letterSpacing:2,color:"#8a8a8a",textTransform:"uppercase",marginBottom:6}}>Tu email</div>
+      <input style={inp} type="email" placeholder="tu@email.com" value={fd.email} onChange={e=>setFd(p=>({...p,email:e.target.value}))}/>
+      <div style={{fontSize:10,color:"#6a6a6a",marginBottom:10}}>Para no perder tu progreso si cambias de móvil o borras la app.</div>
       <div style={{fontSize:11,letterSpacing:2,color:"#8a8a8a",textTransform:"uppercase",marginBottom:6}}>Edad</div>
       <input style={inp} type="number" placeholder="28" value={fd.age} onChange={e=>setFd(p=>({...p,age:e.target.value}))}/>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
@@ -2298,7 +2301,7 @@ export default function App(){
     setExercises(loadExercises(getTodayWorkout(prof).length));
     setHabits(loadHabits(PROFILES[prof].habits.length));
     ensureCloudSession().then(id=>{
-      if(id){ setUserId(id); syncProfileToCloud(id,{name:ud.name,archetype:prof,gender:ud.gender,age:ud.age,weight:ud.weight,height:ud.height,activity:ud.activity}); }
+      if(id){ setUserId(id); if(ud.email){ linkEmailToAccount(ud.email).catch(()=>{}); } syncProfileToCloud(id,{name:ud.name,archetype:prof,gender:ud.gender,age:ud.age,weight:ud.weight,height:ud.height,activity:ud.activity}); }
     });
   };
 
