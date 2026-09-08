@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { PROFILES, WORKOUTS, MEALS, getTodayWorkout, getTodayIndex, getCardioProtocol, getMobilityProtocol } from './data/profiles';
-import { BREATHING_PROTOCOLS, SLEEP_PREP } from './data/wellness';
+import { BREATHING_PROTOCOLS } from './data/wellness';
 import {
   saveProfile, loadProfile, savePlan, loadPlan, saveUserData, loadUserData,
   saveHabits, loadHabits, saveExercises, loadExercises,
@@ -2240,8 +2240,6 @@ export default function App(){
   const [expandEx,setExpandEx]=useState(null);
   const [expandDay,setExpandDay]=useState(null);
   const [expandSupp,setExpandSupp]=useState(null);
-  const [expandTip,setExpandTip]=useState(null);
-  const [expandPrinciple,setExpandPrinciple]=useState(null);
   const [weightLog, setWeightLog]=useState(()=>loadWeightLog());
   const [weightInput, setWeightInput]=useState('');
   const [showProgress,setShowProgress]=useState(false);
