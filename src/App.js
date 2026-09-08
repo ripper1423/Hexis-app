@@ -1516,7 +1516,18 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
 }
 
 function ExerciseDB({onBack,initialTab}){
-  const [tab,setTab]=useState(()=>{try{const t=localStorage.getItem("hexis_tab");return (t==="inicio"||t==="tips")?"entreno":(t||"entreno");}catch(e){return "entreno";}});
+  const [tab,setTab]=useState(initialTab||"musculos");
+  const [gender,setGender]=useState("male");
+  const [view,setView]=useState("front");
+  const [zone,setZone]=useState(null);
+  const [showInfo,setShowInfo]=useState(false);
+  const [openGroup,setOpenGroup]=useState(null);
+  const [selEx,setSelEx]=useState(null);
+  const [matFilter,setMatFilter]=useState("all");
+  const mats=["all","Barra","Mancuernas","Máquina","Cable","Peso corporal"];
+  const filtered=EXERCISES.filter(e=>matFilter==="all"||e.mat===matFilter);
+  const counts={};
+  Object.keys(MUSCLE_GROUPS).forEach(k=>{ counts[k]=EXERCISES.filter(e=>e.muscle===k).length; });
   const TABS=[["musculos","Músculos"],["grupos","Grupos"],["ejercicios","Ejercicios"]];
 
   return(
@@ -2220,7 +2231,7 @@ function Onboarding({onDone}){
 export default function App(){
   const [profile,setProfile]=useState(()=>loadProfile());
   const [plan,setPlan]=useState(()=>loadPlan());
-  const [tab,setTab]=useState(()=>{try{return localStorage.getItem("hexis_tab")||"inicio";}catch(e){return "inicio";}}); useEffect(()=>{try{localStorage.setItem("hexis_tab",tab);}catch(e){}},[tab]);
+  const [tab,setTab]=useState(()=>{try{const t=localStorage.getItem("hexis_tab");return (t==="inicio"||t==="tips")?"entreno":(t||"entreno");}catch(e){return "entreno";}}); useEffect(()=>{try{localStorage.setItem("hexis_tab",tab);}catch(e){}},[tab]);
   const [screen,setScreen]=useState(null); // "exdb" | "nutdb"
   const [habits,setHabits]=useState(()=>{ const p=loadProfile(); return p&&PROFILES[p]?loadHabits(PROFILES[p].habits.length):[false,false,false,false]; });
   const [exercises,setExercises]=useState(()=>{ const p=loadProfile(); return p&&WORKOUTS[p]?loadExercises(getTodayWorkout(p).length):Array(5).fill(false); });
