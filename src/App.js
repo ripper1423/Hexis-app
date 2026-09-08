@@ -74,19 +74,7 @@ const PRINCIPLES = [
   {n:"06",title:"Eficiencia humana",body:"Máximo resultado útil. Mínima fricción innecesaria. Tu cuerpo lleva millones de años perfeccionando este principio. HEXIS no lucha contra eso. Lo usa.",icon:"⚡"},
 ];
 
-const TIPS = [
-  {tag:"Ciencia",icon:"🔬",color:"#C8AA50",title:"Tensión mecánica real",body:"La hipertrofia ocurre cuando el músculo se contrae bajo carga suficiente con rango completo. No es el peso, es la tensión. Siente el músculo, no solo mueves el peso."},
-  {tag:"Nutrición",icon:"🍽",color:"#A09060",title:"El anabolic window ya no existe",body:"Tienes 4-6 horas post-entreno para la proteína, no 30 minutos. Lo que sí importa es el total diario: 1.6-2.4g/kg de proteína en 3-4 comidas."},
-  {tag:"Descanso",icon:"🌙",color:"#8BA4A0",title:"El músculo crece dormido",body:"La mayoría de los pulsos de hormona de crecimiento nocturnos ocurren en sueño profundo, sobre todo en las primeras horas de la noche. Sin 7-8h, el mejor entreno rinde muy por debajo de su potencial. Optimiza el sueño antes que el entreno."},
-  {tag:"Hábitos",icon:"🔄",color:"#D4C5A9",title:"La regla de los 2 minutos",body:"Si un hábito tarda menos de 2 minutos en iniciarse, hazlo ahora. La acción mínima mantiene la identidad activa cada día."},
-  {tag:"Mental",icon:"🧠",color:"#C8AA50",title:"El efecto identidad",body:"Cuando seas 'alguien que entrena', no necesitarás motivación. La identidad lo hace automático. No esperes motivación — actúa hasta crearla."},
-  {tag:"Eficiencia",icon:"⚡",color:"#A09060",title:"El mínimo efectivo",body:"3-4 series por grupo muscular con buena ejecución producen el 80% de la adaptación. El volumen extra tiene rendimientos decrecientes."},
-  {tag:"Tracking",icon:"📊",color:"#8BA4A0",title:"Media móvil semanal",body:"Pésate cada mañana en ayunas y calcula el promedio de 7 días. Ese número elimina el ruido de agua, sal y digestión. La tendencia es tu progreso real."},
-  {tag:"Filosofía",icon:"🏛",color:"#C8AA50",title:"Kalokagathia aplicada",body:"Los griegos no separaban físico y carácter. Cuidar tu cuerpo con inteligencia no es vanidad, es coherencia. El físico es la expresión visible de cómo te tratas a ti mismo."},
-  {tag:"Ciencia",icon:"🚶",color:"#8BA4A0",title:"NEAT: el gasto que no ves",body:"El 15-30% de tu gasto calórico diario no viene del entreno, sino del movimiento espontáneo: subir escaleras, caminar, moverte sin pensarlo. Sube tus pasos diarios y el déficit se sostiene sin necesitar más cardio estructurado."},
-  {tag:"Ciencia",icon:"🔥",color:"#A09060",title:"HIIT vs. LISS: no compiten, se complementan",body:"El HIIT quema más por minuto y genera EPOC (sigues gastando horas después), pero fatiga más y puede interferir con la recuperación de fuerza. El LISS es más suave y no compite con tus ganancias. El sistema real usa ambos según la semana, no uno solo para siempre."},
-  {tag:"Respiración",icon:"🫁",color:"#8BA4A0",title:"La técnica que más rápido te calma",body:"Un estudio de Stanford comparó 4 técnicas de respiración y meditación: la que más bajó la frecuencia respiratoria y más subió el ánimo en una sola sesión fue el 'suspiro fisiológico' — 2 inhalaciones seguidas por la nariz y una exhalación larga por la boca. 3-5 rondas bastan."},
-];
+
 
 const DAILY_QUOTES = [
   "La identidad cambia por repetición, no por intensidad puntual.",
@@ -1528,18 +1516,7 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
 }
 
 function ExerciseDB({onBack,initialTab}){
-  const [tab,setTab]=useState(initialTab||"musculos");
-  const [gender,setGender]=useState("male");
-  const [view,setView]=useState("front");
-  const [zone,setZone]=useState(null);
-  const [showInfo,setShowInfo]=useState(false);
-  const [openGroup,setOpenGroup]=useState(null);
-  const [selEx,setSelEx]=useState(null);
-  const [matFilter,setMatFilter]=useState("all");
-  const mats=["all","Barra","Mancuernas","Máquina","Cable","Peso corporal"];
-  const filtered=EXERCISES.filter(e=>matFilter==="all"||e.mat===matFilter);
-  const counts={};
-  Object.keys(MUSCLE_GROUPS).forEach(k=>{ counts[k]=EXERCISES.filter(e=>e.muscle===k).length; });
+  const [tab,setTab]=useState(()=>{try{const t=localStorage.getItem("hexis_tab");return (t==="inicio"||t==="tips")?"entreno":(t||"entreno");}catch(e){return "entreno";}});
   const TABS=[["musculos","Músculos"],["grupos","Grupos"],["ejercicios","Ejercicios"]];
 
   return(
@@ -2440,7 +2417,7 @@ export default function App(){
   return(
     <div style={root}>
 
-    {tab==="inicio"&&(
+    {tab==="entreno"&&(
       <div style={scr}>
         <div style={{position:"relative"}}>
           <Hero img="/estatuas/columnas_1.jpg" imgPos="center 35%" h={240}>
@@ -2899,76 +2876,10 @@ export default function App(){
       </div>
     )}
 
-    {tab==="tips"&&(
-      <div style={scr}>
-        <Hero img="/estatuas/columnas_4.jpg" imgPos="center 30%" h={190}>
-          <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>Conocimiento · Ciencia · Filosofía</div>
-          <div style={{fontSize:18,fontWeight:700}}>HEXIS Tips</div>
-        </Hero>
-        <div style={{padding:"16px 16px 0"}}>
-          <div style={{background:"#080808",border:`1px solid ${G}22`,borderRadius:12,padding:18,marginBottom:14}}>
-            <div style={{fontSize:11,letterSpacing:3,color:G,textTransform:"uppercase",marginBottom:8}}>Kalokagathia · καλοκαγαθία</div>
-            <div style={{fontFamily:PF,fontSize:14,fontStyle:"italic",color:"#777",lineHeight:1.75,marginBottom:10}}>"La unión perfecta entre cuerpo bello y alma virtuosa. No como opuestos. Como una sola cosa."</div>
-            <div style={{fontSize:12,color:"#555",lineHeight:1.7}}>Los griegos no separaban el físico del carácter. El esculpido griego nacía de <strong style={{color:"#777"}}>vivir bien, de forma coherente, cada día.</strong></div>
-          </div>
-          <div style={{borderLeft:`2px solid ${p.color}`,background:"#080808",borderRadius:"0 10px 10px 0",padding:14,marginBottom:14}}>
-            <div style={{fontSize:11,letterSpacing:3,color:p.color,textTransform:"uppercase",marginBottom:6}}>{profile} · Tu manifiesto</div>
-            <div style={{fontFamily:PF,fontSize:13,fontStyle:"italic",color:"#777",lineHeight:1.7}}>"{p.manifesto}"</div>
-          </div>
-          <SLabel text="Los 6 principios HEXIS"/>
-          {PRINCIPLES.map((pr,i)=>(
-            <div key={pr.n} onClick={()=>setExpandPrinciple(expandPrinciple===i?null:i)} style={{background:"#0c0c0c",border:`1px solid ${expandPrinciple===i?"rgba(200,170,80,0.2)":"#111"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer"}}>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div style={{fontSize:20}}>{pr.icon}</div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:11,fontWeight:700,color:G,letterSpacing:2,marginBottom:3}}>{pr.n}</div>
-                  <div style={{fontSize:13,fontWeight:600,color:"#ddd"}}>{pr.title}</div>
-                </div>
-                <div style={{fontSize:14,color:"#7a7a7a"}}>{expandPrinciple===i?"−":"+"}</div>
-              </div>
-              {expandPrinciple===i&&<div style={{fontSize:12,color:"#666",lineHeight:1.75,marginTop:12,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>{pr.body}</div>}
-            </div>
-          ))}
-          <SLabel text="Ciencia aplicada"/>
-          {TIPS.map((t,i)=>(
-            <div key={i} onClick={()=>setExpandTip(expandTip===i?null:i)} style={{background:"#0c0c0c",border:`1px solid ${expandTip===i?t.color+"33":"#111"}`,borderRadius:12,padding:"16px",marginBottom:10,cursor:"pointer"}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:expandTip===i?10:0}}>
-                <span style={{fontSize:18}}>{t.icon}</span>
-                <div style={{flex:1}}>
-                  <span style={{fontSize:11,letterSpacing:3,color:t.color,textTransform:"uppercase"}}>{t.tag}</span>
-                  <div style={{fontSize:13,fontWeight:700,color:"#ddd",marginTop:3}}>{t.title}</div>
-                </div>
-                <div style={{fontSize:14,color:"#7a7a7a"}}>{expandTip===i?"−":"+"}</div>
-              </div>
-              {expandTip===i&&<div style={{fontSize:13,color:"#666",lineHeight:1.75,paddingTop:10,borderTop:"1px solid #1a1a1a"}}>{t.body}</div>}
-            </div>
-          ))}
-          <SLabel text="Preparación al sueño"/>
-          {(()=>{const sp=SLEEP_PREP[profile]||SLEEP_PREP.ALPHA;const br=BREATHING_PROTOCOLS[sp.breathing];return(
-          <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"16px",marginBottom:14}}>
-            <div style={{fontSize:11,letterSpacing:2,color:p.color,textTransform:"uppercase",marginBottom:8}}>🌙 {profile}, antes de dormir</div>
-            <div style={{fontSize:12,color:"#999",lineHeight:1.7,marginBottom:12,fontStyle:"italic"}}>{sp.intro}</div>
-            {sp.checklist.map((item,i)=>(
-              <div key={i} style={{display:"flex",gap:8,marginBottom:8,fontSize:12,color:"#777",lineHeight:1.6}}>
-                <span style={{color:p.color,flexShrink:0}}>✓</span><span>{item}</span>
-              </div>
-            ))}
-            {br&&<div style={{marginTop:10,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>
-              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🫁 {br.label}</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6,marginBottom:6}}>{br.protocol}</div>
-              <div style={{fontSize:10,color:"#4a4a4a"}}>— {br.source}</div>
-            </div>}
-          </div>
-          );})()}
-          <Quote text='"Lo bueno, si es simple, es doblemente bueno."' attr="Baltasar Gracián"/>
-          <Quote text='"Complejo por dentro. Simple por fuera. Eso es HEXIS."' attr="Manifiesto HEXIS"/>
-          <div style={{height:8}}/>
-        </div>
-      </div>
-    )}
+    
 
     <nav style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"rgba(5,5,5,0.97)",borderTop:"1px solid #111",display:"flex",zIndex:200,backdropFilter:"blur(12px)"}}>
-      {[["inicio","⊙","Inicio"],["entreno","◈","Entreno"],["nutricion","◉","Nutrición"],["tips","◇","Tips"]].map(([id,icon,label])=>(
+      {[["entreno","◈","Entreno"],["nutricion","◉","Nutrición"]].map(([id,icon,label])=>(
         <div key={id} onClick={()=>setTab(id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",padding:"11px 0 14px",cursor:"pointer",gap:3}}>
           <span style={{fontSize:18}}>{icon}</span>
           <span style={{fontSize:11,letterSpacing:1,color:tab===id?G:"#333",textTransform:"uppercase"}}>{label}</span>
