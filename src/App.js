@@ -2651,31 +2651,6 @@ export default function App(){
             <div style={{fontSize:11,color:pct===100?G:"#444",fontWeight:pct===100?700:400}}>{pct}%{pct===100?" ✦":""}</div>
           </div>
           {isPro&&<RecoveryCard archetype={profile} fatigue={recoveryFatigue} avgSleep={coherenceAvgSleep}/>}
-          <SLabel text="Ciencia del entreno" right="Con fuente"/>
-          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
-            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
-              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🔬 Tensión mecánica</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>La hipertrofia ocurre cuando el músculo se contrae bajo carga suficiente con rango completo. No es solo el peso, es la tensión sostenida. Siente el músculo, no solo muevas la carga.</div>
-              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— ACSM Position Stand sobre entreno de fuerza (2026): carga, volumen, frecuencia y rango de movimiento son los factores que más pesan.</div>
-            </div>
-            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
-              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>📊 Volumen semanal de {profile}</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>Este plan reparte entre 10 y 20 series semanales por grupo muscular grande. Por debajo de 5 series/semana el crecimiento es escaso; por encima de 20 los resultados se aplanan y sube el riesgo de fatiga acumulada.</div>
-              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— Schoenfeld, Ogborn &amp; Krieger (2017), meta-análisis dosis-respuesta de volumen de entreno.</div>
-            </div>
-            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
-              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>🌙 Por qué crece en el descanso</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>La mayoría de los pulsos de hormona de crecimiento nocturnos ocurren durante el sueño profundo (ondas lentas), sobre todo en las primeras horas de sueño. El entreno rompe fibra; el descanso la reconstruye. Dormir menos de 7h recorta esa ventana.</div>
-              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— Van Cauter et al., fisiología de la secreción de GH ligada al sueño de ondas lentas.</div>
-            </div>
-            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px"}}>
-              <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:4}}>💊 Suplementación de {profile}</div>
-              <div style={{fontSize:12,color:"#777",lineHeight:1.6}}>{p.supps.slice(0,2).map(s=>s[0]).join(" + ")} son la base para este arquetipo. Ver dosis y timing exactos en Nutrición.</div>
-              <div style={{fontSize:10,color:"#4a4a4a",marginTop:6}}>— ISSN Position Stands sobre creatina y proteína (los dos suplementos con más evidencia acumulada en fuerza).</div>
-            </div>
-          </div>
-          <div style={{fontSize:10,color:"#3a3a3a",lineHeight:1.5,marginBottom:16,padding:"0 2px"}}>Los números de tu plan (series, %1RM, proteína g/kg, ritmo de déficit/superávit) están calibrados dentro de los rangos que recomiendan estas fuentes — no sustituyen la revisión de un entrenador o médico si tienes una lesión o condición previa.</div>
-
           <SLabel text="Ejercicios de hoy" right="Toca para ver técnica y registrar"/>
           {w.map(({name,sets,reps,weight,unit,muscle,rpe,lastWeek,rest,how},i)=>{
             const adaptive=isPro?getAdaptiveWeight(setLogs,name,weight,reps):{weight,source:'plan'};
