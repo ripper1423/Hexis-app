@@ -26,7 +26,32 @@
   <body>
     <noscript>Necesitas JavaScript para usar HEXIS.</noscript>
     <div style="position:fixed;top:-100vh;left:-100vw;width:300vw;height:300vh;background:#050505;z-index:-1;"></div>
+    <div id="hx-splash" style="position:fixed;inset:0;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s ease;">
+      <div style="font-family:'Playfair Display',Georgia,serif;font-size:28px;letter-spacing:6px;color:#f2ede4;">HEXIS</div>
+      <div style="margin-top:10px;font-size:11px;letter-spacing:2px;color:#8a8a8a;font-family:'Poppins',sans-serif;text-align:center;">FORTALEZA DEL CUERPO &middot; CLARIDAD DE LA MENTE</div>
+    </div>
     <div id="root"></div>
+    <script>
+      (function () {
+        var splash = document.getElementById('hx-splash');
+        var root = document.getElementById('root');
+        function hideSplash() {
+          if (!splash) return;
+          splash.style.opacity = '0';
+          setTimeout(function () {
+            if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+          }, 420);
+        }
+        var mo = new MutationObserver(function () {
+          if (root.childNodes.length > 0) {
+            hideSplash();
+            mo.disconnect();
+          }
+        });
+        mo.observe(root, { childList: true });
+        setTimeout(hideSplash, 6000);
+      })();
+    </script>
     <script>
       (function () {
         var lastY = 0;
