@@ -55,6 +55,25 @@ export const FOODS = {
   ],
 };
 
+
+// Unidad real de venta más habitual para cada suplemento (cacito, cápsula...).
+// Genérico — no vendemos marca propia, así que siempre avisa de revisar la etiqueta:
+// la concentración por cacito/cápsula varía de una marca a otra.
+export const SUPP_UNITS = {
+  "Creatina": "≈1 cacito (dosificador incluido, ~5g) — revisa tu etiqueta, varía por marca",
+  "Proteína Whey": "≈1 cacito (scoop, ~30g) — revisa tu etiqueta, varía por marca",
+  "Vitamina D3": "≈1 gota o cápsula — revisa las UI por dosis en tu etiqueta",
+  "Omega 3": "≈2-3 cápsulas de 1000mg — revisa tu etiqueta, varía por marca",
+  "Magnesio": "≈1 cápsula o comprimido — revisa tu etiqueta, varía por marca",
+  "Cafeína": "≈1 cápsula (200mg) o 1 café solo — revisa tu etiqueta",
+  "Ashwagandha": "≈1-2 cápsulas de extracto — revisa tu etiqueta, varía por marca",
+  "L-Teanina": "≈1 cápsula — revisa tu etiqueta, varía por marca",
+  "Vitamina B12": "≈1 comprimido sublingual o cápsula — revisa tu etiqueta",
+  "Colágeno": "≈1 cacito (~10g) — revisa tu etiqueta, varía por marca",
+  "Probiótico": "≈1 cápsula — revisa UFC por dosis en tu etiqueta",
+  "Multivitamínico": "≈1 comprimido o cápsula diaria — revisa tu etiqueta",
+};
+
 export const SUPPLEMENTS = [
   { name:"Creatina monohidrato", icon:"⚡", cat:"Rendimiento", ev:"⭐⭐⭐⭐⭐", dose:"3-5g diarios", timing:"Cualquier hora del día (no importa el momento)", what:"Compuesto natural presente en el músculo. Aumenta los depósitos de fosfocreatina para regenerar ATP más rápido en esfuerzos explosivos e intensos.", for:"Cualquier persona que haga ejercicio de alta intensidad, sin excepción. Especialmente útil en vegetarianos.", science:"El suplemento con más evidencia científica de la historia. Más de 500 estudios. Aumenta fuerza, potencia y masa muscular de forma consistente.", safe:"Completamente seguro a largo plazo. Los riñones solo se ven afectados si hay enfermedad renal preexistente. No hay necesidad de fase de carga." },
   { name:"Proteína Whey", icon:"🥛", cat:"Nutrición", ev:"⭐⭐⭐⭐⭐", dose:"20-40g por toma", timing:"Post-entreno o cuando no llegas al objetivo proteico diario", what:"Proteína de suero de leche de rápida absorción. Alta en leucina, el aminoácido que activa el mTOR y dispara la síntesis proteica muscular.", for:"Cualquiera que no llegue a 1.6-2.4g/kg de proteína con la dieta.", science:"Efectiva para síntesis proteica muscular post-entreno. No es magia: es comida concentrada con perfil de aminoácidos óptimo.", safe:"Segura. Puede causar malestar en intolerantes a la lactosa. Las versiones isoladas tienen menos lactosa." },
