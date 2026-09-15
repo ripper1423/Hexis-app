@@ -208,6 +208,28 @@ export const PROFILES = {
       {day:"D",focus:"Descanso total",type:"rest",done:false},
     ],
   },
+  HÉRCULES: {
+    color:"#8B3A2F", sub:"El Forjador",
+    tagline:"No hay atajos en la forja. Cada carga sostiene la siguiente descarga.",
+    cal:2861, prot:165, carbs:357, fat:86,
+    days:6, goal:"Culturismo natural por fases: superávit controlado en carga, déficit sostenido en descarga. Periodización anual, cero atajos farmacológicos.", phase:"Fase 1 · Fundamentos", week:12,
+    feeling:["strong","focused"], obstacle:["noconstancy","motivation"],
+    habits:["Registra cada comida y cada serie, sin excepciones","Pésate en ayunas 2x/semana, mira la tendencia no el dato suelto","Duerme 7-9h — el músculo crece durmiendo, no en el gimnasio","Sube la carga en los básicos cada semana que puedas"],
+    habitIcons:["📝","⚖️","😴","📈"],
+    manifesto:"No construyes un año en un día. Cada bloque de carga sostiene al siguiente, cada descarga protege lo que ganaste.",
+    supps:[["Creatina","5g","A diario, cualquier momento"],["Proteína Whey","40g","Post-entreno o entre comidas"],["Omega 3","2g","Con la comida principal"],["Vitamina D3","2000 UI","Con desayuno"],["Multivitamínico","1 dosis","Con desayuno"],["Cafeína","200mg","30 min antes de entrenar"]],
+    veg:{grams:630,raciones:"7-8",note:"Base ≥400g/día (OMS), escalado a tus ~2861 kcal diarias."},
+    macrocycle:"Macrociclo natural de 12 meses (52 semanas): Hipertrofia (8 sem) → Hipertrofia (8 sem) → Definición (8 sem) → Mantenimiento (6 sem) → Hipertrofia (8 sem) → Definición (8 sem) → Mantenimiento (6 sem). Actívalos en ese orden desde Perfil → Ciclo de entrenamiento.",
+    weekPlan:[
+      {day:"L",focus:"Empuje · Pecho/Hombro/Tríceps",type:"train",done:false,split:"empuje"},
+      {day:"M",focus:"Tirón · Espalda/Bíceps",type:"train",done:false,split:"tiron"},
+      {day:"X",focus:"Pierna completa",type:"train",done:false,split:"pierna"},
+      {day:"J",focus:"Empuje · Volumen",type:"train",done:false,split:"empuje"},
+      {day:"V",focus:"Tirón · Volumen",type:"train",done:false,split:"tiron"},
+      {day:"S",focus:"Pierna · Volumen",type:"train",done:false,split:"pierna"},
+      {day:"D",focus:"Descanso total",type:"rest",done:false},
+    ],
+  },
 };
 
 // ── PROTOCOLOS DE CARDIO ────────────────────────────────────────────
@@ -528,6 +550,32 @@ export const WORKOUTS = {
       {name:"Plancha",sets:"3",reps:"40 seg",weight:0,unit:"kg",muscle:"Core",rpe:"6/10",lastWeek:30,rest:"60 seg",how:"Cuerpo en línea recta de cabeza a talones, aprieta glúteo y abdomen."},
     ],
   },
+  HÉRCULES: {
+    empuje: [
+      {name:"Press banca plano",sets:"4",reps:"6-8",weight:100,unit:"kg",muscle:"Pecho",rpe:"8/10",lastWeek:97.5,rest:"3 min",how:"Baja controlado hasta rozar el pecho, codos a ~45°. Empuja explosivo sin despegar los glúteos del banco. Es el ejercicio ancla de tu fase de carga."},
+      {name:"Press inclinado mancuernas",sets:"3",reps:"8-10",weight:36,unit:"kg",muscle:"Pecho",rpe:"8/10",lastWeek:34,rest:"2 min",how:"Banco a 30-45°. Controla la bajada 3 segundos, estiramiento completo en pecho superior sin bloquear arriba."},
+      {name:"Press militar de pie",sets:"4",reps:"6-8",weight:60,unit:"kg",muscle:"Hombros",rpe:"8/10",lastWeek:57.5,rest:"3 min",how:"Barra desde clavícula a bloqueo total. Core apretado, glúteos activados, sin arquear lumbar."},
+      {name:"Fondos en paralelas lastrados",sets:"3",reps:"8-10",weight:15,unit:"kg",muscle:"Tríceps",rpe:"8/10",lastWeek:12.5,rest:"2 min",how:"Torso ligeramente inclinado para más pecho, o vertical para más tríceps. Baja hasta 90° de codo."},
+      {name:"Elevaciones laterales",sets:"4",reps:"12-15",weight:14,unit:"kg",muscle:"Hombros",rpe:"7/10",lastWeek:12,rest:"60 seg",how:"Codos ligeramente flexionados, sube hasta la altura del hombro sin usar impulso de cadera."},
+      {name:"Extensión de tríceps en polea",sets:"3",reps:"12-15",weight:30,unit:"kg",muscle:"Tríceps",rpe:"7/10",lastWeek:27.5,rest:"60 seg",how:"Codos pegados al cuerpo, extiende completo y controla la vuelta sin balancear el torso."},
+    ],
+    tiron: [
+      {name:"Peso muerto convencional",sets:"4",reps:"5-6",weight:150,unit:"kg",muscle:"Espalda",rpe:"8/10",lastWeek:145,rest:"3 min",how:"Barra pegada a las espinillas, espalda neutra, empuja el suelo con las piernas antes de tirar con la espalda."},
+      {name:"Dominadas lastradas",sets:"4",reps:"6-8",weight:10,unit:"kg",muscle:"Espalda",rpe:"8/10",lastWeek:7.5,rest:"2-3 min",how:"Agarre prono a la anchura de hombros, sube hasta que la barbilla pase la barra, baja con control total."},
+      {name:"Remo con barra",sets:"4",reps:"8-10",weight:90,unit:"kg",muscle:"Espalda",rpe:"8/10",lastWeek:85,rest:"2 min",how:"Torso a 45°, tira hacia el ombligo, aprieta el omóplato arriba sin usar impulso lumbar."},
+      {name:"Jalón al pecho agarre cerrado",sets:"3",reps:"10-12",weight:65,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:60,rest:"90 seg",how:"Tira con los codos, no con las manos. Pausa breve abajo con el pecho elevado."},
+      {name:"Curl de bíceps con barra Z",sets:"3",reps:"8-10",weight:35,unit:"kg",muscle:"Bíceps",rpe:"8/10",lastWeek:32.5,rest:"90 seg",how:"Codos fijos a los costados, sube sin balancear el torso, controla la bajada."},
+      {name:"Face pull",sets:"3",reps:"15",weight:20,unit:"kg",muscle:"Espalda",rpe:"7/10",lastWeek:17.5,rest:"60 seg",how:"Tira hacia la cara con los codos altos, rotación externa de hombro al final del recorrido."},
+    ],
+    pierna: [
+      {name:"Sentadilla trasera",sets:"4",reps:"6-8",weight:130,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:125,rest:"3 min",how:"Barra sobre trapecio, baja hasta que la cadera pase la rodilla, rodillas alineadas con los pies."},
+      {name:"Peso muerto rumano",sets:"4",reps:"8-10",weight:110,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:105,rest:"2-3 min",how:"Rodilla con flexión mínima, empuja cadera atrás, siente el estiramiento en isquios sin redondear la espalda."},
+      {name:"Prensa de piernas",sets:"3",reps:"10-12",weight:220,unit:"kg",muscle:"Pierna",rpe:"8/10",lastWeek:210,rest:"2 min",how:"Pies a la anchura de hombros, baja hasta 90° de rodilla, empuja sin bloquear al final."},
+      {name:"Zancadas con mancuernas",sets:"3",reps:"10 por pierna",weight:24,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:22,rest:"90 seg",how:"Paso largo, rodilla trasera casi toca el suelo, empuja con el talón delantero."},
+      {name:"Curl femoral tumbado",sets:"3",reps:"12-15",weight:40,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:37.5,rest:"90 seg",how:"Cadera pegada al banco, flexiona completo sin despegar la pelvis del acolchado."},
+      {name:"Elevación de gemelos de pie",sets:"4",reps:"15-20",weight:60,unit:"kg",muscle:"Pierna",rpe:"7/10",lastWeek:55,rest:"60 seg",how:"Sube hasta la punta del pie, pausa 1 segundo arriba, baja hasta sentir estiramiento completo."},
+    ],
+  },
 };
 
 // "Hoy" tiene que salir de la fecha real, no de un dato fijo dentro del
@@ -613,5 +661,11 @@ export const MEALS = {
     {time:"13:00",name:"Almuerzo",items:"Pollo o pavo 220g · arroz integral 150g · verduras · AOVE",kcal:720,prot:55,why:"Comida principal. Carbos para rellenar glucógeno y proteína para síntesis muscular en la fase."},
     {time:"17:00",name:"Pre-entreno",items:"Fruta · batido proteína",kcal:300,prot:25,why:"Carbos rápidos para el entreno + proteína para evitar catabolismo."},
     {time:"21:00",name:"Cena",items:"Salmón o merluza 220g · patata dulce · ensalada",kcal:620,prot:50,why:"Proteína de digestión lenta para recuperación nocturna durante la fase de hipertrofia."},
+  ],
+  HÉRCULES:[
+    {time:"07:30",name:"Desayuno de carga",items:"6 huevos revueltos · avena 90g · plátano · leche",kcal:750,prot:42,why:"Arranque calórico alto con proteína completa y carbohidrato de absorción lenta para sostener el volumen de entreno del día."},
+    {time:"13:00",name:"Comida principal",items:"Ternera magra 250g · arroz basmati 200g · verduras salteadas · AOVE",kcal:870,prot:55,why:"La comida más grande del día — máxima densidad calórica y proteica alrededor del entreno."},
+    {time:"16:30",name:"Pre-entreno",items:"Batido de proteína · avena 60g · plátano · miel",kcal:480,prot:30,why:"Carbohidrato rápido + proteína para llegar con energía y aminoácidos disponibles al entreno."},
+    {time:"20:30",name:"Cena recuperación",items:"Salmón 220g · patata 300g · ensalada · aguacate",kcal:760,prot:38,why:"Omega-3 y proteína para la recuperación nocturna durante la fase de hipertrofia."},
   ],
 };
