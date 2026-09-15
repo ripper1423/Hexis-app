@@ -151,7 +151,7 @@ const levelColor = {Principiante:"#8BA4A0",Intermedio:"#C8AA50",Avanzado:"#D4C5A
 const sectionColor = {proteina:"#C8AA50",carbohidratos:"#A09060",verduras:"#5a7a5a",grasas:"#8BA4A0"};
 const sectionLabel = {proteina:"Proteína",carbohidratos:"Carbohidratos",verduras:"Verduras",grasas:"Grasas"};
 
-const MALE_PROFILES=["ALPHA","SHAPE","ZEN"];
+const MALE_PROFILES=["ALPHA","SHAPE","ZEN","HÉRCULES"];
 const FEMALE_PROFILES=["HERA","ATENEA","GAIA"];
 
 function detect(f,o,gender){
@@ -222,6 +222,7 @@ const FIGS={
   SHAPE:()=><ArchImg src="/estatuas/arquetipo_shape.png" pos="100% 0%"/>,
   ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.png" pos="100% 0%"/>,
   GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.png" pos="100% 0%"/>,
+  HÉRCULES:()=><ArchImg src="/estatuas/estatua_masculina_hercules_v2.jpg" pos="100% 0%"/>,
 };
 
 // ── UI COMPONENTS ────────────────────────────────────────────────
@@ -1609,6 +1610,15 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
             </>
           )}
         </div>
+
+        {p.macrocycle && (
+          <>
+            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Macrociclo anual</div>
+            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24,fontSize:12,color:"#999",lineHeight:1.7}}>
+              {p.macrocycle}
+            </div>
+          </>
+        )}
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Datos y almacenamiento</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24,fontSize:12,color:"#777",lineHeight:1.7}}>
