@@ -23,7 +23,7 @@ import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Categor
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
 import { getRecoveryStatus } from './recovery';
 import { CYCLES, applyCycleMacros, getCycleProgress } from './cycles';
-import { FASE1_STAGES, FASE1_TOTAL_WEEKS, getFase1Progress } from './fase1';
+import { FASE1_TOTAL_WEEKS, getFase1Progress } from './fase1';
 import { analyzePhotoRemote } from './api';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
 import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
@@ -1548,7 +1548,7 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
             <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
                 <div style={{fontSize:12,fontWeight:700,color:p.color}}>Bloque {fase1Progress.stage.block} · {fase1Progress.stage.blockName}</div>
-                <div style={{fontSize:11,color:"#8a8a8a"}}>Semana {fase1Progress.weekNum}/12</div>
+                <div style={{fontSize:11,color:"#8a8a8a"}}>Semana {fase1Progress.weekNum}/{FASE1_TOTAL_WEEKS}</div>
               </div>
               <div style={{height:6,background:"#1a1a1a",borderRadius:100,overflow:"hidden",marginBottom:8}}>
                 <div style={{height:"100%",width:`${fase1Progress.pct}%`,background:p.color,borderRadius:100}}/>
@@ -2541,7 +2541,7 @@ export default function App(){
       <div style={scr}>
         <div style={{position:"relative"}}>
           <Hero img="/estatuas/columnas_1.jpg" imgPos="center 35%" h={240}>
-            <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/12`:""}</div>
+            <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/${FASE1_TOTAL_WEEKS}`:""}</div>
             <div style={{fontSize:28,fontWeight:900,letterSpacing:2,marginBottom:3}}>{profile}</div>
             <div style={{fontSize:11,color:"#666"}}>{p.sub} · {p.goal}</div>
           </Hero>
@@ -2737,7 +2737,7 @@ export default function App(){
     {tab==="entreno"&&(
       <div style={scr}>
         <Hero img="/estatuas/columnas_2.jpg" imgPos="center 40%" h={200}>
-          <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/12`:""}</div>
+          <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/${FASE1_TOTAL_WEEKS}`:""}</div>
           <div style={{fontSize:18,fontWeight:700,marginBottom:2}}>{profile} · Sesión de hoy</div>
           <div style={{fontSize:11,color:"#555"}}>{w.length} ejercicios · {p.days} días/semana</div>
         </Hero>
