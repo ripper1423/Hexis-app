@@ -1426,6 +1426,19 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
 
 function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId,avatarUrl,onAvatarChange}){
   const cycleProgress=getCycleProgress(cycle);
+  const handleCycleTap=(c)=>{
+    if(cycle&&cycle.id===c.id){
+      window.alert(`Ya tienes "${c.label}" activo (semana ${cycleProgress?cycleProgress.weekNum:1} de ${c.weeks}). Para reiniciar su semana 1, cambia primero a otro ciclo y luego vuelve a este.`);
+      return;
+    }
+    if(cycle){
+      const prevLabel=cycleProgress?cycleProgress.cycle.label:cycle.id;
+      const ok=window.confirm(`\u00bfCambiar de "${prevLabel}" a "${c.label}"?\n\nSe reiniciar\u00e1 el contador de semanas: empezar\u00e1s en la semana 1 de ${c.weeks}.`);
+      if(!ok) return;
+    }
+    onSetCycle(c.id);
+    window.alert(`\u2713 Ciclo activado: ${c.icon} ${c.label} \u2014 semana 1 de ${c.weeks}.\n\nTus macros en Dieta ya est\u00e1n ajustadas. Ver\u00e1s el contador de semana aqu\u00ed arriba y tambi\u00e9n en la pesta\u00f1a Entreno.`);
+  };
   const [pushStatus,setPushStatus]=useState('checking');
   useEffect(()=>{
     if(!('serviceWorker' in navigator)||!('PushManager' in window)){ setPushStatus('unsupported'); return; }
@@ -1544,7 +1557,7 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
               )}
               <div style={{fontSize:11,color:"#666",marginBottom:10}}>{cycle?"Cambiar de ciclo":"Elige tu ciclo actual"}:</div>
               {Object.values(CYCLES).map(c=>(
-                <div key={c.id} onClick={()=>onSetCycle(c.id)} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",borderRadius:8,marginBottom:6,cursor:"pointer",background:cycle?.id===c.id?"rgba(200,170,80,0.08)":"transparent",border:`1px solid ${cycle?.id===c.id?p.color:"#1a1a1a"}`}}>
+                <div key={c.id} onClick={()=>handleCycleTap(c)} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",borderRadius:8,marginBottom:6,cursor:"pointer",background:cycle?.id===c.id?"rgba(200,170,80,0.08)":"transparent",border:`1px solid ${cycle?.id===c.id?p.color:"#1a1a1a"}`}}>
                   <div style={{fontSize:18}}>{c.icon}</div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:12,fontWeight:600,color:cycle?.id===c.id?p.color:"#ccc"}}>{c.label}</div>
