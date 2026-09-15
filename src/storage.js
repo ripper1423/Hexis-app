@@ -18,6 +18,7 @@ const STORAGE_KEYS = {
   STEPS_LOG:  'hexis_steps_log',   // [ { date, steps } ] — NEAT diario
   SLEEP_LOG:  'hexis_sleep_log',   // [ { date, hours } ] — sueño diario
   CYCLE:      'hexis_cycle',       // { id, startDate } — ciclo activo (Arquitectura de Dominio)
+  FASE1_START: 'hexis_fase1_start', // 'YYYY-MM-DD' — inicio real de Fase 1 · Fundamentos (12 semanas, ver src/fase1.js)
   MIRROR_LOG: 'hexis_mirror_log',  // [ { date, note, score, label } ] — Espejo de Coherencia
   FOOD_LOG:   'hexis_food_log',    // [ { id, date, category, name, kcal, prot, carbs, fat, qty, source } ] — registro real diario de alimentos
   MEASURE_LOG: 'hexis_measure_log', // [ { date, type, value } ] — medidas corporales (cintura, pecho, brazo, muslo, cadera) en cm
@@ -158,6 +159,28 @@ export function loadCycle() {
 }
 export function clearCycle() {
   localStorage.removeItem(STORAGE_KEYS.CYCLE);
+}
+
+// Fecha de inicio de Fase 1 · Fundamentos (12 semanas, ver src/fase1.js).
+// Se fija una sola vez: si el usuario ya tenía historial de hábitos antes
+// de este cambio, se ancla a su día real más antiguo registrado (no a
+// 'hoy'), para no reiniciar el conteo de quien ya llevaba tiempo en HEXIS.
+export function ensureFase1Start() {
+  const existing = localStorage.getItem(STORAGE_KEYS.FASE1_START);
+  if (existing) return existing;
+  let earliest = null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.HABIT_LOG);
+    const log = raw ? JSON.parse(raw) : {};
+    const dates = Object.keys(log).filter(k => log[k]).sort();
+    if (dates.length) earliest = dates[0];
+  } catch (e) {}
+  const start = earliest || today();
+  localStorage.setItem(STORAGE_KEYS.FASE1_START, start);
+  return start;
+}
+export function loadFase1Start() {
+  return localStorage.getItem(STORAGE_KEYS.FASE1_START);
 }
 
 // ── ESPEJO DE COHERENCIA — cierre diario opcional ───────────────────
