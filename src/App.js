@@ -26,6 +26,35 @@ import { analyzePhotoRemote } from './api';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
 import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
 
+// ── CAPA DE CONOCIMIENTO CONTEXTUAL (Entreno) ───────────────────────
+// Contenido real por grupo muscular (de los 14 valores reales usados en
+// WORKOUTS), enlazado a HEXISPEDIA. Si un ejercicio usa un valor de
+// `muscle` no listado aqui, el panel simplemente no se muestra (nada
+// simulado / sin placeholders inventados).
+const MUSCLE_CONTEXT = {
+  "Pecho":{icon:"🫀",que:"Empuje horizontal — pectoral mayor, con ayuda de deltoides anterior y tríceps.",rec:"48–72h antes de volver a entrenarlo con la misma intensidad: es la ventana típica de resíntesis proteica tras el daño muscular.",nut:"Reparte la proteína en 3–4 tomas de 25–40g en vez de concentrarla en una sola comida post-entreno.",supp:["Proteína Whey","Creatina monohidrato"],suppIds:["HEX-0002","HEX-0001"],hex:"HEX-FIT-09"},
+  "Hombros":{icon:"💪",que:"Empuje vertical y estabilización — deltoides anterior/medio/posterior y manguito rotador.",rec:"Grupo pequeño y muy solicitado (también en pecho y espalda): vigila el volumen semanal total para no sobreentrenarlo.",nut:"Omega-3 ayuda a controlar la inflamación articular en hombros muy castigados.",supp:["Omega-3 (EPA/DHA)"],suppIds:["HEX-0007"],hex:"HEX-FIT-22"},
+  "Tríceps":{icon:"💪",que:"Extensión de codo — las tres cabezas del tríceps braquial, motor secundario en todo empuje.",rec:"Ya trabaja indirectamente en press de pecho y hombro — cuenta ese volumen extra al planificar la semana.",nut:"Proteína suficiente en las horas posteriores al entreno para maximizar la síntesis.",supp:["Proteína Whey"],suppIds:["HEX-0002"],hex:"HEX-FIT-09"},
+  "Espalda":{icon:"🔙",que:"Tracción — dorsal ancho, romboides y trapecio medio. Equilibra el empuje de pecho y hombro.",rec:"48–72h de descanso. Si notas dolor lumbar al tirar, revisa la técnica antes de subir carga.",nut:"El hierro (carne roja, legumbres) es clave para el transporte de oxígeno en trabajo de tracción de alto volumen.",supp:["Creatina monohidrato"],suppIds:["HEX-0001"],hex:"HEX-FIT-09"},
+  "Bíceps":{icon:"💪",que:"Flexión de codo — bíceps braquial y braquial anterior, motor secundario en toda tracción.",rec:"Grupo pequeño, se recupera en 24–48h salvo que hayas entrenado espalda el día anterior.",nut:"No necesita nutrición especial más allá de cubrir tu proteína diaria total.",supp:["Proteína Whey"],suppIds:["HEX-0002"],hex:"HEX-FIT-09"},
+  "Cuádriceps":{icon:"🦵",que:"Extensión de rodilla — el grupo muscular más grande del tren inferior, motor principal en sentadillas y prensa.",rec:"48–72h: entre los grupos que más fatiga sistémica generan. El DOMS de pierna suele ser el más intenso.",nut:"Carbohidratos antes del entreno de pierna: es el grupo con mayor gasto de glucógeno de toda la sesión.",supp:["Creatina monohidrato"],suppIds:["HEX-0001"],hex:"HEX-ALI-12"},
+  "Isquios":{icon:"🦵",que:"Flexión de rodilla y extensión de cadera — isquiotibiales, clave en peso muerto y curl femoral.",rec:"Muy propensos a sobrecarga si el peso sube rápido. 48–72h de descanso mínimo.",nut:"Magnesio para la función muscular — los isquios son un grupo frecuente de calambres nocturnos en deportistas.",supp:["Magnesio"],suppIds:["HEX-0006"],hex:"HEX-ALI-12"},
+  "Glúteo":{icon:"🍑",que:"Extensión de cadera — el motor de mayor potencia del cuerpo humano en sentadilla, hip thrust y peso muerto.",rec:"48–72h. Es un grupo grande: dale el mismo respeto de recuperación que a cuádriceps.",nut:"Igual que cuádriceps: carbohidratos pre-entreno para sostener el volumen de trabajo.",supp:["Creatina monohidrato"],suppIds:["HEX-0001"],hex:"HEX-ALI-12"},
+  "Gemelos":{icon:"🦵",que:"Flexión plantar — gastrocnemio y sóleo. Grupo de alta resistencia a la fatiga, tolera más frecuencia.",rec:"24–48h — se recuperan más rápido que el resto de la pierna por su alto % de fibra lenta.",nut:"Electrolitos si entrenas gemelo con mucho volumen y sudoración alta (zona propensa a calambres).",supp:["Magnesio"],suppIds:["HEX-0006"],hex:"HEX-ALI-12"},
+  "Gemelo":{icon:"🦵",que:"Flexión plantar — gastrocnemio y sóleo. Grupo de alta resistencia a la fatiga, tolera más frecuencia.",rec:"24–48h — se recuperan más rápido que el resto de la pierna por su alto % de fibra lenta.",nut:"Electrolitos si entrenas gemelo con mucho volumen y sudoración alta (zona propensa a calambres).",supp:["Magnesio"],suppIds:["HEX-0006"],hex:"HEX-ALI-12"},
+  "Pierna":{icon:"🦵",que:"Tren inferior en conjunto — cuádriceps, isquios, glúteo y gemelo trabajando de forma coordinada.",rec:"48–72h mínimo: es la sesión de mayor gasto energético y fatiga sistémica de la semana.",nut:"Carbohidratos antes y proteína después — es el día que más glucógeno vacía tu cuerpo.",supp:["Creatina monohidrato","Proteína Whey"],suppIds:["HEX-0001","HEX-0002"],hex:"HEX-ALI-12"},
+  "Core":{icon:"🎯",que:"Estabilización de tronco — recto abdominal, oblicuos y transverso. Sostiene la técnica en todos los demás ejercicios.",rec:"Alta tolerancia a la frecuencia — puedes entrenarlo casi a diario si no hay dolor.",nut:"Nada específico de suplementación — el foco aquí es la grasa corporal general si el objetivo es visibilidad, no solo fuerza del core.",supp:[],suppIds:[],hex:"HEX-SAL-06"},
+  "Movilidad":{icon:"🤸",que:"Rango articular activo — mejora la posición que puedes alcanzar con control, no solo el músculo en sí.",rec:"Se puede practicar a diario: no genera el mismo daño muscular que el entreno de fuerza.",nut:"Hidratación y magnesio ayudan a la calidad del tejido conectivo a largo plazo.",supp:["Magnesio"],suppIds:["HEX-0006"],hex:"HEX-FIT-21"},
+  "Espalda baja":{icon:"🔙",que:"Estabilización lumbar — erectores espinales, clave en peso muerto y sentadilla para mantener la columna neutra.",rec:"Zona sensible: si hay molestia, prioriza técnica y reduce carga antes de forzar el descanso.",nut:"Igual que espalda: proteína suficiente + hierro para el trabajo de tracción y bisagra de cadera.",supp:["Magnesio"],suppIds:["HEX-0006"],hex:"HEX-DES-19"},
+};
+function hxRepFocus(reps){
+  const n = parseInt(reps);
+  if(isNaN(n)) return "Trabajo técnico y de movilidad, no de carga máxima.";
+  if(n<=6) return reps+" reps — rango de fuerza/potencia: prioriza mover más peso con buena técnica.";
+  if(n<=12) return reps+" reps — rango de hipertrofia: el punto dulce para crecimiento muscular.";
+  return reps+" reps — rango de resistencia muscular: más control metabólico que carga máxima.";
+}
+
 // ── ACCESO DE PROPIETARIO (testing interno) ─────────────────────────
 // Visitar la app una vez con ?hexisOwner=<token> desbloquea HEXIS PRO
 // de forma permanente en ESE dispositivo/navegador (queda guardado en
@@ -2641,6 +2670,7 @@ export default function App(){
           {w.map(({name,sets,reps,weight,unit,muscle,rpe,lastWeek,rest,how},i)=>{
             const adaptive=isPro?getAdaptiveWeight(setLogs,name,weight,reps):{weight,source:'plan'};
             const suggested=adaptive.weight;
+            const mc=MUSCLE_CONTEXT[muscle];
             return(
             <div key={i} onClick={()=>{const next=expandEx===i?null:i;setExpandEx(next);if(next===null)setLoggingIdx(null);}} style={{background:"#0c0c0c",border:`1px solid ${expandEx===i?"rgba(200,170,80,0.3)":exercises[i]?"rgba(200,170,80,0.1)":"#1a1a1a"}`,borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer",opacity:exercises[i]&&expandEx!==i?0.5:1,transition:"all 0.2s"}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -2684,6 +2714,35 @@ export default function App(){
                     <div><div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Descanso</div><div style={{fontSize:12,color:"#aaa",fontWeight:600}}>{rest}</div></div>
                     <div><div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:2}}>Peso sugerido</div><div style={{fontSize:12,color:"#aaa",fontWeight:600}}>{suggested}{unit}{!isPro&&" (fijo)"}</div></div>
                   </div>
+                  {mc&&(
+                  <div style={{marginTop:2,marginBottom:12,paddingTop:12,borderTop:"1px solid #1a1a1a"}}>
+                    <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:6}}>{mc.icon} Qué trabaja</div>
+                    <div style={{fontSize:12,color:"#888",lineHeight:1.7,marginBottom:8}}>{mc.que}</div>
+                    <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:6}}>Por qué hoy</div>
+                    <div style={{fontSize:12,color:"#888",lineHeight:1.7,marginBottom:8}}>{hxRepFocus(reps)}</div>
+                    <div style={{display:"flex",gap:16,marginBottom:10,flexWrap:"wrap"}}>
+                      <div style={{flex:"1 1 45%",minWidth:120}}>
+                        <div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Recuperación</div>
+                        <div style={{fontSize:11,color:"#aaa",lineHeight:1.6}}>{mc.rec}</div>
+                      </div>
+                      <div style={{flex:"1 1 45%",minWidth:120}}>
+                        <div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:3}}>Nutrición</div>
+                        <div style={{fontSize:11,color:"#aaa",lineHeight:1.6}}>{mc.nut}</div>
+                      </div>
+                    </div>
+                    {mc.suppIds.length>0&&(
+                    <div style={{marginBottom:10}}>
+                      <div style={{fontSize:8,color:"#8a8a8a",textTransform:"uppercase",letterSpacing:1,marginBottom:5}}>Suplementación relacionada</div>
+                      <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                        {mc.suppIds.map((sid,si)=>(
+                          <a key={sid} href={"https://h3xis.com/hexispedia#"+sid} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:p.color,border:"1px solid "+p.color+"44",borderRadius:20,padding:"4px 10px",textDecoration:"none"}}>{mc.supp[si]} →</a>
+                        ))}
+                      </div>
+                    </div>
+                    )}
+                    <a href={"https://h3xis.com/hexispedia#"+mc.hex} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:G,textDecoration:"underline"}}>Profundizar en HEXISPEDIA →</a>
+                  </div>
+                  )}
                   {loggingIdx===i&&(
                     <div style={{background:"#080808",border:"1px solid #151515",borderRadius:10,padding:12}}>
                       <div style={{fontSize:11,letterSpacing:2,color:G,textTransform:"uppercase",marginBottom:8}}>Registra tu serie real</div>
