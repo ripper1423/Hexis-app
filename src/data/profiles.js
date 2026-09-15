@@ -9,6 +9,7 @@ export const PROFILES = {
     habitIcons:["🌙","🥩","👣","🏋️","💊"],
     manifesto:"Construyes tu cuerpo con la misma constancia con que los griegos esculpían el mármol. Sin prisa, sin pausa.",
     supps:[["Creatina","5g","Post-entreno con agua"],["Proteína Whey","30g","Inmediatamente post-entreno"],["Vitamina D3","2000 UI","Con desayuno y grasa"],["Omega 3","2g","Con la comida principal"]],
+    veg:{grams:600,raciones:"7",note:"Base ≥400g/día (OMS), escalado a tus ~2650 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Empuje · Pecho y Hombros",type:"train",done:true,split:"empuje"},
       {day:"M",focus:"Tirón · Espalda y Bíceps",type:"train",done:true,split:"tiron"},
@@ -29,6 +30,7 @@ export const PROFILES = {
     habitIcons:["💧","👣","⚖️","🏋️"],
     manifesto:"La definición no es ausencia. Es presencia. Tu cuerpo expresando quién eres con claridad y elegancia.",
     supps:[["Proteína Whey","25g","Post-entreno"],["Magnesio","300mg","Antes de dormir"],["Vitamina D3","2000 UI","Con desayuno"],["Colágeno","10g","Con vitamina C"]],
+    veg:{grams:400,raciones:"5",note:"Base ≥400g/día (OMS), escalado a tus ~1820 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Inferior · Glúteo y Pierna",type:"train",done:true,split:"inferior"},
       {day:"M",focus:"Superior · Pecho y Espalda",type:"train",done:true,split:"superior_pecho_espalda"},
@@ -49,6 +51,7 @@ export const PROFILES = {
     habitIcons:["🧘","👣","📵","🏋️"],
     manifesto:"El equilibrio no es inactividad. Es la fuerza que surge cuando cuerpo y mente dejan de luchar entre sí.",
     supps:[["Ashwagandha","600mg","Con la cena"],["Magnesio","300mg","Antes de dormir"],["Vitamina B12","1000mcg","Con el desayuno"],["L-Teanina","200mg","En momentos de estrés agudo"]],
+    veg:{grams:450,raciones:"5-6",note:"Base ≥400g/día (OMS), escalado a tus ~2100 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body suave",type:"train",done:true,split:"fullbody_suave"},
       {day:"M",focus:"Movilidad y stretching",type:"mobility",done:true},
@@ -69,6 +72,7 @@ export const PROFILES = {
     habitIcons:["⚖️","🏋️","📏","👣"],
     manifesto:"La recomposición no es magia. Es paciencia inteligente. El cuerpo cambia cuando el sistema es constante.",
     supps:[["Creatina","5g","Post-entreno"],["Proteína Whey","30g","Post-entreno"],["Cafeína","200mg","30 min pre-entreno"],["Vitamina D3","2000 UI","Con desayuno"]],
+    veg:{grams:400,raciones:"5",note:"Base ≥400g/día (OMS), escalado a tus ~1980 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body A · Fuerza",type:"train",done:true,split:"a_fuerza"},
       {day:"M",focus:"Cardio HIIT 20 min",type:"cardio",done:true},
@@ -89,6 +93,7 @@ export const PROFILES = {
     habitIcons:["⏱","👣","🗓","🏋️"],
     manifesto:"La estructura no te quita libertad. Te la da. Un sistema eficiente rinde más en menos tiempo que el caos con más horas.",
     supps:[["Creatina","5g","Cualquier momento del día"],["Proteína Whey","30g","Post-entreno o como comida rápida"],["Cafeína","150mg","30 min antes de entrenar"],["Vitamina D3","2000 UI","Con el desayuno"]],
+    veg:{grams:450,raciones:"5-6",note:"Base ≥400g/día (OMS), escalado a tus ~2000 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body A · Compuestos pesados",type:"train",done:true,split:"fullbody_a"},
       {day:"M",focus:"Descanso activo",type:"rest",done:true},
@@ -109,6 +114,7 @@ export const PROFILES = {
     habitIcons:["👣","🧘","🏋️","🌿"],
     manifesto:"La tierra no compite con nada. Solo sostiene. Tu cuerpo tampoco necesita compararse — necesita que lo escuches.",
     supps:[["Magnesio","300mg","Antes de dormir"],["Omega 3","2g","Con la comida principal"],["Vitamina D3","2000 UI","Con desayuno"],["Probiótico","1 cápsula","En ayunas"]],
+    veg:{grams:400,raciones:"5",note:"Base ≥400g/día (OMS), escalado a tus ~1950 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body suave A",type:"train",done:true,split:"fullbody_suave"},
       {day:"M",focus:"Caminar 30 min",type:"cardio",done:true},
@@ -129,6 +135,7 @@ export const PROFILES = {
     habitIcons:["📝","⏰","👣","🥩"],
     manifesto:"Estabilizarte no es rendirte. Es la base sobre la que se construye todo lo demás.",
     supps:[["Proteína Whey","30g","Como apoyo entre comidas"],["Vitamina D3","2000 UI","Con desayuno"],["Omega 3","2g","Con la comida principal"],["Multivitamínico","1 dosis","Con desayuno"]],
+    veg:{grams:500,raciones:"6",note:"Base ≥400g/día (OMS), escalado a tus ~2252 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body A · Base",type:"train",done:true,split:"fullbody_a"},
       {day:"M",focus:"Caminar 30 min",type:"cardio",done:true},
@@ -149,6 +156,7 @@ export const PROFILES = {
     habitIcons:["📝","⏰","👣","💧"],
     manifesto:"No compites con nadie. Solo con la versión de ti que picoteaba sin mirar.",
     supps:[["Proteína Whey","25g","Como apoyo entre comidas"],["Magnesio","300mg","Antes de dormir"],["Vitamina D3","2000 UI","Con desayuno"],["Omega 3","2g","Con la comida principal"]],
+    veg:{grams:450,raciones:"5-6",note:"Base ≥400g/día (OMS), escalado a tus ~2032 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Full Body A · Base",type:"train",done:true,split:"fullbody_a"},
       {day:"M",focus:"Caminar 30 min",type:"cardio",done:true},
@@ -189,6 +197,7 @@ export const PROFILES = {
     habitIcons:["🌙","⚖️","📊","🏋️"],
     manifesto:"Cada semana ajustas algo más. La definición final se construye mucho antes de la tarima.",
     supps:[["Proteína Whey","25g","Post-entreno"],["Creatina","5g","Cualquier momento del día"],["Vitamina D3","2000 UI","Con desayuno"],["Colágeno","10g","Con vitamina C"]],
+    veg:{grams:550,raciones:"6-7",note:"Base ≥400g/día (OMS), escalado a tus ~2582 kcal diarias."},
     weekPlan:[
       {day:"L",focus:"Empuje · Pecho y Hombros",type:"train",done:true,split:"empuje"},
       {day:"M",focus:"Tirón · Espalda y Bíceps",type:"train",done:false,split:"tiron"},
