@@ -661,6 +661,45 @@ export function exportAllData() {
   return { app: 'HEXIS', exportedAt: new Date().toISOString(), version: 1, data };
 }
 
+// ── FOTO DE PERFIL (avatar) ────────────────────────────────────────
+// Bucket publico 'avatars' en Supabase Storage: un archivo por usuario
+// (ruta {userId}/avatar.jpg, siempre se sobreescribe con upsert). La URL
+// publica tambien se guarda en user_profiles.avatar_url para poder
+// mostrarla al instante sin depender de listar el bucket.
+export async function uploadAvatarPhoto(userId, file) {
+  if (!userId || !file) return null;
+  try {
+    const path = `${userId}/avatar.jpg`;
+    const { error: upErr } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg', cacheControl: '3600' });
+    if (upErr) throw upErr;
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    const url = `${data.publicUrl}?v=${Date.now()}`;
+    await supabase.from('user_profiles').upsert({ id: userId, avatar_url: url }, { onConflict: 'id' });
+    return url;
+  } catch (e) {
+    console.warn('HEXIS cloud: no se pudo subir la foto de perfil', e.message);
+    return null;
+  }
+}
+
+export async function loadAvatarUrl(userId) {
+  if (!userId) return null;
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('avatar_url')
+      .eq('id', userId)
+      .single();
+    if (error) throw error;
+    return (data && data.avatar_url) || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+
 export function downloadDataBackup() {
   const backup = exportAllData();
   const json = JSON.stringify(backup, null, 2);
