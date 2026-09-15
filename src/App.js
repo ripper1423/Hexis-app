@@ -17,6 +17,7 @@ import {
   saveFoodLogEntry, loadFoodLog, removeFoodLogEntry,
   saveMeasurement, loadMeasurementLog,
   savePushSubscriptionToCloud, removePushSubscriptionFromCloud,
+  uploadAvatarPhoto, loadAvatarUrl,
 } from './storage';
 import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Category, weeklyCaloriesBurned, weeklySleep, volumeByMuscleGroup, weightTrend, computeHexisAge } from './adaptive';
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
@@ -1423,7 +1424,7 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
   );
 }
 
-function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId}){
+function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId,avatarUrl,onAvatarChange}){
   const cycleProgress=getCycleProgress(cycle);
   const [pushStatus,setPushStatus]=useState('checking');
   useEffect(()=>{
@@ -1443,6 +1444,43 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
       setPushStatus(ok?'on':'error');
     }catch(e){ console.warn('HEXIS push: fallo activando',e.message); setPushStatus('error'); }
   };
+  const [avatarBusy,setAvatarBusy]=useState(false);
+  const avatarInputRef=useRef(null);
+  const handleAvatarPick=async(e)=>{
+    const file=e.target.files&&e.target.files[0];
+    e.target.value="";
+    if(!file||!userId) return;
+    setAvatarBusy(true);
+    try{
+      const resizedBlob=await new Promise((resolve,reject)=>{
+        const img=new Image();
+        const reader=new FileReader();
+        reader.onload=()=>{
+          img.onload=()=>{
+            const size=480;
+            const canvas=document.createElement('canvas');
+            canvas.width=size; canvas.height=size;
+            const ctx=canvas.getContext('2d');
+            const scale=Math.max(size/img.width,size/img.height);
+            const w=img.width*scale, h=img.height*scale;
+            ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+            canvas.toBlob((blob)=>{ blob?resolve(blob):reject(new Error('no_blob')); },'image/jpeg',0.85);
+          };
+          img.onerror=()=>reject(new Error('img_error'));
+          img.src=reader.result;
+        };
+        reader.onerror=()=>reject(new Error('read_error'));
+        reader.readAsDataURL(file);
+      });
+      const url=await uploadAvatarPhoto(userId,resizedBlob);
+      if(url&&onAvatarChange) onAvatarChange(url);
+      else if(!url) window.alert('No se pudo subir la foto. Intentalo de nuevo.');
+    }catch(err){
+      window.alert('No se pudo procesar esa foto. Prueba con otra.');
+    }finally{
+      setAvatarBusy(false);
+    }
+  };
   const handleDisablePush=async()=>{
     setPushStatus('saving');
     try{
@@ -1460,6 +1498,13 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
           <div style={{fontSize:11,letterSpacing:4,color:G,textTransform:"uppercase"}}>Tu cuenta</div>
           <div style={{fontSize:16,fontWeight:700}}>Perfil y ajustes</div>
         </div>
+      </div>
+      <div style={{display:"flex",justifyContent:"center",padding:"20px 0 0"}}>
+        <div onClick={()=>avatarInputRef.current&&avatarInputRef.current.click()} style={{position:"relative",width:84,height:84,borderRadius:"50%",cursor:"pointer",background:avatarUrl?`center/cover no-repeat url(${avatarUrl})`:"#151515",border:"2px solid rgba(200,170,80,0.4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:34}}>
+          {!avatarUrl&&"👤"}
+          <div style={{position:"absolute",bottom:-2,right:-2,width:26,height:26,borderRadius:"50%",background:G,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,border:"2px solid #0a0a0a"}}>{avatarBusy?"…":"✎"}</div>
+        </div>
+        <input ref={avatarInputRef} type="file" accept="image/*" onChange={handleAvatarPick} style={{display:"none"}}/>
       </div>
       <div style={{padding:"20px"}}>
         <div style={{background:"#0d0d0d",border:`1px solid ${p.color}`,borderRadius:14,padding:"18px 16px",marginBottom:24}}>
@@ -2262,6 +2307,7 @@ export default function App(){
   const [plan,setPlan]=useState(()=>loadPlan());
   const [tab,setTab]=useState(()=>{try{const t=localStorage.getItem("hexis_tab");return (t==="inicio"||t==="tips")?"entreno":(t||"entreno");}catch(e){return "entreno";}}); useEffect(()=>{try{localStorage.setItem("hexis_tab",tab);}catch(e){}},[tab]);
   const [screen,setScreen]=useState(null); // "exdb" | "nutdb"
+  const [avatarUrl,setAvatarUrl]=useState(null);
   const [habits,setHabits]=useState(()=>{ const p=loadProfile(); return p&&PROFILES[p]?loadHabits(PROFILES[p].habits.length):[false,false,false,false]; });
   const [exercises,setExercises]=useState(()=>{ const p=loadProfile(); return p&&WORKOUTS[p]?loadExercises(getTodayWorkout(p).length):Array(5).fill(false); });
   const [water,setWater]=useState(()=>loadWater());
@@ -2299,6 +2345,7 @@ export default function App(){
     ensureCloudSession().then(async id=>{
       if(id){
         setUserId(id);
+        loadAvatarUrl(id).then(setAvatarUrl);
         const p=loadProfile();
         const ud=loadUserData();
         if(p&&ud){
@@ -2360,7 +2407,7 @@ export default function App(){
   if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="musculos"/>;
   if(screen==="atlas") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="grupos"/>;
   if(screen==="nutdb") return <NutritionDB onBack={()=>setScreen(null)}/>;
-  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} userId={userId} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
+  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} userId={userId} avatarUrl={avatarUrl} onAvatarChange={setAvatarUrl} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
     if(window.confirm('¿Reiniciar la aplicación desde el principio? Se borrará todo tu progreso guardado en este dispositivo.')){
       clearAll();setProfile(null);setPlan(null);setWeightLog([]);setStreakData({current:0,best:0});setHabits([false,false,false,false]);setExercises(Array(5).fill(false));setWater(0);setScreen(null);setCycle(null);
     }
@@ -2463,7 +2510,7 @@ export default function App(){
             <div style={{fontSize:28,fontWeight:900,letterSpacing:2,marginBottom:3}}>{profile}</div>
             <div style={{fontSize:11,color:"#666"}}>{p.sub} · {p.goal}</div>
           </Hero>
-          <div onClick={()=>setScreen("perfil")} title="Perfil y ajustes" style={{position:"absolute",top:16,right:16,zIndex:5,width:36,height:36,borderRadius:"50%",background:"rgba(5,5,5,0.55)",border:"1px solid rgba(200,170,80,0.35)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:15,color:G}}>👤</div>
+          <div onClick={()=>setScreen("perfil")} title="Perfil y ajustes" style={{position:"absolute",top:16,right:16,zIndex:5,width:36,height:36,borderRadius:"50%",background:avatarUrl?`center/cover no-repeat url(${avatarUrl}), rgba(5,5,5,0.55)`:"rgba(5,5,5,0.55)",border:"1px solid rgba(200,170,80,0.35)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:15,color:G}}>{!avatarUrl&&"👤"}</div>
         </div>
         <div style={{padding:"16px 16px 0"}}>
           <div style={{background:"rgba(200,170,80,0.06)",border:"1px solid rgba(200,170,80,0.15)",borderRadius:12,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:14}}>
