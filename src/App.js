@@ -26,7 +26,7 @@ import { CYCLES, applyCycleMacros, getCycleProgress } from './cycles';
 import { FASE1_TOTAL_WEEKS, getFase1Progress } from './fase1';
 import { analyzePhotoRemote } from './api';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
-import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
+import { FOODS, SUPPLEMENTS, SUPP_UNITS, MACRO_INFO } from './data/foods';
 
 // ── CAPA DE CONOCIMIENTO CONTEXTUAL (Entreno) ───────────────────────
 // Contenido real por grupo muscular (de los 14 valores reales usados en
@@ -328,6 +328,26 @@ function MacroGrid({cal,prot,carbs,fat,color}){
           <div style={{fontSize:8,letterSpacing:1,color:"#787878",textTransform:"uppercase",marginTop:2}}>{l}</div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function MacroPercentBar({prot,carbs,fat,color}){
+  const pk=prot*4,ck=carbs*4,fk=fat*9;
+  const tot=(pk+ck+fk)||1;
+  const pp=Math.round(pk/tot*100),cp=Math.round(ck/tot*100),fp=Math.max(0,100-pp-cp);
+  return(
+    <div style={{marginBottom:16}}>
+      <div style={{display:"flex",height:10,borderRadius:100,overflow:"hidden",marginBottom:8}}>
+        <div style={{width:`${pp}%`,background:color||G}}/>
+        <div style={{width:`${cp}%`,background:"#8a8a8a"}}/>
+        <div style={{width:`${fp}%`,background:"#4a4a4a"}}/>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"#8a8a8a"}}>
+        <span>🥩 Prot {pp}%</span>
+        <span>🍚 Carb {cp}%</span>
+        <span>🥑 Grasa {fp}%</span>
+      </div>
     </div>
   );
 }
@@ -2955,6 +2975,16 @@ export default function App(){
           <SLabel text="Macros objetivo"/>
           <MacroGrid cal={activeMacros.cal} prot={activeMacros.prot} carbs={activeMacros.carbs} fat={activeMacros.fat} color={p.color}/>
           {isPro&&cycle&&<div style={{fontSize:11,color:"#666",marginTop:-8,marginBottom:12}}>Ajustado por tu ciclo activo: {CYCLES[cycle.id]?.label}</div>}
+          <MacroPercentBar prot={activeMacros.prot} carbs={activeMacros.carbs} fat={activeMacros.fat} color={p.color}/>
+          {p.veg&&(
+            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:10,padding:"12px 14px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+              <div style={{fontSize:20}}>🥦</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:600,color:"#ddd"}}>Verdura: {p.veg.grams}g · {p.veg.raciones} raciones/día</div>
+                <div style={{fontSize:10,color:"#666",marginTop:2}}>{p.veg.note}</div>
+              </div>
+            </div>
+          )}
           <div style={{background:"#0c0c0c",border:"1px solid #111",borderRadius:10,padding:14,marginBottom:14}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
               <div style={{fontSize:12,color:"#666"}}>💧 Hidratación objetivo 2.5L</div>
@@ -2996,6 +3026,7 @@ export default function App(){
                   <div style={{fontSize:13,fontWeight:600,color:"#ddd"}}>{name}</div>
                   <div style={{fontSize:12,color:p.color,fontWeight:600}}>{dose}</div>
                 </div>
+                {SUPP_UNITS[name]&&<div style={{fontSize:10,color:"#666",marginTop:3}}>{SUPP_UNITS[name]}</div>}
                 {expandSupp===i&&<div style={{fontSize:11,color:"#666",marginTop:6}}>⏰ {timing}</div>}
               </div>
             ))}
