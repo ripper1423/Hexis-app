@@ -10,7 +10,7 @@ import {
   fetchSubscriptionTier, redeemProCode,
   saveSetLog, loadSetLogs, removeSetLog, saveVo2Test, loadVo2Log, logVo2ToCloud,
   saveGoalWeight, loadGoalWeight, saveSteps, loadStepsLog, saveSleep, loadSleepLog, logWellnessToCloud,
-  saveCycle, loadCycle, saveMirrorEntry, loadMirrorLog,
+  saveCycle, loadCycle, ensureFase1Start, saveMirrorEntry, loadMirrorLog,
   getAccountStatus, linkEmailToAccount, restoreAccountByEmail,
   fetchCloudProfile, fetchCloudHistory, restoreLocalLogs,
   uploadProgressPhoto, fetchProgressPhotos, deleteProgressPhoto,
@@ -23,6 +23,7 @@ import { getAdaptiveWeight, weeklyVolume, weeklyEffort, fatigueRatio, vo2Categor
 import { computeCoherenceScore, MIRROR_PROMPTS } from './coherence';
 import { getRecoveryStatus } from './recovery';
 import { CYCLES, applyCycleMacros, getCycleProgress } from './cycles';
+import { FASE1_STAGES, FASE1_TOTAL_WEEKS, getFase1Progress } from './fase1';
 import { analyzePhotoRemote } from './api';
 import { EXERCISES, MUSCLE_GROUPS } from './data/exercises';
 import { FOODS, SUPPLEMENTS, MACRO_INFO } from './data/foods';
@@ -1424,8 +1425,9 @@ function MetricsScreen({isPro,onUnlocked,onBack,setLogs,vo2Log,color,gender,age,
   );
 }
 
-function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId,avatarUrl,onAvatarChange}){
+function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycle,userId,avatarUrl,onAvatarChange,fase1Start}){
   const cycleProgress=getCycleProgress(cycle);
+  const fase1Progress=getFase1Progress(fase1Start);
   const handleCycleTap=(c)=>{
     if(cycle&&cycle.id===c.id){
       window.alert(`Ya tienes "${c.label}" activo (semana ${cycleProgress?cycleProgress.weekNum:1} de ${c.weeks}). Para reiniciar su semana 1, cambia primero a otro ciclo y luego vuelve a este.`);
@@ -1539,6 +1541,24 @@ function PerfilScreen({profile,p,isPro,onUnlocked,onBack,onReset,cycle,onSetCycl
         </div>
 
         <AccountLinkCard/>
+
+        {fase1Progress&&(
+          <>
+            <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Fase 1 · Fundamentos</div>
+            <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <div style={{fontSize:12,fontWeight:700,color:p.color}}>Bloque {fase1Progress.stage.block} · {fase1Progress.stage.blockName}</div>
+                <div style={{fontSize:11,color:"#8a8a8a"}}>Semana {fase1Progress.weekNum}/12</div>
+              </div>
+              <div style={{height:6,background:"#1a1a1a",borderRadius:100,overflow:"hidden",marginBottom:8}}>
+                <div style={{height:"100%",width:`${fase1Progress.pct}%`,background:p.color,borderRadius:100}}/>
+              </div>
+              <div style={{fontSize:12,fontWeight:600,color:"#ccc",marginBottom:4}}>S{fase1Progress.stage.week} {fase1Progress.stage.name}</div>
+              <div style={{fontSize:12,color:"#aaa",lineHeight:1.6}}>{fase1Progress.stage.focus}</div>
+              {fase1Progress.done&&<div style={{fontSize:11,color:G,marginTop:8}}>✦ Fase 1 completada. {isPro?"Sigue profundizando con tus Ciclos, abajo.":"HEXIS PRO añade Ciclos (Hipertrofia, Definición, Fuerza...) para seguir progresando con objetivos concretos."}</div>}
+            </div>
+          </>
+        )}
 
         <div style={{fontSize:11,letterSpacing:3,color:"#8a8a8a",textTransform:"uppercase",marginBottom:10}}>Ciclo de entrenamiento</div>
         <div style={{background:"#0c0c0c",border:"1px solid #1a1a1a",borderRadius:12,padding:"14px 16px",marginBottom:24}}>
@@ -2345,6 +2365,7 @@ export default function App(){
   const [sleepLog,setSleepLog]=useState(()=>loadSleepLog());
   const [goalWeight,setGoalWeight]=useState(()=>loadGoalWeight());
   const [cycle,setCycle]=useState(()=>loadCycle());
+  const [fase1Start]=useState(()=>ensureFase1Start());
   const [mirrorLog,setMirrorLog]=useState(()=>loadMirrorLog());
   const [measureLog,setMeasureLog]=useState(()=>loadMeasurementLog());
 
@@ -2420,7 +2441,7 @@ export default function App(){
   if(screen==="exdb") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="musculos"/>;
   if(screen==="atlas") return <ExerciseDB onBack={()=>setScreen(null)} initialTab="grupos"/>;
   if(screen==="nutdb") return <NutritionDB onBack={()=>setScreen(null)}/>;
-  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} cycle={cycle} userId={userId} avatarUrl={avatarUrl} onAvatarChange={setAvatarUrl} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
+  if(screen==="perfil") return <PerfilScreen profile={profile} p={PROFILES[profile]} isPro={isPro} onUnlocked={()=>setIsPro(true)} onBack={()=>setScreen(null)} fase1Start={fase1Start} cycle={cycle} userId={userId} avatarUrl={avatarUrl} onAvatarChange={setAvatarUrl} onSetCycle={(id)=>{const c=saveCycle(id);setCycle(c);}} onReset={()=>{
     if(window.confirm('¿Reiniciar la aplicación desde el principio? Se borrará todo tu progreso guardado en este dispositivo.')){
       clearAll();setProfile(null);setPlan(null);setWeightLog([]);setStreakData({current:0,best:0});setHabits([false,false,false,false]);setExercises(Array(5).fill(false));setWater(0);setScreen(null);setCycle(null);
     }
@@ -2508,6 +2529,7 @@ export default function App(){
   const baseMacros={cal:plan?.cal||p.cal, prot:plan?.prot||p.prot, carbs:plan?.carbs||p.carbs, fat:plan?.fat||p.fat};
   const activeMacros=(isPro&&cycle&&CYCLES[cycle.id])?applyCycleMacros(baseMacros,cycle.id):baseMacros;
   const cycleProgress=isPro?getCycleProgress(cycle):null;
+  const fase1Progress=getFase1Progress(fase1Start);
 
   const scr={paddingBottom:90,overflowY:"auto",minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
   const root={maxWidth:430,minHeight:"100vh",background:BG,margin:"0 auto",fontFamily:"Poppins,sans-serif",color:"#fff",position:"relative",overflow:"hidden"};
@@ -2519,7 +2541,7 @@ export default function App(){
       <div style={scr}>
         <div style={{position:"relative"}}>
           <Hero img="/estatuas/columnas_1.jpg" imgPos="center 35%" h={240}>
-            <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}</div>
+            <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/12`:""}</div>
             <div style={{fontSize:28,fontWeight:900,letterSpacing:2,marginBottom:3}}>{profile}</div>
             <div style={{fontSize:11,color:"#666"}}>{p.sub} · {p.goal}</div>
           </Hero>
@@ -2715,7 +2737,7 @@ export default function App(){
     {tab==="entreno"&&(
       <div style={scr}>
         <Hero img="/estatuas/columnas_2.jpg" imgPos="center 40%" h={200}>
-          <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}</div>
+          <div style={{fontSize:11,letterSpacing:4,color:p.color,textTransform:"uppercase",marginBottom:4}}>{p.phase}{fase1Progress?` · Semana ${fase1Progress.weekNum}/12`:""}</div>
           <div style={{fontSize:18,fontWeight:700,marginBottom:2}}>{profile} · Sesión de hoy</div>
           <div style={{fontSize:11,color:"#555"}}>{w.length} ejercicios · {p.days} días/semana</div>
         </Hero>
