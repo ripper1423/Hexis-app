@@ -222,10 +222,10 @@ const FIGS={
   SHAPE:()=><ArchImg src="/estatuas/arquetipo_shape.png" pos="100% 0%"/>,
   ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.png" pos="100% 0%"/>,
   GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.png" pos="100% 0%"/>,
-  HÉRCULES:()=><ArchImg src="/estatuas/estatua_masculina_hercules_v2.jpg" pos="100% 0%"/>,
-  ATLAS:()=><ArchImg src="/estatuas/arquetipo_alpha_v2.png" pos="100% 0%"/>,
-  ATALANTA:()=><ArchImg src="/estatuas/estatua_femenina_busto.jpg" pos="100% 0%"/>,
-  ARTEMISA:()=><ArchImg src="/estatuas/estatua_femenina_justicia.jpg" pos="100% 0%"/>,
+  HÉRCULES:()=><ArchImg src="/estatuas/estatua_hercules_v3.jpg" pos="100% 0%"/>,
+  ATLAS:()=><ArchImg src="/estatuas/estatua_atlas.jpg" pos="100% 0%"/>,
+  ATALANTA:()=><ArchImg src="/estatuas/estatua_atalanta.jpg" pos="100% 0%"/>,
+  ARTEMISA:()=><ArchImg src="/estatuas/estatua_artemisa.png" pos="100% 0%"/>,
 };
 
 // ── UI COMPONENTS ────────────────────────────────────────────────
