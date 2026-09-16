@@ -151,8 +151,8 @@ const levelColor = {Principiante:"#8BA4A0",Intermedio:"#C8AA50",Avanzado:"#D4C5A
 const sectionColor = {proteina:"#C8AA50",carbohidratos:"#A09060",verduras:"#5a7a5a",grasas:"#8BA4A0"};
 const sectionLabel = {proteina:"Proteína",carbohidratos:"Carbohidratos",verduras:"Verduras",grasas:"Grasas"};
 
-const MALE_PROFILES=["ALPHA","SHAPE","ZEN","HÉRCULES"];
-const FEMALE_PROFILES=["HERA","ATENEA","GAIA"];
+const MALE_PROFILES=["ALPHA","SHAPE","ZEN","HÉRCULES","ATLAS"];
+const FEMALE_PROFILES=["HERA","ATENEA","GAIA","ATALANTA","ARTEMISA"];
 
 function detect(f,o,gender){
   const allowed=gender==="female"?FEMALE_PROFILES:MALE_PROFILES;
@@ -223,6 +223,9 @@ const FIGS={
   ATENEA:()=><ArchImg src="/estatuas/arquetipo_atenea.png" pos="100% 0%"/>,
   GAIA:()=><ArchImg src="/estatuas/arquetipo_gaia.png" pos="100% 0%"/>,
   HÉRCULES:()=><ArchImg src="/estatuas/estatua_masculina_hercules_v2.jpg" pos="100% 0%"/>,
+  ATLAS:()=><ArchImg src="/estatuas/arquetipo_alpha_v2.png" pos="100% 0%"/>,
+  ATALANTA:()=><ArchImg src="/estatuas/estatua_femenina_busto.jpg" pos="100% 0%"/>,
+  ARTEMISA:()=><ArchImg src="/estatuas/estatua_femenina_justicia.jpg" pos="100% 0%"/>,
 };
 
 // ── UI COMPONENTS ────────────────────────────────────────────────
@@ -2162,7 +2165,7 @@ function Onboarding({onDone}){
   const next=()=>{if(step===3){setDp(detect(feelings,obstacles,fd.gender));}setStep(s=>s+1);};
   const ok=fd.name&&fd.age&&fd.weight&&fd.height&&fd.activity&&fd.email&&fd.email.includes("@");
   const pc=dp?PROFILES[dp].color:G;
-  const DFig=dp?FIGS[dp]:FigW;
+  const DFig=dp?(FIGS[dp]||FIGS.ALPHA):FigW;
   const pct=[0,10,22,35,48,60,72,86,100][step]||0;
   const scr={minHeight:"100vh",background:BG,fontFamily:"Poppins,sans-serif",color:"#fff"};
 
